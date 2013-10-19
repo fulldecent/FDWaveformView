@@ -10,15 +10,6 @@
 // AND http://stackoverflow.com/questions/8298610/waveform-on-ios
 // DO SEE http://stackoverflow.com/questions/1191868/uiimageview-scaling-interpolation
 // see http://stackoverflow.com/questions/3514066/how-to-tint-a-transparent-png-image-in-iphone
-/*
- UIImage * toImage = [UIImage imageNamed:@"myname.png"];
- [UIView transitionWithView:self.view
- duration:5.0f
- options:UIViewAnimationOptionTransitionCrossDissolve
- animations:^{
- self.imageView.image = toImage;
- } completion:nil];
- */
 
 #import "FDWaveFormView.h"
 #import <UIKit/UIKit.h>
@@ -52,12 +43,15 @@
 {
     _audioURL = audioURL;
     self.asset = [AVURLAsset URLAssetWithURL:audioURL options:nil];
-    self.totalSamples = (unsigned long int) self.asset.duration.value; // IS THIS RIGHT?
+    self.image.image = nil;
+    self.highlightedImage.image = nil;
+    self.totalSamples = (unsigned long int) self.asset.duration.value;
     _progressSamples = 0; // skip setter
     [self setNeedsDisplay];
 }
 
-- (void)initialize{
+- (void)initialize
+{
     self.image = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
     self.highlightedImage = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
     self.image.contentMode = UIViewContentModeScaleToFill;
@@ -67,22 +61,19 @@
     [self.clipping addSubview:self.highlightedImage];
     self.clipping.clipsToBounds = YES;
     [self addSubview:self.clipping];
-//    self.backgroundColor = [UIColor lightGrayColor];
 }
 
 - (id)initWithCoder:(NSCoder *)aCoder
 {
-    if (self = [super initWithCoder:aCoder]){
+    if (self = [super initWithCoder:aCoder])
         [self initialize];
-    }
     return self;
 }
 
 - (id)initWithFrame:(CGRect)rect
 {
-    if (self = [super initWithFrame:rect]){
+    if (self = [super initWithFrame:rect])
         [self initialize];
-    }
     return self;
 }
 
@@ -104,8 +95,7 @@
 
     CGFloat widthInPixels = self.frame.size.width * [UIScreen mainScreen].scale * minimumOverDraw;
     CGFloat heightInPixels = self.frame.size.height * [UIScreen mainScreen].scale;
-    if (widthInPixels > self.image.image.size.width ||
-        heightInPixels > self.image.image.size.height) {
+    if (self.asset && (widthInPixels > self.image.image.size.width || heightInPixels > self.image.image.size.height)) {
         NSLog(@"FDWaveformView: need W= %f and have W=%f", widthInPixels, self.image.image.size.width);
         NSLog(@"FDWaveformView: need H= %f and have H=%f", heightInPixels, self.image.image.size.height);
         [self renderPNGAudioPictogramLogForAsset:self.asset
