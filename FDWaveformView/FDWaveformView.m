@@ -88,7 +88,7 @@
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    float progress = (float)self.progressSamples / self.totalSamples;
+    float progress = self.totalSamples ? (float)self.progressSamples / self.totalSamples : 0;
     self.clipping.frame = CGRectMake(0,0,self.frame.size.width*progress,self.frame.size.height);
     self.image.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
     self.highlightedImage.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
