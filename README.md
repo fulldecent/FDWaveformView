@@ -17,3 +17,4 @@ Status:
 
   * Used in production code
   * Works good for smaller audio files (<30 seconds)
+  * Need to make a Podspec and clean up project to Pod's recommended style
