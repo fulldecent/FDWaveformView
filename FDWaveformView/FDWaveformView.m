@@ -105,15 +105,18 @@
 {
     [super layoutSubviews];
     float progress = self.totalSamples ? (float)self.progressSamples / self.totalSamples : 0;
-    self.clipping.frame = CGRectMake(0,0,self.frame.size.width*progress,self.frame.size.height);
     self.image.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
     self.highlightedImage.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
+    self.clipping.frame = CGRectMake(0,0,self.frame.size.width*progress,self.frame.size.height);
 
-    CGFloat widthInPixels = self.frame.size.width * [UIScreen mainScreen].scale * minimumOverDraw;
-    CGFloat heightInPixels = self.frame.size.height * [UIScreen mainScreen].scale;
-    if (self.asset && (widthInPixels > self.image.image.size.width || heightInPixels > self.image.image.size.height)) {
-        NSLog(@"FDWaveformView: need W= %f and have W=%f", widthInPixels, self.image.image.size.width);
-        NSLog(@"FDWaveformView: need H= %f and have H=%f", heightInPixels, self.image.image.size.height);
+    CGFloat neededWidthInPixels = self.frame.size.width * [UIScreen mainScreen].scale * minimumOverDraw;
+    CGFloat neededHeightInPixels = self.frame.size.height * [UIScreen mainScreen].scale;
+    if (self.asset && (neededWidthInPixels > self.image.image.size.width || neededHeightInPixels > self.image.image.size.height)) {
+        NSLog(@"FDWaveformView: rendering, need %d x %d, have %d x %d",
+              (int)neededWidthInPixels,
+              (int)neededHeightInPixels,
+              (int)self.image.image.size.width,
+              (int)self.image.image.size.height);
         [self renderPNGAudioPictogramLogForAsset:self.asset
                                             done:^(UIImage *image, UIImage *selectedImage) {
                                                 self.image.image = image;
