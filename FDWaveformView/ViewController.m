@@ -22,6 +22,7 @@
     
     self.waveform.audioURL = url;
     self.waveform.progressSamples = 10000;
+    self.waveform.doesAllowScrubbing = YES;
 }
 
 - (void)doAnimation

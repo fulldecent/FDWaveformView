@@ -39,17 +39,6 @@
 @synthesize highlightedImage = _highlightedImage;
 @synthesize clipping = _clipping;
 
-- (void)setAudioURL:(NSURL *)audioURL
-{
-    _audioURL = audioURL;
-    self.asset = [AVURLAsset URLAssetWithURL:audioURL options:nil];
-    self.image.image = nil;
-    self.highlightedImage.image = nil;
-    self.totalSamples = (unsigned long int) self.asset.duration.value;
-    _progressSamples = 0; // skip setter
-    [self setNeedsDisplay];
-}
-
 - (void)initialize
 {
     self.image = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
@@ -77,12 +66,39 @@
     return self;
 }
 
+- (void)setAudioURL:(NSURL *)audioURL
+{
+    _audioURL = audioURL;
+    self.asset = [AVURLAsset URLAssetWithURL:audioURL options:nil];
+    self.image.image = nil;
+    self.highlightedImage.image = nil;
+    self.totalSamples = (unsigned long int) self.asset.duration.value;
+    _progressSamples = 0; // skip setter
+    [self setNeedsDisplay];
+}
+
 - (void)setProgressSamples:(unsigned long)progressSamples
 {
     _progressSamples = progressSamples;
     float progress = (float)self.progressSamples / self.totalSamples;
     self.clipping.frame = CGRectMake(0,0,self.frame.size.width*progress,self.frame.size.height);
     [self setNeedsLayout];
+}
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    if (!self.doesAllowScrubbing)
+        return;
+    UITouch *touch = [touches anyObject];
+    self.progressSamples = (float)self.totalSamples * [touch locationInView:self].x / self.bounds.size.width;
+}
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    if (!self.doesAllowScrubbing)
+        return;
+    UITouch *touch = [touches anyObject];
+    self.progressSamples = (float)self.totalSamples * [touch locationInView:self].x / self.bounds.size.width;
 }
 
 - (void)layoutSubviews
