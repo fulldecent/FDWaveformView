@@ -212,10 +212,10 @@
         if (sampleBufferRef) {
             CMBlockBufferRef blockBufferRef = CMSampleBufferGetDataBuffer(sampleBufferRef);
             size_t bufferLength = CMBlockBufferGetDataLength(blockBufferRef);
-            NSMutableData * data = [NSMutableData dataWithLength:bufferLength];
-            CMBlockBufferCopyDataBytes(blockBufferRef, 0, bufferLength, data.mutableBytes);
+            void *data = malloc(bufferLength);
+            CMBlockBufferCopyDataBytes(blockBufferRef, 0, bufferLength, data);
             
-            SInt16 *samples = (SInt16 *)data.mutableBytes;
+            SInt16 *samples = (SInt16 *)data;
             int sampleCount = bufferLength / bytesPerInputSample;
             for (int i=0; i<sampleCount; i++) {
                 Float32 sample = (Float32) *samples++;
@@ -237,6 +237,7 @@
             }
             CMSampleBufferInvalidate(sampleBufferRef);
             CFRelease(sampleBufferRef);
+            free(data);
         }
     }
     
