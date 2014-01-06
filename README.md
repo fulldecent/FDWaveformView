@@ -10,6 +10,7 @@ Features:
   * Supports animation
   * If stretch me, I will redraw to avoid pixelation
   * Supports iOS5+ and ARC
+  * If allowed, touching me can set progress to that point
 
 <img src="http://i.imgur.com/ZfSpUw3.png">
 
