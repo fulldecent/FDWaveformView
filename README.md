@@ -17,4 +17,5 @@ Features:
 Usage:
 
   * Add `pod 'FDWaveformView', '~> 0.1.0'` to your <a href="https://github.com/AFNetworking/AFNetworking/wiki/Getting-Started-with-AFNetworking">Podfile</a>
+  * The the API documentation under "Class Reference" at http://cocoadocs.org/docsets/FDWaveformView/
   * Add your project to "I USE THIS" at https://www.cocoacontrols.com/controls/fdwaveformview to keep more project updates coming
