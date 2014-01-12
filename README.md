@@ -12,10 +12,10 @@ Features:
   * Supports iOS5+ and ARC
   * If allowed, touching me can set progress to that point
 
-<img src="http://i.imgur.com/ZfSpUw3.png">
+<img src="http://i.imgur.com/zYORGao.png">
 
 Usage:
 
-  * Add `pod 'FDWaveformView', '~> 0.1.0'` to your <a href="https://github.com/AFNetworking/AFNetworking/wiki/Getting-Started-with-AFNetworking">Podfile</a>
+  * Add `pod 'FDWaveformView', '~> 0.1.2'` to your <a href="https://github.com/AFNetworking/AFNetworking/wiki/Getting-Started-with-AFNetworking">Podfile</a>
   * The the API documentation under "Class Reference" at http://cocoadocs.org/docsets/FDWaveformView/
   * Add your project to "I USE THIS" at https://www.cocoacontrols.com/controls/fdwaveformview to keep more project updates coming

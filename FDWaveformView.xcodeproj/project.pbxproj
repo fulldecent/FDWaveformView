@@ -13,28 +13,14 @@
 		D9FE1179180256830000F135 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D9FE1177180256830000F135 /* InfoPlist.strings */; };
 		D9FE117B180256830000F135 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D9FE117A180256830000F135 /* main.m */; };
 		D9FE117F180256830000F135 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D9FE117E180256830000F135 /* AppDelegate.m */; };
-		D9FE1182180256830000F135 /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D9FE1180180256830000F135 /* Main_iPhone.storyboard */; };
-		D9FE1185180256830000F135 /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D9FE1183180256830000F135 /* Main_iPad.storyboard */; };
+		D9FE1182180256830000F135 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D9FE1180180256830000F135 /* Main.storyboard */; };
 		D9FE1188180256830000F135 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9FE1187180256830000F135 /* ViewController.m */; };
 		D9FE118A180256830000F135 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D9FE1189180256830000F135 /* Images.xcassets */; };
-		D9FE1191180256840000F135 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9FE1190180256840000F135 /* XCTest.framework */; };
-		D9FE1192180256840000F135 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9FE116E180256830000F135 /* Foundation.framework */; };
-		D9FE1193180256840000F135 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9FE1172180256830000F135 /* UIKit.framework */; };
 		D9FE11A8180256940000F135 /* FDWaveformView.m in Sources */ = {isa = PBXBuildFile; fileRef = D9FE11A7180256940000F135 /* FDWaveformView.m */; };
 		D9FE11AA1802574D0000F135 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9FE11A91802574D0000F135 /* MediaPlayer.framework */; };
 		D9FE11AC180257560000F135 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9FE11AB180257560000F135 /* AVFoundation.framework */; };
 		D9FE11AE18025B1B0000F135 /* Submarine.aiff in Resources */ = {isa = PBXBuildFile; fileRef = D9FE11AD18025B1B0000F135 /* Submarine.aiff */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		D9FE1194180256840000F135 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D9FE1163180256830000F135 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = D9FE116A180256830000F135;
-			remoteInfo = test2;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		D9FE116B180256830000F135 /* FDWaveformView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FDWaveformView.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -47,12 +33,10 @@
 		D9FE117C180256830000F135 /* FDWaveformView-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FDWaveformView-Prefix.pch"; sourceTree = "<group>"; };
 		D9FE117D180256830000F135 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		D9FE117E180256830000F135 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		D9FE1181180256830000F135 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
-		D9FE1184180256830000F135 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPad.storyboard; sourceTree = "<group>"; };
+		D9FE1181180256830000F135 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		D9FE1186180256830000F135 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		D9FE1187180256830000F135 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		D9FE1189180256830000F135 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		D9FE118F180256840000F135 /* FDWaveformViewTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FDWaveformViewTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D9FE1190180256840000F135 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		D9FE11A6180256940000F135 /* FDWaveformView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FDWaveformView.h; sourceTree = "<group>"; };
 		D9FE11A7180256940000F135 /* FDWaveformView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FDWaveformView.m; sourceTree = "<group>"; };
@@ -74,16 +58,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		D9FE118C180256840000F135 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				D9FE1191180256840000F135 /* XCTest.framework in Frameworks */,
-				D9FE1193180256840000F135 /* UIKit.framework in Frameworks */,
-				D9FE1192180256840000F135 /* Foundation.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -100,7 +74,6 @@
 			isa = PBXGroup;
 			children = (
 				D9FE116B180256830000F135 /* FDWaveformView.app */,
-				D9FE118F180256840000F135 /* FDWaveformViewTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -125,8 +98,7 @@
 				D9FE11A7180256940000F135 /* FDWaveformView.m */,
 				D9FE117D180256830000F135 /* AppDelegate.h */,
 				D9FE117E180256830000F135 /* AppDelegate.m */,
-				D9FE1180180256830000F135 /* Main_iPhone.storyboard */,
-				D9FE1183180256830000F135 /* Main_iPad.storyboard */,
+				D9FE1180180256830000F135 /* Main.storyboard */,
 				D9FE1186180256830000F135 /* ViewController.h */,
 				D9FE1187180256830000F135 /* ViewController.m */,
 				D9FE11AD18025B1B0000F135 /* Submarine.aiff */,
@@ -167,24 +139,6 @@
 			productReference = D9FE116B180256830000F135 /* FDWaveformView.app */;
 			productType = "com.apple.product-type.application";
 		};
-		D9FE118E180256840000F135 /* FDWaveformViewTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = D9FE11A3180256840000F135 /* Build configuration list for PBXNativeTarget "FDWaveformViewTests" */;
-			buildPhases = (
-				D9FE118B180256840000F135 /* Sources */,
-				D9FE118C180256840000F135 /* Frameworks */,
-				D9FE118D180256840000F135 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				D9FE1195180256840000F135 /* PBXTargetDependency */,
-			);
-			name = FDWaveformViewTests;
-			productName = test2Tests;
-			productReference = D9FE118F180256840000F135 /* FDWaveformViewTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -193,11 +147,6 @@
 			attributes = {
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "William Entriken";
-				TargetAttributes = {
-					D9FE118E180256840000F135 = {
-						TestTargetID = D9FE116A180256830000F135;
-					};
-				};
 			};
 			buildConfigurationList = D9FE1166180256830000F135 /* Build configuration list for PBXProject "FDWaveformView" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -213,7 +162,6 @@
 			projectRoot = "";
 			targets = (
 				D9FE116A180256830000F135 /* FDWaveformView */,
-				D9FE118E180256840000F135 /* FDWaveformViewTests */,
 			);
 		};
 /* End PBXProject section */
@@ -224,17 +172,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				D9FE11AE18025B1B0000F135 /* Submarine.aiff in Resources */,
-				D9FE1185180256830000F135 /* Main_iPad.storyboard in Resources */,
 				D9FE118A180256830000F135 /* Images.xcassets in Resources */,
-				D9FE1182180256830000F135 /* Main_iPhone.storyboard in Resources */,
+				D9FE1182180256830000F135 /* Main.storyboard in Resources */,
 				D9FE1179180256830000F135 /* InfoPlist.strings in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D9FE118D180256840000F135 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -252,22 +192,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		D9FE118B180256840000F135 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		D9FE1195180256840000F135 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = D9FE116A180256830000F135 /* FDWaveformView */;
-			targetProxy = D9FE1194180256840000F135 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		D9FE1177180256830000F135 /* InfoPlist.strings */ = {
@@ -278,20 +203,12 @@
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
-		D9FE1180180256830000F135 /* Main_iPhone.storyboard */ = {
+		D9FE1180180256830000F135 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
 				D9FE1181180256830000F135 /* Base */,
 			);
-			name = Main_iPhone.storyboard;
-			sourceTree = "<group>";
-		};
-		D9FE1183180256830000F135 /* Main_iPad.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				D9FE1184180256830000F135 /* Base */,
-			);
-			name = Main_iPad.storyboard;
+			name = Main.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -397,48 +314,6 @@
 			};
 			name = Release;
 		};
-		D9FE11A4180256840000F135 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/test2.app/test2";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "test2/test2-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = "test2Tests/FDWaveformViewTests-Info.plist";
-				PRODUCT_NAME = FDWaveformViewTests;
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Debug;
-		};
-		D9FE11A5180256840000F135 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/test2.app/test2";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "test2/test2-Prefix.pch";
-				INFOPLIST_FILE = "test2Tests/FDWaveformViewTests-Info.plist";
-				PRODUCT_NAME = FDWaveformViewTests;
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -456,15 +331,6 @@
 			buildConfigurations = (
 				D9FE11A1180256840000F135 /* Debug */,
 				D9FE11A2180256840000F135 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		D9FE11A3180256840000F135 /* Build configuration list for PBXNativeTarget "FDWaveformViewTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				D9FE11A4180256840000F135 /* Debug */,
-				D9FE11A5180256840000F135 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
