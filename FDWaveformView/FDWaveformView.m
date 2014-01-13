@@ -135,7 +135,7 @@
 {
     // TODO: switch to a synchronous function that paints onto a given context
     CGSize imageSize = CGSizeMake(sampleCount, imageHeight);
-    UIGraphicsBeginImageContext(imageSize); // this is leaking memory?
+    UIGraphicsBeginImageContext(imageSize);
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGContextSetAlpha(context,1.0);
     CGContextSetLineWidth(context, 1.0);
@@ -154,9 +154,7 @@
     }
 
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsBeginImageContext(image.size);
     CGRect drawRect = CGRectMake(0, 0, image.size.width, image.size.height);
-    [image drawInRect:drawRect];
     [[UIColor blueColor] set];
     UIRectFillUsingBlendMode(drawRect, kCGBlendModeSourceAtop);
     UIImage *tintedImage = UIGraphicsGetImageFromCurrentImageContext();
