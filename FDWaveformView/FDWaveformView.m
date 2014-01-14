@@ -50,6 +50,9 @@
     [self.clipping addSubview:self.highlightedImage];
     self.clipping.clipsToBounds = YES;
     [self addSubview:self.clipping];
+    
+    self.wavesColor = [UIColor blackColor];
+    self.progressColor = [UIColor blueColor];
 }
 
 - (id)initWithCoder:(NSCoder *)aCoder
@@ -64,6 +67,18 @@
     if (self = [super initWithFrame:rect])
         [self initialize];
     return self;
+}
+
+- (void)dealloc
+{
+    self.delegate = nil;
+    self.audioURL = nil;
+    self.image = nil;
+    self.highlightedImage = nil;
+    self.clipping = nil;
+    self.asset = nil;
+    self.wavesColor = nil;
+    self.progressColor = nil;
 }
 
 - (void)setAudioURL:(NSURL *)audioURL
@@ -102,6 +117,12 @@
 - (void)layoutSubviews
 {
     [super layoutSubviews];
+    
+    if ([self.delegate respondsToSelector:@selector(waveformViewWillRender:)])
+    {
+        [self.delegate waveformViewWillRender:self];
+    }
+    
     float progress = self.totalSamples ? (float)self.progressSamples / self.totalSamples : 0;
     self.image.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
     self.highlightedImage.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
@@ -110,20 +131,23 @@
     CGFloat neededWidthInPixels = self.frame.size.width * [UIScreen mainScreen].scale * minimumOverDraw;
     CGFloat neededHeightInPixels = self.frame.size.height * [UIScreen mainScreen].scale;
     if (self.asset && (neededWidthInPixels > self.image.image.size.width || neededHeightInPixels > self.image.image.size.height)) {
-        NSLog(@"FDWaveformView: rendering, need %d x %d, have %d x %d",
-              (int)neededWidthInPixels,
-              (int)neededHeightInPixels,
-              (int)self.image.image.size.width,
-              (int)self.image.image.size.height);
-        [self renderPNGAudioPictogramLogForAsset:self.asset
-                                            done:^(UIImage *image, UIImage *selectedImage) {
-                                                self.image.image = image;
-                                                self.highlightedImage.image = selectedImage;
-                                            }];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+            [self renderPNGAudioPictogramLogForAsset:self.asset
+                                                done:^(UIImage *image, UIImage *selectedImage) {
+                                                    dispatch_async(dispatch_get_main_queue(), ^{
+                                                        self.image.image = image;
+                                                        self.highlightedImage.image = selectedImage;
+                                                        
+                                                        if ([self.delegate respondsToSelector:@selector(waveformViewDidRender:)])
+                                                        {
+                                                            [self.delegate waveformViewDidRender:self];
+                                                        }
+                                                    });
+                                                }];
+        });
     }
 }
 
-#define plotChannelOneColor [[UIColor blackColor] CGColor]
 - (void) plotLogGraph:(Float32 *) samples
              maximumValue:(Float32) normalizeMax
              mimimumValue:(Float32) normalizeMin
@@ -137,7 +161,7 @@
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGContextSetAlpha(context,1.0);
     CGContextSetLineWidth(context, 1.0);
-    CGContextSetStrokeColorWithColor(context, plotChannelOneColor);
+    CGContextSetStrokeColorWithColor(context, [self.wavesColor CGColor]);
     
     float halfGraphHeight = (imageHeight / 2);
     float centerLeft = halfGraphHeight;
@@ -153,11 +177,10 @@
 
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     CGRect drawRect = CGRectMake(0, 0, image.size.width, image.size.height);
-    [[UIColor blueColor] set];
+    [self.progressColor set];
     UIRectFillUsingBlendMode(drawRect, kCGBlendModeSourceAtop);
     UIImage *tintedImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
-    NSLog(@"FDWaveformView: done rendering PNG W=%f H=%f", image.size.width, image.size.height);
     done(image, tintedImage);
 }
 
@@ -240,7 +263,6 @@
     // if (reader.status == AVAssetReaderStatusFailed || reader.status == AVAssetReaderStatusUnknown)
         // Something went wrong. Handle it.
     if (reader.status == AVAssetReaderStatusCompleted){
-        NSLog(@"FDWaveformView: start rendering PNG W= %f", outSamples);
         [self plotLogGraph:(Float32 *)fullSongData.bytes
               maximumValue:maximum
               mimimumValue:noiseFloor

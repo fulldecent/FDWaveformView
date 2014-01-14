@@ -8,7 +8,7 @@
 
 #import "ViewController.h"
 
-@interface ViewController ()
+@interface ViewController () <FDWaveformViewDelegate>
 @end
 
 @implementation ViewController
@@ -20,6 +20,10 @@
     NSString *filePath = [thisBundle pathForResource:@"Submarine" ofType:@"aiff"];
     NSURL *url = [NSURL fileURLWithPath:filePath];
     
+    // We wish to animate the waveformv iew in when it is rendered
+    self.waveform.delegate = self;
+    self.waveform.alpha = 0.0f;
+    
     self.waveform.audioURL = url;
     self.waveform.progressSamples = 10000;
     self.waveform.doesAllowScrubbing = YES;
@@ -30,6 +34,16 @@
     [UIView animateWithDuration:0.3 animations:^{
         NSInteger randomNumber = arc4random() % self.waveform.totalSamples;
         self.waveform.progressSamples = randomNumber;
+    }];
+}
+
+#pragma mark -
+#pragma mark FDWaveformViewDelegate
+
+- (void)waveformViewDidRender:(FDWaveformView *)waveformView
+{
+    [UIView animateWithDuration:0.25f animations:^{
+        waveformView.alpha = 1.0f;
     }];
 }
 
