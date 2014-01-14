@@ -19,6 +19,8 @@
 @property (nonatomic, assign) unsigned long int startSamples; // does nothing right now (see #9)
 @property (nonatomic, assign) unsigned long int endSamples; // does nothing right now (see #9)
 @property (nonatomic) BOOL doesAllowScrubbing;
+@property (nonatomic, copy) UIColor *wavesColor;
+@property (nonatomic, copy) UIColor *progressColor;
 @end
 
 @protocol FDWaveformViewDelegate <NSObject>

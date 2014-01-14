@@ -50,6 +50,9 @@
     [self.clipping addSubview:self.highlightedImage];
     self.clipping.clipsToBounds = YES;
     [self addSubview:self.clipping];
+    
+    self.wavesColor = [UIColor blackColor];
+    self.progressColor = [UIColor blueColor];
 }
 
 - (id)initWithCoder:(NSCoder *)aCoder
@@ -74,6 +77,8 @@
     self.highlightedImage = nil;
     self.clipping = nil;
     self.asset = nil;
+    self.wavesColor = nil;
+    self.progressColor = nil;
 }
 
 - (void)setAudioURL:(NSURL *)audioURL
@@ -143,7 +148,6 @@
     }
 }
 
-#define plotChannelOneColor [[UIColor blackColor] CGColor]
 - (void) plotLogGraph:(Float32 *) samples
              maximumValue:(Float32) normalizeMax
              mimimumValue:(Float32) normalizeMin
@@ -157,7 +161,7 @@
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGContextSetAlpha(context,1.0);
     CGContextSetLineWidth(context, 1.0);
-    CGContextSetStrokeColorWithColor(context, plotChannelOneColor);
+    CGContextSetStrokeColorWithColor(context, [self.wavesColor CGColor]);
     
     float halfGraphHeight = (imageHeight / 2);
     float centerLeft = halfGraphHeight;
@@ -173,7 +177,7 @@
 
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     CGRect drawRect = CGRectMake(0, 0, image.size.width, image.size.height);
-    [[UIColor blueColor] set];
+    [self.progressColor set];
     UIRectFillUsingBlendMode(drawRect, kCGBlendModeSourceAtop);
     UIImage *tintedImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
