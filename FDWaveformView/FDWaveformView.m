@@ -73,7 +73,9 @@
     self.image.image = nil;
     self.highlightedImage.image = nil;
     self.totalSamples = (unsigned long int) self.asset.duration.value;
-    _progressSamples = 0; // skip setter
+    _progressSamples = 0; // skip custom setter
+    _startSamples = 0; // skip custom setter
+    _endSamples = (unsigned long int) self.asset.duration.value; // skip custom setter
     [self setNeedsDisplay];
 }
 
@@ -85,20 +87,16 @@
     [self setNeedsLayout];
 }
 
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+- (void)setStartSamples:(unsigned long)startSamples
 {
-    if (!self.doesAllowScrubbing)
-        return;
-    UITouch *touch = [touches anyObject];
-    self.progressSamples = (float)self.totalSamples * [touch locationInView:self].x / self.bounds.size.width;
+    _startSamples = startSamples;
+    [self setNeedsLayout];
 }
 
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+- (void)setEndSamples:(unsigned long)endSamples
 {
-    if (!self.doesAllowScrubbing)
-        return;
-    UITouch *touch = [touches anyObject];
-    self.progressSamples = (float)self.totalSamples * [touch locationInView:self].x / self.bounds.size.width;
+    _endSamples = endSamples;
+    [self setNeedsLayout];
 }
 
 - (void)layoutSubviews
@@ -133,9 +131,9 @@
               imageHeight:(float) imageHeight
                      done:(void(^)(UIImage *image, UIImage *selectedImage))done
 {
-    // TODO: switch to a synchronous function that paints onto a given context
+    // TODO: switch to a synchronous function that paints onto a given context? (for issue #2)
     CGSize imageSize = CGSizeMake(sampleCount, imageHeight);
-    UIGraphicsBeginImageContext(imageSize); // this is leaking memory?
+    UIGraphicsBeginImageContext(imageSize);
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGContextSetAlpha(context,1.0);
     CGContextSetLineWidth(context, 1.0);
@@ -254,6 +252,22 @@
     }
 }
 
+#pragma mark - Interaction
 
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    if (!self.doesAllowScrubbing)
+        return;
+    UITouch *touch = [touches anyObject];
+    self.progressSamples = (float)self.totalSamples * [touch locationInView:self].x / self.bounds.size.width;
+}
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    if (!self.doesAllowScrubbing)
+        return;
+    UITouch *touch = [touches anyObject];
+    self.progressSamples = (float)self.totalSamples * [touch locationInView:self].x / self.bounds.size.width;
+}
 
 @end

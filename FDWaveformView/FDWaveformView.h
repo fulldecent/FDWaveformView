@@ -13,5 +13,7 @@
 @property (nonatomic, strong) NSURL *audioURL;
 @property (nonatomic, assign, readonly) unsigned long int totalSamples;
 @property (nonatomic, assign) unsigned long int progressSamples;
+@property (nonatomic, assign) unsigned long int startSamples; // does nothing right now (see #9)
+@property (nonatomic, assign) unsigned long int endSamples; // does nothing right now (see #9)
 @property (nonatomic) BOOL doesAllowScrubbing;
 @end
