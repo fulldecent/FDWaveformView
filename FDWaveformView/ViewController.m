@@ -37,6 +37,18 @@
     }];
 }
 
+- (void)doZoomIn
+{
+    self.waveform.startSamples = 0;
+    self.waveform.endSamples = self.waveform.totalSamples / 4;
+}
+
+- (void)doZoomOut
+{
+    self.waveform.startSamples = 0;
+    self.waveform.endSamples = self.waveform.totalSamples;
+}
+
 #pragma mark -
 #pragma mark FDWaveformViewDelegate
 

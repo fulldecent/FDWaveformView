@@ -105,12 +105,18 @@
 - (void)setStartSamples:(unsigned long)startSamples
 {
     _startSamples = startSamples;
+    self.image.image = nil;
+    self.highlightedImage.image = nil;
+    [self setNeedsDisplay];
     [self setNeedsLayout];
 }
 
 - (void)setEndSamples:(unsigned long)endSamples
 {
     _endSamples = endSamples;
+    self.image.image = nil;
+    self.highlightedImage.image = nil;
+    [self setNeedsDisplay];
     [self setNeedsLayout];
 }
 
@@ -123,7 +129,7 @@
         [self.delegate waveformViewWillRender:self];
     }
     
-    float progress = self.totalSamples ? (float)self.progressSamples / self.totalSamples : 0;
+    float progress = self.totalSamples ? (float)(self.progressSamples-self.startSamples)/(self.endSamples-self.startSamples) : 0;
     self.image.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
     self.highlightedImage.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
     self.clipping.frame = CGRectMake(0,0,self.frame.size.width*progress,self.frame.size.height);
@@ -223,6 +229,7 @@
     NSInteger downsampleFactor = self.totalSamples / widthInPixels;
     downsampleFactor = downsampleFactor<1 ? 1 : downsampleFactor;
     NSMutableData *fullSongData = [[NSMutableData alloc] initWithCapacity:self.totalSamples/downsampleFactor*2]; // 16-bit samples
+    reader.timeRange = CMTimeRangeMake(CMTimeMake(self.startSamples, self.asset.duration.timescale), CMTimeMake((self.endSamples-self.startSamples), self.asset.duration.timescale));
     [reader startReading];
     
     while (reader.status == AVAssetReaderStatusReading) {

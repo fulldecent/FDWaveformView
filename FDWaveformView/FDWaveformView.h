@@ -16,9 +16,10 @@
 @property (nonatomic, strong) NSURL *audioURL;
 @property (nonatomic, assign, readonly) unsigned long int totalSamples;
 @property (nonatomic, assign) unsigned long int progressSamples;
-@property (nonatomic, assign) unsigned long int startSamples; // does nothing right now (see #9)
-@property (nonatomic, assign) unsigned long int endSamples; // does nothing right now (see #9)
+@property (nonatomic, assign) unsigned long int startSamples;
+@property (nonatomic, assign) unsigned long int endSamples;
 @property (nonatomic) BOOL doesAllowScrubbing;
+@property (nonatomic) BOOL doesAllowStretchAndScroll; // does nothing right now
 @property (nonatomic, copy) UIColor *wavesColor;
 @property (nonatomic, copy) UIColor *progressColor;
 @end

@@ -13,4 +13,6 @@
 @property (weak, nonatomic) IBOutlet FDWaveformView *waveform;
 @property (strong, nonatomic) IBOutlet UIView *playButton;
 - (IBAction)doAnimation;
+- (IBAction)doZoomIn;
+- (IBAction)doZoomOut;
 @end
