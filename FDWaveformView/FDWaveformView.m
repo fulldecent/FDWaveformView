@@ -22,6 +22,7 @@
 #define imageToData(x) UIImagePNGRepresentation(x)
 #define targetOverDraw 3 // Will make image that is more pixels than screen can show
 #define minimumOverDraw 2
+#define bleedMargin 0.1 // fraction of additional plotting rendered on either side of STARTSAMPLES/ENDSAMPLES
 
 @interface FDWaveformView() <UIGestureRecognizerDelegate>
 @property (nonatomic, strong) UIImageView *image;
