@@ -12,7 +12,7 @@ Features:
   * Supports iOS5+ and ARC
   * If allowed, touching me can set progress to that point
 
-<img src="http://i.imgur.com/zYORGao.png">
+<img src="http://i.imgur.com/EbEqBEz.png" width=250>
 
 Usage:
 
