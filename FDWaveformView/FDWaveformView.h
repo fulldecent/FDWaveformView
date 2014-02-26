@@ -19,7 +19,7 @@
 @property (nonatomic, assign) unsigned long int startSamples;
 @property (nonatomic, assign) unsigned long int endSamples;
 @property (nonatomic) BOOL doesAllowScrubbing;
-@property (nonatomic) BOOL doesAllowStretchAndScroll; // does nothing right now
+@property (nonatomic) BOOL doesAllowStretchAndScroll;
 @property (nonatomic, copy) UIColor *wavesColor;
 @property (nonatomic, copy) UIColor *progressColor;
 @end

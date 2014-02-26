@@ -22,7 +22,7 @@
 #define imageToData(x) UIImagePNGRepresentation(x)
 #define targetOverDraw 3 // Will make image that is more pixels than screen can show
 #define minimumOverDraw 2
-#define bleedMargin 0.1 // fraction of additional plotting rendered on either side of STARTSAMPLES/ENDSAMPLES
+#define bleedMargin 0.3 // fraction of additional plotting rendered on either side of STARTSAMPLES/ENDSAMPLES
 
 @interface FDWaveformView() <UIGestureRecognizerDelegate>
 @property (nonatomic, strong) UIImageView *image;
@@ -143,34 +143,47 @@
     [super layoutSubviews];
     
     if ([self.delegate respondsToSelector:@selector(waveformViewWillRender:)])
-    {
         [self.delegate waveformViewWillRender:self];
-    }
     
-    float progress = self.totalSamples ? (float)(self.progressSamples-self.startSamples)/(self.endSamples-self.startSamples) : 0;
-    self.image.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
-    self.highlightedImage.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
-    self.clipping.frame = CGRectMake(0,0,self.frame.size.width*progress,self.frame.size.height);
+    // We need to place the images which have samples from cachedStart..cachedEnd
+    // inside our frame which represents startSamples..endSamples
+    // all figures are a portion of our frame size
+    float scaledStart = 0, scaledProgress = 0, scaledEnd = 1, scaledWidth = 1;
+    if (self.cachedEndSamples > self.cachedStartSamples) {
+        scaledStart = (self.startSamples-self.cachedStartSamples)/(self.endSamples-self.startSamples);
+        scaledEnd = (self.cachedEndSamples-self.startSamples)/(self.endSamples-self.startSamples);
+        scaledWidth = scaledEnd - scaledStart;
+        scaledProgress = (self.progressSamples-self.startSamples)/(self.endSamples-self.startSamples);
+    }
+    CGRect frame = CGRectMake(self.frame.size.width*scaledStart, 0, self.frame.size.width*scaledWidth, self.frame.size.height);
+    self.image.frame = self.highlightedImage.frame = frame;
+    self.clipping.frame = CGRectMake(0,0,self.frame.size.width*scaledProgress,self.frame.size.height);
     self.clipping.hidden = self.progressSamples < self.startSamples;
 
     CGFloat neededWidthInPixels = self.frame.size.width * [UIScreen mainScreen].scale * minimumOverDraw;
     CGFloat neededHeightInPixels = self.frame.size.height * [UIScreen mainScreen].scale;
-    if (self.asset && (neededWidthInPixels > self.image.image.size.width || neededHeightInPixels > self.image.image.size.height)) {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-            [self renderPNGAudioPictogramLogForAsset:self.asset
-                                                done:^(UIImage *image, UIImage *selectedImage) {
-                                                    dispatch_async(dispatch_get_main_queue(), ^{
-                                                        self.image.image = image;
-                                                        self.highlightedImage.image = selectedImage;
-                                                        
-                                                        if ([self.delegate respondsToSelector:@selector(waveformViewDidRender:)])
-                                                        {
-                                                            [self.delegate waveformViewDidRender:self];
-                                                        }
-                                                    });
-                                                }];
-        });
-    }
+    unsigned long int basicRange = self.endSamples - self.startSamples;
+    unsigned long int renderingStartSamples = minMaxX(self.startSamples-basicRange*bleedMargin, 0, self.totalSamples);
+    unsigned long int renderingEndSamples = minMaxX(self.endSamples+basicRange*bleedMargin, 0, self.totalSamples);
+    if (!self.asset || (neededWidthInPixels <= self.image.image.size.width && neededHeightInPixels <= self.image.image.size.height))
+        return;
+
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        [self renderPNGAudioPictogramLogForAsset:self.asset
+                                    startSamples:renderingStartSamples
+                                      endSamples:renderingEndSamples
+                                            done:^(UIImage *image, UIImage *selectedImage) {
+                                                dispatch_async(dispatch_get_main_queue(), ^{
+                                                    self.image.image = image;
+                                                    self.highlightedImage.image = selectedImage;
+                                                    self.cachedStartSamples = renderingStartSamples;
+                                                    self.cachedEndSamples = renderingEndSamples;
+                                                    [self layoutSubviews]; // warning
+                                                    if ([self.delegate respondsToSelector:@selector(waveformViewDidRender:)])
+                                                        [self.delegate waveformViewDidRender:self];
+                                                });
+                                            }];
+    });
 }
 
 - (void) plotLogGraph:(Float32 *) samples
@@ -210,7 +223,9 @@
 }
 
 - (void)renderPNGAudioPictogramLogForAsset:(AVURLAsset *)songAsset
-                                           done:(void(^)(UIImage *image, UIImage *selectedImage))done
+                              startSamples:(unsigned long int)start
+                                endSamples:(unsigned long int)end
+                                      done:(void(^)(UIImage *image, UIImage *selectedImage))done
 
 {
     // TODO: break out subsampling code
@@ -245,10 +260,13 @@
     Float64 tally = 0;
     Float32 tallyCount = 0;
     Float32 outSamples = 0;
-    NSInteger downsampleFactor = self.totalSamples / widthInPixels;
+    
+    
+    
+    NSInteger downsampleFactor = (end-start) / widthInPixels;
     downsampleFactor = downsampleFactor<1 ? 1 : downsampleFactor;
     NSMutableData *fullSongData = [[NSMutableData alloc] initWithCapacity:self.totalSamples/downsampleFactor*2]; // 16-bit samples
-    reader.timeRange = CMTimeRangeMake(CMTimeMake(self.startSamples, self.asset.duration.timescale), CMTimeMake((self.endSamples-self.startSamples), self.asset.duration.timescale));
+    reader.timeRange = CMTimeRangeMake(CMTimeMake(start, self.asset.duration.timescale), CMTimeMake((end-start), self.asset.duration.timescale));
     [reader startReading];
     
     while (reader.status == AVAssetReaderStatusReading) {
