@@ -22,8 +22,9 @@
 #define imageToData(x) UIImagePNGRepresentation(x)
 #define targetOverDraw 3 // Will make image that is more pixels than screen can show
 #define minimumOverDraw 2
+#define bleedMargin 0.1 // fraction of additional plotting rendered on either side of STARTSAMPLES/ENDSAMPLES
 
-@interface FDWaveformView()
+@interface FDWaveformView() <UIGestureRecognizerDelegate>
 @property (nonatomic, strong) UIImageView *image;
 @property (nonatomic, strong) UIImageView *highlightedImage;
 @property (nonatomic, strong) UIView *clipping;
@@ -31,6 +32,9 @@
 @property (nonatomic, assign) unsigned long int totalSamples;
 @property (nonatomic, assign) unsigned long int cachedStartSamples;
 @property (nonatomic, assign) unsigned long int cachedEndSamples;
+@property (nonatomic, strong) UIPinchGestureRecognizer *pinchRecognizer;
+@property (nonatomic, strong) UIPanGestureRecognizer *panRecognizer;
+@property (nonatomic, strong) UITapGestureRecognizer *tapRecognizer;
 @end
 
 @implementation FDWaveformView
@@ -38,6 +42,9 @@
 @synthesize image = _image;
 @synthesize highlightedImage = _highlightedImage;
 @synthesize clipping = _clipping;
+@synthesize pinchRecognizer = _pinchRecognizer;
+@synthesize panRecognizer = _panRecognizer;
+@synthesize tapRecognizer = _tapRecognizer;
 
 - (void)initialize
 {
@@ -53,6 +60,17 @@
     
     self.wavesColor = [UIColor blackColor];
     self.progressColor = [UIColor blueColor];
+    
+    self.pinchRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinchGesture:)];
+    self.pinchRecognizer.delegate = self;
+    [self addGestureRecognizer:self.pinchRecognizer];
+
+    self.panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
+    self.panRecognizer.delegate = self;
+    [self addGestureRecognizer:self.panRecognizer];
+    
+    self.tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapGesture:)];
+    [self addGestureRecognizer:self.tapRecognizer];
 }
 
 - (id)initWithCoder:(NSCoder *)aCoder
@@ -133,6 +151,7 @@
     self.image.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
     self.highlightedImage.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
     self.clipping.frame = CGRectMake(0,0,self.frame.size.width*progress,self.frame.size.height);
+    self.clipping.hidden = self.progressSamples < self.startSamples;
 
     CGFloat neededWidthInPixels = self.frame.size.width * [UIScreen mainScreen].scale * minimumOverDraw;
     CGFloat neededHeightInPixels = self.frame.size.height * [UIScreen mainScreen].scale;
@@ -281,20 +300,66 @@
 
 #pragma mark - Interaction
 
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    if (!self.doesAllowScrubbing)
-        return;
-    UITouch *touch = [touches anyObject];
-    self.progressSamples = (float)self.totalSamples * [touch locationInView:self].x / self.bounds.size.width;
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    return YES;
 }
 
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+- (void)handlePinchGesture:(UIPinchGestureRecognizer *)recognizer
 {
-    if (!self.doesAllowScrubbing)
+    if (!self.doesAllowStretchAndScroll)
         return;
-    UITouch *touch = [touches anyObject];
-    self.progressSamples = (float)self.totalSamples * [touch locationInView:self].x / self.bounds.size.width;
+    if (recognizer.scale == 1) return;
+    
+    unsigned long middleSamples = (self.startSamples + self.endSamples) / 2;
+    unsigned long rangeSamples = self.endSamples - self.startSamples;
+    if (middleSamples - 1/recognizer.scale*rangeSamples/2 >= 0)
+        _startSamples = middleSamples - 1/recognizer.scale*rangeSamples/2;
+    else
+        _startSamples = 0;
+    if (middleSamples + 1/recognizer.scale*rangeSamples/2 <= self.totalSamples)
+        _endSamples = middleSamples + 1/recognizer.scale*rangeSamples/2;
+    else
+        _endSamples = self.totalSamples;
+    
+    self.image.image = nil;
+    self.highlightedImage.image = nil;
+    [self setNeedsDisplay];
+    [self setNeedsLayout];
+    recognizer.scale = 1;
+}
+
+- (void)handlePanGesture:(UIPanGestureRecognizer *)recognizer
+{
+    CGPoint point = [recognizer translationInView:self];
+    NSLog(@"translation: %f", point.x);
+
+    if (self.doesAllowStretchAndScroll) {
+        long translationSamples = (float)(self.endSamples-self.startSamples) * point.x / self.bounds.size.width;
+        [recognizer setTranslation:CGPointZero inView:self];
+        if ((float)_startSamples - translationSamples >= 0)
+            _startSamples -= translationSamples;
+        else
+            _startSamples = 0;
+        if ((float)_endSamples - translationSamples <= self.totalSamples)
+            _endSamples -= translationSamples;
+        else
+            _endSamples = self.totalSamples;
+        self.image.image = nil;
+        self.highlightedImage.image = nil;
+        [self setNeedsDisplay];
+        [self setNeedsLayout];
+    } else if (self.doesAllowScrubbing) {
+        self.progressSamples = self.startSamples + (float)(self.endSamples-self.startSamples) * [recognizer locationInView:self].x / self.bounds.size.width;
+    }
+    
+    return;
+}
+
+- (void)handleTapGesture:(UITapGestureRecognizer *)recognizer
+{
+    if (self.doesAllowScrubbing) {
+        self.progressSamples = self.startSamples + (float)(self.endSamples-self.startSamples) * [recognizer locationInView:self].x / self.bounds.size.width;
+    }
 }
 
 @end

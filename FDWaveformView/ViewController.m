@@ -9,9 +9,11 @@
 #import "ViewController.h"
 
 @interface ViewController () <FDWaveformViewDelegate>
+@property (nonatomic, strong) NSDate *startRendering;
 @end
 
 @implementation ViewController
+@synthesize startRendering = _startRendering;
 
 - (void)viewDidLoad
 {
@@ -27,6 +29,7 @@
     self.waveform.audioURL = url;
     self.waveform.progressSamples = 10000;
     self.waveform.doesAllowScrubbing = YES;
+    self.waveform.doesAllowStretchAndScroll = YES;
 }
 
 - (void)doAnimation
@@ -52,8 +55,14 @@
 #pragma mark -
 #pragma mark FDWaveformViewDelegate
 
+- (void)waveformViewWillRender:(FDWaveformView *)waveformView
+{
+    self.startRendering = [NSDate date];
+}
+
 - (void)waveformViewDidRender:(FDWaveformView *)waveformView
 {
+    NSLog(@"FDWaveformView rendering done, took %f seconds", -[self.startRendering timeIntervalSinceNow]);
     [UIView animateWithDuration:0.25f animations:^{
         waveformView.alpha = 1.0f;
     }];
