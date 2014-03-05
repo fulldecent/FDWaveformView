@@ -20,9 +20,19 @@
 #define decibel(amplitude) (20.0 * log10(absX(amplitude)/32767.0))
 #define imgExt @"png"
 #define imageToData(x) UIImagePNGRepresentation(x)
-#define targetOverDraw 3 // Will make image that is more pixels than screen can show
-#define minimumOverDraw 2
-#define bleedMargin 0.3 // fraction of additional plotting rendered on either side of STARTSAMPLES/ENDSAMPLES
+
+// Drawing a larger image than needed to have it available for scrolling
+#define horizontalMinimumBleed 0.1
+#define horizontalMaximumBleed 3
+#define horizontalTargetBleed 0.5
+// Drawing more pixels than shown to get antialiasing
+#define horizontalMinimumOverdraw 2
+#define horizontalMaximumOverdraw 5
+#define horizontalTargetOverdraw 3
+#define verticalMinimumOverdraw 1
+#define verticalMaximumOverdraw 3
+#define verticalTargetOverdraw 2
+
 
 @interface FDWaveformView() <UIGestureRecognizerDelegate>
 @property (nonatomic, strong) UIImageView *image;
@@ -35,6 +45,7 @@
 @property (nonatomic, strong) UIPinchGestureRecognizer *pinchRecognizer;
 @property (nonatomic, strong) UIPanGestureRecognizer *panRecognizer;
 @property (nonatomic, strong) UITapGestureRecognizer *tapRecognizer;
+@property BOOL renderingInProgress;
 @end
 
 @implementation FDWaveformView
@@ -107,8 +118,8 @@
     self.highlightedImage.image = nil;
     self.totalSamples = (unsigned long int) self.asset.duration.value;
     _progressSamples = 0; // skip custom setter
-    _startSamples = 0; // skip custom setter
-    _endSamples = (unsigned long int) self.asset.duration.value; // skip custom setter
+    _zoomStartSamples = 0; // skip custom setter
+    _zoomEndSamples = (unsigned long int) self.asset.duration.value; // skip custom setter
     [self setNeedsDisplay];
 }
 
@@ -120,20 +131,16 @@
     [self setNeedsLayout];
 }
 
-- (void)setStartSamples:(unsigned long)startSamples
+- (void)setZoomStartSamples:(unsigned long)startSamples
 {
-    _startSamples = startSamples;
-    self.image.image = nil;
-    self.highlightedImage.image = nil;
+    _zoomStartSamples = startSamples;
     [self setNeedsDisplay];
     [self setNeedsLayout];
 }
 
-- (void)setEndSamples:(unsigned long)endSamples
+- (void)setZoomEndSamples:(unsigned long)endSamples
 {
-    _endSamples = endSamples;
-    self.image.image = nil;
-    self.highlightedImage.image = nil;
+    _zoomEndSamples = endSamples;
     [self setNeedsDisplay];
     [self setNeedsLayout];
 }
@@ -142,56 +149,78 @@
 {
     [super layoutSubviews];
     
-    if ([self.delegate respondsToSelector:@selector(waveformViewWillRender:)])
-        [self.delegate waveformViewWillRender:self];
-    
     // We need to place the images which have samples from cachedStart..cachedEnd
     // inside our frame which represents startSamples..endSamples
     // all figures are a portion of our frame size
     float scaledStart = 0, scaledProgress = 0, scaledEnd = 1, scaledWidth = 1;
     if (self.cachedEndSamples > self.cachedStartSamples) {
-        scaledStart = (self.startSamples-self.cachedStartSamples)/(self.endSamples-self.startSamples);
-        scaledEnd = (self.cachedEndSamples-self.startSamples)/(self.endSamples-self.startSamples);
+        scaledStart = ((float)self.cachedStartSamples-self.zoomStartSamples)/(self.zoomEndSamples-self.zoomStartSamples);
+        scaledEnd = ((float)self.cachedEndSamples-self.zoomStartSamples)/(self.zoomEndSamples-self.zoomStartSamples);
         scaledWidth = scaledEnd - scaledStart;
-        scaledProgress = (self.progressSamples-self.startSamples)/(self.endSamples-self.startSamples);
+        scaledProgress = ((float)self.progressSamples-self.zoomStartSamples)/(self.zoomEndSamples-self.zoomStartSamples);
     }
     CGRect frame = CGRectMake(self.frame.size.width*scaledStart, 0, self.frame.size.width*scaledWidth, self.frame.size.height);
     self.image.frame = self.highlightedImage.frame = frame;
     self.clipping.frame = CGRectMake(0,0,self.frame.size.width*scaledProgress,self.frame.size.height);
-    self.clipping.hidden = self.progressSamples < self.startSamples;
+    self.clipping.hidden = self.progressSamples <= self.zoomStartSamples;
 
-    CGFloat neededWidthInPixels = self.frame.size.width * [UIScreen mainScreen].scale * minimumOverDraw;
-    CGFloat neededHeightInPixels = self.frame.size.height * [UIScreen mainScreen].scale;
-    unsigned long int basicRange = self.endSamples - self.startSamples;
-    unsigned long int renderingStartSamples = minMaxX(self.startSamples-basicRange*bleedMargin, 0, self.totalSamples);
-    unsigned long int renderingEndSamples = minMaxX(self.endSamples+basicRange*bleedMargin, 0, self.totalSamples);
-    if (!self.asset || (neededWidthInPixels <= self.image.image.size.width && neededHeightInPixels <= self.image.image.size.height))
+    if (!self.asset || self.renderingInProgress)
         return;
+    unsigned long int displayRange = self.zoomEndSamples - self.zoomStartSamples;
+    BOOL needToRender = NO;
+    if (!self.image.image)
+        needToRender = YES;
+//    NSLog(@"%d %ul",self.cachedStartSamples,minMaxX((long)self.startSamples - displayRange * horizontalMaximumBleed, 0, self.totalSamples));
+    if (self.cachedStartSamples < (unsigned long)minMaxX((float)self.zoomStartSamples - displayRange * horizontalMaximumBleed, 0, self.totalSamples))
+        needToRender = YES;
+    if (self.cachedStartSamples > (unsigned long)minMaxX((float)self.zoomStartSamples - displayRange * horizontalMinimumBleed, 0, self.totalSamples))
+        needToRender = YES;
+    if (self.cachedEndSamples < (unsigned long)minMaxX((float)self.zoomEndSamples + displayRange * horizontalMinimumBleed, 0, self.totalSamples))
+        needToRender = YES;
+    if (self.cachedEndSamples > (unsigned long)minMaxX((float)self.zoomEndSamples + displayRange * horizontalMaximumBleed, 0, self.totalSamples))
+        needToRender = YES;
+    if (self.image.image.size.width < self.frame.size.width * [UIScreen mainScreen].scale * horizontalMinimumOverdraw)
+        needToRender = YES;
+    if (self.image.image.size.width > self.frame.size.width * [UIScreen mainScreen].scale * horizontalMaximumOverdraw)
+        needToRender = YES;
+    if (self.image.image.size.height < self.frame.size.height * [UIScreen mainScreen].scale * verticalMinimumOverdraw)
+        needToRender = YES;
+    if (self.image.image.size.height > self.frame.size.height * [UIScreen mainScreen].scale * verticalMaximumOverdraw)
+        needToRender = YES;
+    if (!needToRender)
+        return;
+    
+    self.renderingInProgress = YES;
+    if ([self.delegate respondsToSelector:@selector(waveformViewWillRender:)])
+        [self.delegate waveformViewWillRender:self];
+    unsigned long int renderStartSamples = minMaxX((long)self.zoomStartSamples - displayRange * horizontalTargetBleed, 0, self.totalSamples);
+    unsigned long int renderEndSamples = minMaxX((long)self.zoomEndSamples + displayRange * horizontalTargetBleed, 0, self.totalSamples);
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
         [self renderPNGAudioPictogramLogForAsset:self.asset
-                                    startSamples:renderingStartSamples
-                                      endSamples:renderingEndSamples
+                                    startSamples:renderStartSamples
+                                      endSamples:renderEndSamples
                                             done:^(UIImage *image, UIImage *selectedImage) {
                                                 dispatch_async(dispatch_get_main_queue(), ^{
                                                     self.image.image = image;
                                                     self.highlightedImage.image = selectedImage;
-                                                    self.cachedStartSamples = renderingStartSamples;
-                                                    self.cachedEndSamples = renderingEndSamples;
+                                                    self.cachedStartSamples = renderStartSamples;
+                                                    self.cachedEndSamples = renderEndSamples;
                                                     [self layoutSubviews]; // warning
                                                     if ([self.delegate respondsToSelector:@selector(waveformViewDidRender:)])
                                                         [self.delegate waveformViewDidRender:self];
+                                                    self.renderingInProgress = NO;
                                                 });
                                             }];
     });
 }
 
-- (void) plotLogGraph:(Float32 *) samples
-             maximumValue:(Float32) normalizeMax
-             mimimumValue:(Float32) normalizeMin
-              sampleCount:(NSInteger) sampleCount
-              imageHeight:(float) imageHeight
-                     done:(void(^)(UIImage *image, UIImage *selectedImage))done
+- (void)plotLogGraph:(Float32 *) samples
+        maximumValue:(Float32) normalizeMax
+        mimimumValue:(Float32) normalizeMin
+         sampleCount:(NSInteger) sampleCount
+         imageHeight:(float) imageHeight
+                done:(void(^)(UIImage *image, UIImage *selectedImage))done
 {
     // TODO: switch to a synchronous function that paints onto a given context? (for issue #2)
     CGSize imageSize = CGSizeMake(sampleCount, imageHeight);
@@ -229,8 +258,8 @@
 
 {
     // TODO: break out subsampling code
-    CGFloat widthInPixels = self.frame.size.width * [UIScreen mainScreen].scale * targetOverDraw;
-    CGFloat heightInPixels = self.frame.size.height * [UIScreen mainScreen].scale;
+    CGFloat widthInPixels = self.frame.size.width * [UIScreen mainScreen].scale * horizontalTargetOverdraw;
+    CGFloat heightInPixels = self.frame.size.height * [UIScreen mainScreen].scale * verticalTargetOverdraw;
 
     NSError *error = nil;
     AVAssetReader *reader = [[AVAssetReader alloc] initWithAsset:songAsset error:&error];
@@ -260,8 +289,6 @@
     Float64 tally = 0;
     Float32 tallyCount = 0;
     Float32 outSamples = 0;
-    
-    
     
     NSInteger downsampleFactor = (end-start) / widthInPixels;
     downsampleFactor = downsampleFactor<1 ? 1 : downsampleFactor;
@@ -328,19 +355,16 @@
         return;
     if (recognizer.scale == 1) return;
     
-    unsigned long middleSamples = (self.startSamples + self.endSamples) / 2;
-    unsigned long rangeSamples = self.endSamples - self.startSamples;
+    unsigned long middleSamples = (self.zoomStartSamples + self.zoomEndSamples) / 2;
+    unsigned long rangeSamples = self.zoomEndSamples - self.zoomStartSamples;
     if (middleSamples - 1/recognizer.scale*rangeSamples/2 >= 0)
-        _startSamples = middleSamples - 1/recognizer.scale*rangeSamples/2;
+        _zoomStartSamples = middleSamples - 1/recognizer.scale*rangeSamples/2;
     else
-        _startSamples = 0;
+        _zoomStartSamples = 0;
     if (middleSamples + 1/recognizer.scale*rangeSamples/2 <= self.totalSamples)
-        _endSamples = middleSamples + 1/recognizer.scale*rangeSamples/2;
+        _zoomEndSamples = middleSamples + 1/recognizer.scale*rangeSamples/2;
     else
-        _endSamples = self.totalSamples;
-    
-    self.image.image = nil;
-    self.highlightedImage.image = nil;
+        _zoomEndSamples = self.totalSamples;
     [self setNeedsDisplay];
     [self setNeedsLayout];
     recognizer.scale = 1;
@@ -352,22 +376,18 @@
     NSLog(@"translation: %f", point.x);
 
     if (self.doesAllowStretchAndScroll) {
-        long translationSamples = (float)(self.endSamples-self.startSamples) * point.x / self.bounds.size.width;
+        long translationSamples = (float)(self.zoomEndSamples-self.zoomStartSamples) * point.x / self.bounds.size.width;
         [recognizer setTranslation:CGPointZero inView:self];
-        if ((float)_startSamples - translationSamples >= 0)
-            _startSamples -= translationSamples;
-        else
-            _startSamples = 0;
-        if ((float)_endSamples - translationSamples <= self.totalSamples)
-            _endSamples -= translationSamples;
-        else
-            _endSamples = self.totalSamples;
-        self.image.image = nil;
-        self.highlightedImage.image = nil;
+        if ((float)self.zoomStartSamples - translationSamples < 0)
+            translationSamples = (float)self.zoomStartSamples;
+        if ((float)self.zoomEndSamples - translationSamples > self.totalSamples)
+            translationSamples = self.zoomEndSamples - self.totalSamples;
+        _zoomStartSamples -= translationSamples;
+        _zoomEndSamples -= translationSamples;
         [self setNeedsDisplay];
         [self setNeedsLayout];
     } else if (self.doesAllowScrubbing) {
-        self.progressSamples = self.startSamples + (float)(self.endSamples-self.startSamples) * [recognizer locationInView:self].x / self.bounds.size.width;
+        self.progressSamples = self.zoomStartSamples + (float)(self.zoomEndSamples-self.zoomStartSamples) * [recognizer locationInView:self].x / self.bounds.size.width;
     }
     
     return;
@@ -376,7 +396,7 @@
 - (void)handleTapGesture:(UITapGestureRecognizer *)recognizer
 {
     if (self.doesAllowScrubbing) {
-        self.progressSamples = self.startSamples + (float)(self.endSamples-self.startSamples) * [recognizer locationInView:self].x / self.bounds.size.width;
+        self.progressSamples = self.zoomStartSamples + (float)(self.zoomEndSamples-self.zoomStartSamples) * [recognizer locationInView:self].x / self.bounds.size.width;
     }
 }
 

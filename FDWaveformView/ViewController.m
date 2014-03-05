@@ -42,14 +42,14 @@
 
 - (void)doZoomIn
 {
-    self.waveform.startSamples = 0;
-    self.waveform.endSamples = self.waveform.totalSamples / 4;
+    self.waveform.zoomStartSamples = 0;
+    self.waveform.zoomEndSamples = self.waveform.totalSamples / 4;
 }
 
 - (void)doZoomOut
 {
-    self.waveform.startSamples = 0;
-    self.waveform.endSamples = self.waveform.totalSamples;
+    self.waveform.zoomStartSamples = 0;
+    self.waveform.zoomEndSamples = self.waveform.totalSamples;
 }
 
 #pragma mark -
