@@ -6,7 +6,7 @@ FDWaveformView is an easy way to display an audio waveform in your app. It is a 
 Usage
 -----
 
-To use it, add a `FDWaveformView` using Interface Builder or programmatically and then just  load your audio.
+To use it, add a `FDWaveformView` using Interface Builder or programmatically and then just load your audio. Warning, if your audio file does not have file extension, see <a href="https://stackoverflow.com/questions/9290972/is-it-possible-to-make-avurlasset-work-without-a-file-extension">this SO question</a>.
 
 An example of creating a waveform:
 
