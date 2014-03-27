@@ -5,7 +5,7 @@ Pod::Spec.new do |s|
   s.homepage     = "https://github.com/fulldecent/FDWaveformView"
   s.license      = 'MIT'
   s.author       = { "William Entriken" => "github.com@phor.net" }
-  s.platform     = :ios
+  s.platform     = :ios, '5.0'
   s.source       = { :git => "https://github.com/fulldecent/FDWaveformView.git", :tag => "v0.2.0" }
   s.source_files  = 'FDWaveformView/FDWaveformView.{h,m}'
   s.frameworks = 'AVFoundation', 'MediaPlayer', 'CoreGraphics'
