@@ -32,7 +32,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "D9FE118E180256840000F135"
+               BlueprintIdentifier = "D95AED6A191594D100A257D4"
                BuildableName = "FDWaveformViewTests.xctest"
                BlueprintName = "FDWaveformViewTests"
                ReferencedContainer = "container:FDWaveformView.xcodeproj">
@@ -44,7 +44,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "D95AED6A191594D100A257D4"
                BuildableName = "FDWaveformView Tests.xctest"
-               BlueprintName = "FDWaveformView Tests"
+               BlueprintName = "FDWaveformViewTests"
                ReferencedContainer = "container:FDWaveformView.xcodeproj">
             </BuildableReference>
          </TestableReference>

@@ -173,9 +173,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		D95AED6A191594D100A257D4 /* FDWaveformView Tests */ = {
+		D95AED6A191594D100A257D4 /* FDWaveformViewTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D95AED7C191594D100A257D4 /* Build configuration list for PBXNativeTarget "FDWaveformView Tests" */;
+			buildConfigurationList = D95AED7C191594D100A257D4 /* Build configuration list for PBXNativeTarget "FDWaveformViewTests" */;
 			buildPhases = (
 				D95AED67191594D100A257D4 /* Sources */,
 				D95AED68191594D100A257D4 /* Frameworks */,
@@ -186,7 +186,7 @@
 			dependencies = (
 				D95AED79191594D100A257D4 /* PBXTargetDependency */,
 			);
-			name = "FDWaveformView Tests";
+			name = FDWaveformViewTests;
 			productName = "FDWaveformView Tests";
 			productReference = D95AED6B191594D100A257D4 /* FDWaveformView Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -236,7 +236,7 @@
 			projectRoot = "";
 			targets = (
 				D9FE116A180256830000F135 /* FDWaveformView */,
-				D95AED6A191594D100A257D4 /* FDWaveformView Tests */,
+				D95AED6A191594D100A257D4 /* FDWaveformViewTests */,
 			);
 		};
 /* End PBXProject section */
@@ -466,7 +466,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		D95AED7C191594D100A257D4 /* Build configuration list for PBXNativeTarget "FDWaveformView Tests" */ = {
+		D95AED7C191594D100A257D4 /* Build configuration list for PBXNativeTarget "FDWaveformViewTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D95AED7A191594D100A257D4 /* Debug */,
