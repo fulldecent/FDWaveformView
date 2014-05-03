@@ -62,6 +62,8 @@ Creates **antialiased waveforms** by drawing more pixels than are seen on screen
 
 **Supports ARC** and **iOS5+**.
 
+**Includes unit tests** which run successfully using Travis CI.
+
 Installation
 ------------
 
