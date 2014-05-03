@@ -1,4 +1,4 @@
-FDWaveformView
+FDWaveformView [![Build Status](https://travis-ci.org/fulldecent/FDWaveformView.svg?branch=master)](https://travis-ci.org/fulldecent/FDWaveformView)
 ==============
 
 FDWaveformView is an easy way to display an audio waveform in your app. It is a nice visualization to show a playing audio file or to select a position in a file.
