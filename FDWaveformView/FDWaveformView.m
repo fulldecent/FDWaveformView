@@ -126,9 +126,11 @@
 - (void)setProgressSamples:(unsigned long)progressSamples
 {
     _progressSamples = progressSamples;
-    float progress = (float)self.progressSamples / self.totalSamples;
-    self.clipping.frame = CGRectMake(0,0,self.frame.size.width*progress,self.frame.size.height);
-    [self setNeedsLayout];
+    if (self.totalSamples) {
+        float progress = (float)self.progressSamples / self.totalSamples;
+        self.clipping.frame = CGRectMake(0,0,self.frame.size.width*progress,self.frame.size.height);
+        [self setNeedsLayout];
+    }
 }
 
 - (void)setZoomStartSamples:(unsigned long)startSamples

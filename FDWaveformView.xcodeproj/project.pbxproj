@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D95AED6C191594D100A257D4 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9FE1190180256840000F135 /* XCTest.framework */; };
+		D95AED6D191594D100A257D4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9FE116E180256830000F135 /* Foundation.framework */; };
+		D95AED6E191594D100A257D4 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9FE1172180256830000F135 /* UIKit.framework */; };
+		D95AED74191594D100A257D4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D95AED72191594D100A257D4 /* InfoPlist.strings */; };
+		D95AED76191594D100A257D4 /* FDWaveformView_Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = D95AED75191594D100A257D4 /* FDWaveformView_Tests.m */; };
 		D9FE116F180256830000F135 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9FE116E180256830000F135 /* Foundation.framework */; };
 		D9FE1171180256830000F135 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9FE1170180256830000F135 /* CoreGraphics.framework */; };
 		D9FE1173180256830000F135 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9FE1172180256830000F135 /* UIKit.framework */; };
@@ -22,7 +27,22 @@
 		D9FE11AE18025B1B0000F135 /* Submarine.aiff in Resources */ = {isa = PBXBuildFile; fileRef = D9FE11AD18025B1B0000F135 /* Submarine.aiff */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		D95AED78191594D100A257D4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D9FE1163180256830000F135 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D9FE116A180256830000F135;
+			remoteInfo = FDWaveformView;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		D95AED6B191594D100A257D4 /* FDWaveformView Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "FDWaveformView Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D95AED71191594D100A257D4 /* FDWaveformView Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "FDWaveformView Tests-Info.plist"; sourceTree = "<group>"; };
+		D95AED73191594D100A257D4 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		D95AED75191594D100A257D4 /* FDWaveformView_Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FDWaveformView_Tests.m; sourceTree = "<group>"; };
+		D95AED77191594D100A257D4 /* FDWaveformView Tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FDWaveformView Tests-Prefix.pch"; sourceTree = "<group>"; };
 		D9FE116B180256830000F135 /* FDWaveformView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FDWaveformView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D9FE116E180256830000F135 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		D9FE1170180256830000F135 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -46,6 +66,16 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		D95AED68191594D100A257D4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D95AED6C191594D100A257D4 /* XCTest.framework in Frameworks */,
+				D95AED6E191594D100A257D4 /* UIKit.framework in Frameworks */,
+				D95AED6D191594D100A257D4 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D9FE1168180256830000F135 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -61,10 +91,30 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D95AED6F191594D100A257D4 /* FDWaveformView Tests */ = {
+			isa = PBXGroup;
+			children = (
+				D95AED75191594D100A257D4 /* FDWaveformView_Tests.m */,
+				D95AED70191594D100A257D4 /* Supporting Files */,
+			);
+			path = "FDWaveformView Tests";
+			sourceTree = "<group>";
+		};
+		D95AED70191594D100A257D4 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				D95AED71191594D100A257D4 /* FDWaveformView Tests-Info.plist */,
+				D95AED72191594D100A257D4 /* InfoPlist.strings */,
+				D95AED77191594D100A257D4 /* FDWaveformView Tests-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		D9FE1162180256830000F135 = {
 			isa = PBXGroup;
 			children = (
 				D9FE1174180256830000F135 /* FDWaveformView */,
+				D95AED6F191594D100A257D4 /* FDWaveformView Tests */,
 				D9FE116D180256830000F135 /* Frameworks */,
 				D9FE116C180256830000F135 /* Products */,
 			);
@@ -74,6 +124,7 @@
 			isa = PBXGroup;
 			children = (
 				D9FE116B180256830000F135 /* FDWaveformView.app */,
+				D95AED6B191594D100A257D4 /* FDWaveformView Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -122,6 +173,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		D95AED6A191594D100A257D4 /* FDWaveformView Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D95AED7C191594D100A257D4 /* Build configuration list for PBXNativeTarget "FDWaveformView Tests" */;
+			buildPhases = (
+				D95AED67191594D100A257D4 /* Sources */,
+				D95AED68191594D100A257D4 /* Frameworks */,
+				D95AED69191594D100A257D4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D95AED79191594D100A257D4 /* PBXTargetDependency */,
+			);
+			name = "FDWaveformView Tests";
+			productName = "FDWaveformView Tests";
+			productReference = D95AED6B191594D100A257D4 /* FDWaveformView Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		D9FE116A180256830000F135 /* FDWaveformView */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = D9FE11A0180256840000F135 /* Build configuration list for PBXNativeTarget "FDWaveformView" */;
@@ -145,8 +214,13 @@
 		D9FE1163180256830000F135 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = "William Entriken";
+				TargetAttributes = {
+					D95AED6A191594D100A257D4 = {
+						TestTargetID = D9FE116A180256830000F135;
+					};
+				};
 			};
 			buildConfigurationList = D9FE1166180256830000F135 /* Build configuration list for PBXProject "FDWaveformView" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -162,11 +236,20 @@
 			projectRoot = "";
 			targets = (
 				D9FE116A180256830000F135 /* FDWaveformView */,
+				D95AED6A191594D100A257D4 /* FDWaveformView Tests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		D95AED69191594D100A257D4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D95AED74191594D100A257D4 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D9FE1169180256830000F135 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -181,6 +264,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		D95AED67191594D100A257D4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D95AED76191594D100A257D4 /* FDWaveformView_Tests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D9FE1167180256830000F135 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -194,7 +285,23 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		D95AED79191594D100A257D4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D9FE116A180256830000F135 /* FDWaveformView */;
+			targetProxy = D95AED78191594D100A257D4 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
+		D95AED72191594D100A257D4 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D95AED73191594D100A257D4 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
 		D9FE1177180256830000F135 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -214,11 +321,54 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		D95AED7A191594D100A257D4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/FDWaveformView.app/FDWaveformView";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "FDWaveformView Tests/FDWaveformView Tests-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = "FDWaveformView Tests/FDWaveformView Tests-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		D95AED7B191594D100A257D4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/FDWaveformView.app/FDWaveformView";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "FDWaveformView Tests/FDWaveformView Tests-Prefix.pch";
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = "FDWaveformView Tests/FDWaveformView Tests-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
 		D9FE119E180256840000F135 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -258,7 +408,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -317,6 +466,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		D95AED7C191594D100A257D4 /* Build configuration list for PBXNativeTarget "FDWaveformView Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D95AED7A191594D100A257D4 /* Debug */,
+				D95AED7B191594D100A257D4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		D9FE1166180256830000F135 /* Build configuration list for PBXProject "FDWaveformView" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
