@@ -68,6 +68,7 @@
     [self.clipping addSubview:self.highlightedImage];
     self.clipping.clipsToBounds = YES;
     [self addSubview:self.clipping];
+    self.clipsToBounds = YES;
     
     self.wavesColor = [UIColor blackColor];
     self.progressColor = [UIColor blueColor];
