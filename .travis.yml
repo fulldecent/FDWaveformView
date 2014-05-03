@@ -1,0 +1,21 @@
+language: objective-c
+
+#language: objective-c
+#xcode_project: FDSoundActivatedRecorder.xcodeproj
+#xcode_scheme: FDSoundActivatedRecorder
+#xcode_sdk: iphonesimulator7.0
+
+# PER https://github.com/travis-ci/travis-ci/issues/2197
+# https://github.com/jessesquires/BButton/blob/54a8b3eb1f237a502201910f455a030800956ebe/.travis.yml
+
+before_install: 
+- brew update
+- brew upgrade xctool
+
+script: 
+- xctool -project FDWaveformView -scheme FDWaveformView -sdk iphonesimulator7.0 ONLY_ACTIVE_ARCH=NO clean build test 
+
+
+notifications:
+  email:
+    fdwaveformview@phor.net
