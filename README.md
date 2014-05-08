@@ -43,7 +43,7 @@ Features
     self.waveform.doesAllowStretchAndScroll = YES;
 
 <p align="center">
-  <img src="https://i.imgur.com/KIV1tEu.gif" width=250 loop=infinite>
+  <img src="https://i.imgur.com/8oR7cpq.gif" width=250 loop=infinite>
 </p>
 
 **Supports animation** for changing properties:
