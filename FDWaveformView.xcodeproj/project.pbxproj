@@ -38,7 +38,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		D95AED6B191594D100A257D4 /* FDWaveformView Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "FDWaveformView Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D95AED6B191594D100A257D4 /* FDWaveformViewTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FDWaveformViewTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D95AED71191594D100A257D4 /* FDWaveformView Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "FDWaveformView Tests-Info.plist"; sourceTree = "<group>"; };
 		D95AED73191594D100A257D4 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D95AED75191594D100A257D4 /* FDWaveformView_Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FDWaveformView_Tests.m; sourceTree = "<group>"; };
@@ -124,7 +124,7 @@
 			isa = PBXGroup;
 			children = (
 				D9FE116B180256830000F135 /* FDWaveformView.app */,
-				D95AED6B191594D100A257D4 /* FDWaveformView Tests.xctest */,
+				D95AED6B191594D100A257D4 /* FDWaveformViewTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -188,7 +188,7 @@
 			);
 			name = FDWaveformViewTests;
 			productName = "FDWaveformView Tests";
-			productReference = D95AED6B191594D100A257D4 /* FDWaveformView Tests.xctest */;
+			productReference = D95AED6B191594D100A257D4 /* FDWaveformViewTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		D9FE116A180256830000F135 /* FDWaveformView */ = {
@@ -473,6 +473,7 @@
 				D95AED7B191594D100A257D4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		D9FE1166180256830000F135 /* Build configuration list for PBXProject "FDWaveformView" */ = {
 			isa = XCConfigurationList;

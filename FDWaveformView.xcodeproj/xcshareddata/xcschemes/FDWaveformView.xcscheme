@@ -43,7 +43,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "D95AED6A191594D100A257D4"
-               BuildableName = "FDWaveformView Tests.xctest"
+               BuildableName = "FDWaveformViewTests.xctest"
                BlueprintName = "FDWaveformViewTests"
                ReferencedContainer = "container:FDWaveformView.xcodeproj">
             </BuildableReference>
