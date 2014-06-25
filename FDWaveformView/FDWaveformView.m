@@ -76,7 +76,7 @@
     self.pinchRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinchGesture:)];
     self.pinchRecognizer.delegate = self;
     [self addGestureRecognizer:self.pinchRecognizer];
-
+    
     self.panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
     self.panRecognizer.delegate = self;
     [self addGestureRecognizer:self.panRecognizer];
@@ -166,14 +166,14 @@
     self.image.frame = self.highlightedImage.frame = frame;
     self.clipping.frame = CGRectMake(0,0,self.frame.size.width*scaledProgress,self.frame.size.height);
     self.clipping.hidden = self.progressSamples <= self.zoomStartSamples;
-
+    
     if (!self.asset || self.renderingInProgress)
         return;
     unsigned long int displayRange = self.zoomEndSamples - self.zoomStartSamples;
     BOOL needToRender = NO;
     if (!self.image.image)
         needToRender = YES;
-//    NSLog(@"%d %ul",self.cachedStartSamples,minMaxX((long)self.startSamples - displayRange * horizontalMaximumBleed, 0, self.totalSamples));
+    //    NSLog(@"%d %ul",self.cachedStartSamples,minMaxX((long)self.startSamples - displayRange * horizontalMaximumBleed, 0, self.totalSamples));
     if (self.cachedStartSamples < (unsigned long)minMaxX((float)self.zoomStartSamples - displayRange * horizontalMaximumBleed, 0, self.totalSamples))
         needToRender = YES;
     if (self.cachedStartSamples > (unsigned long)minMaxX((float)self.zoomStartSamples - displayRange * horizontalMinimumBleed, 0, self.totalSamples))
@@ -198,7 +198,7 @@
         [self.delegate waveformViewWillRender:self];
     unsigned long int renderStartSamples = minMaxX((long)self.zoomStartSamples - displayRange * horizontalTargetBleed, 0, self.totalSamples);
     unsigned long int renderEndSamples = minMaxX((long)self.zoomEndSamples + displayRange * horizontalTargetBleed, 0, self.totalSamples);
-
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
         [self renderPNGAudioPictogramLogForAsset:self.asset
                                     startSamples:renderStartSamples
@@ -244,7 +244,7 @@
         CGContextAddLineToPoint(context, intSample, centerLeft+pixels);
         CGContextStrokePath(context);
     }
-
+    
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     CGRect drawRect = CGRectMake(0, 0, image.size.width, image.size.height);
     [self.progressColor set];
@@ -263,7 +263,7 @@
     // TODO: break out subsampling code
     CGFloat widthInPixels = self.frame.size.width * [UIScreen mainScreen].scale * horizontalTargetOverdraw;
     CGFloat heightInPixels = self.frame.size.height * [UIScreen mainScreen].scale * verticalTargetOverdraw;
-
+    
     NSError *error = nil;
     AVAssetReader *reader = [[AVAssetReader alloc] initWithAsset:songAsset error:&error];
     AVAssetTrack *songTrack = [songAsset.tracks objectAtIndex:0];
@@ -335,7 +335,7 @@
     }
     
     // if (reader.status == AVAssetReaderStatusFailed || reader.status == AVAssetReaderStatusUnknown)
-        // Something went wrong. Handle it.
+    // Something went wrong. Handle it.
     if (reader.status == AVAssetReaderStatusCompleted){
         [self plotLogGraph:(Float32 *)fullSongData.bytes
               maximumValue:maximum
@@ -377,7 +377,7 @@
 {
     CGPoint point = [recognizer translationInView:self];
     NSLog(@"translation: %f", point.x);
-
+    
     if (self.doesAllowStretchAndScroll) {
         long translationSamples = (float)(self.zoomEndSamples-self.zoomStartSamples) * point.x / self.bounds.size.width;
         [recognizer setTranslation:CGPointZero inView:self];
@@ -398,15 +398,15 @@
         }
         else if (recognizer.state == UIGestureRecognizerStateChanged) {
             if ([self.delegate respondsToSelector:@selector(waveformDidBeginScrubbing:)]) {
-                [self.delegate waveformDidBeginScrubbing:self];
+                [self.delegate waveformView:self didScrubToProgress:[self progress]];
             }
         }
         else if (recognizer.state == UIGestureRecognizerStateEnded || recognizer.state == UIGestureRecognizerStateCancelled) {
-            if ([self.delegate respondsToSelector:@selector(waveformDidBeginScrubbing:)]) {
-                [self.delegate waveformDidBeginScrubbing:self];
+            if ([self.delegate respondsToSelector:@selector(waveformDidEndScrubbing:)]) {
+                [self.delegate waveformDidEndScrubbing:self];
             }
         }
-       
+        
     }
     
     return;
@@ -423,8 +423,8 @@
 {
     if (self.doesAllowScrubbing) {
         self.progressSamples = self.zoomStartSamples + (float)(self.zoomEndSamples-self.zoomStartSamples) * [recognizer locationInView:self].x / self.bounds.size.width;
-        if ([self.delegate respondsToSelector:@selector(waveformDidScrubToProgress:)]) {
-            [self.delegate waveformDidScrubToProgress:[self progress]];
+        if ([self.delegate respondsToSelector:@selector(waveformView:didScrubToProgress:)]) {
+            [self.delegate waveformView:self didScrubToProgress:[self progress]];
         }
     }
 }
