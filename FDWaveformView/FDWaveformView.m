@@ -391,15 +391,28 @@
         [self setNeedsLayout];
     } else if (self.doesAllowScrubbing) {
         self.progressSamples = self.zoomStartSamples + (float)(self.zoomEndSamples-self.zoomStartSamples) * [recognizer locationInView:self].x / self.bounds.size.width;
+        if ([self.delegate respondsToSelector:@selector(waveformDidScrubToProgress:)]) {
+            [self.delegate waveformDidScrubToProgress:[self progress]];
+        }
     }
     
     return;
+}
+
+- (float)progress{
+    
+    float progress = (float)self.progressSamples / self.totalSamples;
+    return progress;
+    
 }
 
 - (void)handleTapGesture:(UITapGestureRecognizer *)recognizer
 {
     if (self.doesAllowScrubbing) {
         self.progressSamples = self.zoomStartSamples + (float)(self.zoomEndSamples-self.zoomStartSamples) * [recognizer locationInView:self].x / self.bounds.size.width;
+        if ([self.delegate respondsToSelector:@selector(waveformDidScrubToProgress:)]) {
+            [self.delegate waveformDidScrubToProgress:[self progress]];
+        }
     }
 }
 
