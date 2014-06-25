@@ -22,10 +22,17 @@
 @property (nonatomic) BOOL doesAllowStretchAndScroll;
 @property (nonatomic, copy) UIColor *wavesColor;
 @property (nonatomic, copy) UIColor *progressColor;
+
+
+- (float)progress;
+
 @end
+
+
 
 @protocol FDWaveformViewDelegate <NSObject>
 @optional
 - (void)waveformViewWillRender:(FDWaveformView *)waveformView;
 - (void)waveformViewDidRender:(FDWaveformView *)waveformView;
+- (void)waveformDidScrubToProgress:(float)progress;
 @end
