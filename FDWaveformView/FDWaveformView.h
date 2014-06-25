@@ -34,5 +34,8 @@
 @optional
 - (void)waveformViewWillRender:(FDWaveformView *)waveformView;
 - (void)waveformViewDidRender:(FDWaveformView *)waveformView;
-- (void)waveformDidScrubToProgress:(float)progress;
+- (void)waveformView:(FDWaveformView *)waveformView didScrubToProgress:(float)progress;
+- (void)waveformDidBeginScrubbing:(FDWaveformView *)waveformView;
+- (void)waveformDidEndScrubbing:(FDWaveformView *)waveformView;
+
 @end

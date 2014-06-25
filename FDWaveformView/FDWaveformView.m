@@ -391,9 +391,22 @@
         [self setNeedsLayout];
     } else if (self.doesAllowScrubbing) {
         self.progressSamples = self.zoomStartSamples + (float)(self.zoomEndSamples-self.zoomStartSamples) * [recognizer locationInView:self].x / self.bounds.size.width;
-        if ([self.delegate respondsToSelector:@selector(waveformDidScrubToProgress:)]) {
-            [self.delegate waveformDidScrubToProgress:[self progress]];
+        if (recognizer.state == UIGestureRecognizerStateBegan) {
+            if ([self.delegate respondsToSelector:@selector(waveformDidBeginScrubbing:)]) {
+                [self.delegate waveformDidBeginScrubbing:self];
+            }
         }
+        else if (recognizer.state == UIGestureRecognizerStateChanged) {
+            if ([self.delegate respondsToSelector:@selector(waveformDidBeginScrubbing:)]) {
+                [self.delegate waveformDidBeginScrubbing:self];
+            }
+        }
+        else if (recognizer.state == UIGestureRecognizerStateEnded || recognizer.state == UIGestureRecognizerStateCancelled) {
+            if ([self.delegate respondsToSelector:@selector(waveformDidBeginScrubbing:)]) {
+                [self.delegate waveformDidBeginScrubbing:self];
+            }
+        }
+       
     }
     
     return;
