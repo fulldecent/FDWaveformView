@@ -15,4 +15,9 @@
 - (IBAction)doAnimation;
 - (IBAction)doZoomIn;
 - (IBAction)doZoomOut;
+- (IBAction)doRunPerformanceProfile;
+- (IBAction)doLoadAAC;
+- (IBAction)doLoadMP3;
+- (IBAction)doLoadOGG;
+
 @end

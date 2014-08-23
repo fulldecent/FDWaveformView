@@ -46,6 +46,7 @@
 @property (nonatomic, strong) UIPanGestureRecognizer *panRecognizer;
 @property (nonatomic, strong) UITapGestureRecognizer *tapRecognizer;
 @property BOOL renderingInProgress;
+@property BOOL loadingInProgress;
 @end
 
 @implementation FDWaveformView
@@ -114,14 +115,36 @@
 - (void)setAudioURL:(NSURL *)audioURL
 {
     _audioURL = audioURL;
+    self.loadingInProgress = YES;
+    if ([self.delegate respondsToSelector:@selector(waveformViewWillLoad:)])
+        [self.delegate waveformViewWillLoad:self];
     self.asset = [AVURLAsset URLAssetWithURL:audioURL options:nil];
-    self.image.image = nil;
-    self.highlightedImage.image = nil;
-    self.totalSamples = (unsigned long int) self.asset.duration.value;
-    _progressSamples = 0; // skip custom setter
-    _zoomStartSamples = 0; // skip custom setter
-    _zoomEndSamples = (unsigned long int) self.asset.duration.value; // skip custom setter
-    [self setNeedsDisplay];
+
+    [self.asset loadValuesAsynchronouslyForKeys:@[@"duration"] completionHandler:^() {
+        self.loadingInProgress = NO;
+        if ([self.delegate respondsToSelector:@selector(waveformViewDidLoad:)])
+            [self.delegate waveformViewDidLoad:self];
+        
+        NSError *error = nil;
+        AVKeyValueStatus durationStatus = [self.asset statusOfValueForKey:@"duration" error:&error];
+        switch (durationStatus) {
+            case AVKeyValueStatusLoaded:
+                self.image.image = nil;
+                self.highlightedImage.image = nil;
+                self.totalSamples = (unsigned long int) self.asset.duration.value;
+                _progressSamples = 0; // skip custom setter
+                _zoomStartSamples = 0; // skip custom setter
+                _zoomEndSamples = (unsigned long int) self.asset.duration.value; // skip custom setter
+                [self setNeedsDisplay];
+                [self performSelectorOnMainThread:@selector(setNeedsLayout) withObject:nil waitUntilDone:NO];
+                break;
+                
+            case AVKeyValueStatusFailed:
+            case AVKeyValueStatusCancelled:
+                NSLog(@"FDWaveformView could not load asset: %@", error.localizedDescription);
+                break;
+        }
+    }];
 }
 
 - (void)setProgressSamples:(unsigned long)progressSamples
@@ -152,23 +175,9 @@
 {
     [super layoutSubviews];
     
-    // We need to place the images which have samples from cachedStart..cachedEnd
-    // inside our frame which represents startSamples..endSamples
-    // all figures are a portion of our frame size
-    float scaledStart = 0, scaledProgress = 0, scaledEnd = 1, scaledWidth = 1;
-    if (self.cachedEndSamples > self.cachedStartSamples) {
-        scaledStart = ((float)self.cachedStartSamples-self.zoomStartSamples)/(self.zoomEndSamples-self.zoomStartSamples);
-        scaledEnd = ((float)self.cachedEndSamples-self.zoomStartSamples)/(self.zoomEndSamples-self.zoomStartSamples);
-        scaledWidth = scaledEnd - scaledStart;
-        scaledProgress = ((float)self.progressSamples-self.zoomStartSamples)/(self.zoomEndSamples-self.zoomStartSamples);
-    }
-    CGRect frame = CGRectMake(self.frame.size.width*scaledStart, 0, self.frame.size.width*scaledWidth, self.frame.size.height);
-    self.image.frame = self.highlightedImage.frame = frame;
-    self.clipping.frame = CGRectMake(0,0,self.frame.size.width*scaledProgress,self.frame.size.height);
-    self.clipping.hidden = self.progressSamples <= self.zoomStartSamples;
-
     if (!self.asset || self.renderingInProgress)
         return;
+    
     unsigned long int displayRange = self.zoomEndSamples - self.zoomStartSamples;
     BOOL needToRender = NO;
     if (!self.image.image)
@@ -190,8 +199,25 @@
         needToRender = YES;
     if (self.image.image.size.height > self.frame.size.height * [UIScreen mainScreen].scale * verticalMaximumOverdraw)
         needToRender = YES;
-    if (!needToRender)
+    if (!needToRender) {
+        // We need to place the images which have samples from cachedStart..cachedEnd
+        // inside our frame which represents startSamples..endSamples
+        // all figures are a portion of our frame size
+        float scaledStart = 0, scaledProgress = 0, scaledEnd = 1, scaledWidth = 1;
+        if (self.cachedEndSamples > self.cachedStartSamples) {
+            scaledStart = ((float)self.cachedStartSamples-self.zoomStartSamples)/(self.zoomEndSamples-self.zoomStartSamples);
+            scaledEnd = ((float)self.cachedEndSamples-self.zoomStartSamples)/(self.zoomEndSamples-self.zoomStartSamples);
+            scaledWidth = scaledEnd - scaledStart;
+            scaledProgress = ((float)self.progressSamples-self.zoomStartSamples)/(self.zoomEndSamples-self.zoomStartSamples);
+        }
+        CGRect frame = CGRectMake(self.frame.size.width*scaledStart, 0, self.frame.size.width*scaledWidth, self.frame.size.height);
+        self.image.frame = self.highlightedImage.frame = frame;
+        self.clipping.frame = CGRectMake(0,0,self.frame.size.width*scaledProgress,self.frame.size.height);
+        self.clipping.hidden = self.progressSamples <= self.zoomStartSamples;
         return;
+    }
+
+    
     
     self.renderingInProgress = YES;
     if ([self.delegate respondsToSelector:@selector(waveformViewWillRender:)])

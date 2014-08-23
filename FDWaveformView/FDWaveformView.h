@@ -28,4 +28,6 @@
 @optional
 - (void)waveformViewWillRender:(FDWaveformView *)waveformView;
 - (void)waveformViewDidRender:(FDWaveformView *)waveformView;
+- (void)waveformViewWillLoad:(FDWaveformView *)waveformView;
+- (void)waveformViewDidLoad:(FDWaveformView *)waveformView;
 @end

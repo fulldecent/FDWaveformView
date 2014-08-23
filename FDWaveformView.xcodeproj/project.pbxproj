@@ -12,6 +12,9 @@
 		D95AED6E191594D100A257D4 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9FE1172180256830000F135 /* UIKit.framework */; };
 		D95AED74191594D100A257D4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D95AED72191594D100A257D4 /* InfoPlist.strings */; };
 		D95AED76191594D100A257D4 /* FDWaveformView_Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = D95AED75191594D100A257D4 /* FDWaveformView_Tests.m */; };
+		D9C831CA19A8FFC3006D6AD2 /* TchaikovskyExample2.ogg in Resources */ = {isa = PBXBuildFile; fileRef = D9C831C719A8FFC3006D6AD2 /* TchaikovskyExample2.ogg */; };
+		D9C831CB19A8FFC3006D6AD2 /* TchaikovskyExample2.m4a in Resources */ = {isa = PBXBuildFile; fileRef = D9C831C819A8FFC3006D6AD2 /* TchaikovskyExample2.m4a */; };
+		D9C831CC19A8FFC3006D6AD2 /* TchaikovskyExample2.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D9C831C919A8FFC3006D6AD2 /* TchaikovskyExample2.mp3 */; };
 		D9FE116F180256830000F135 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9FE116E180256830000F135 /* Foundation.framework */; };
 		D9FE1171180256830000F135 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9FE1170180256830000F135 /* CoreGraphics.framework */; };
 		D9FE1173180256830000F135 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9FE1172180256830000F135 /* UIKit.framework */; };
@@ -43,6 +46,9 @@
 		D95AED73191594D100A257D4 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D95AED75191594D100A257D4 /* FDWaveformView_Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FDWaveformView_Tests.m; sourceTree = "<group>"; };
 		D95AED77191594D100A257D4 /* FDWaveformView Tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FDWaveformView Tests-Prefix.pch"; sourceTree = "<group>"; };
+		D9C831C719A8FFC3006D6AD2 /* TchaikovskyExample2.ogg */ = {isa = PBXFileReference; lastKnownFileType = file; path = TchaikovskyExample2.ogg; sourceTree = "<group>"; };
+		D9C831C819A8FFC3006D6AD2 /* TchaikovskyExample2.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = TchaikovskyExample2.m4a; sourceTree = "<group>"; };
+		D9C831C919A8FFC3006D6AD2 /* TchaikovskyExample2.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = TchaikovskyExample2.mp3; sourceTree = "<group>"; };
 		D9FE116B180256830000F135 /* FDWaveformView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FDWaveformView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D9FE116E180256830000F135 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		D9FE1170180256830000F135 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -153,6 +159,9 @@
 				D9FE1186180256830000F135 /* ViewController.h */,
 				D9FE1187180256830000F135 /* ViewController.m */,
 				D9FE11AD18025B1B0000F135 /* Submarine.aiff */,
+				D9C831C719A8FFC3006D6AD2 /* TchaikovskyExample2.ogg */,
+				D9C831C819A8FFC3006D6AD2 /* TchaikovskyExample2.m4a */,
+				D9C831C919A8FFC3006D6AD2 /* TchaikovskyExample2.mp3 */,
 				D9FE1189180256830000F135 /* Images.xcassets */,
 				D9FE1175180256830000F135 /* Supporting Files */,
 			);
@@ -256,8 +265,11 @@
 			files = (
 				D9FE11AE18025B1B0000F135 /* Submarine.aiff in Resources */,
 				D9FE118A180256830000F135 /* Images.xcassets in Resources */,
+				D9C831CC19A8FFC3006D6AD2 /* TchaikovskyExample2.mp3 in Resources */,
 				D9FE1182180256830000F135 /* Main.storyboard in Resources */,
+				D9C831CA19A8FFC3006D6AD2 /* TchaikovskyExample2.ogg in Resources */,
 				D9FE1179180256830000F135 /* InfoPlist.strings in Resources */,
+				D9C831CB19A8FFC3006D6AD2 /* TchaikovskyExample2.m4a in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
