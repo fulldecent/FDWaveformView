@@ -110,8 +110,7 @@
     self.waveform.audioURL = url;
 }
 
-#pragma mark -
-#pragma mark FDWaveformViewDelegate
+#pragma mark - FDWaveformViewDelegate
 
 - (void)waveformViewWillRender:(FDWaveformView *)waveformView
 {
@@ -138,6 +137,26 @@
     self.endLoading = [NSDate date];
     NSLog(@"FDWaveformView loading done, took %f seconds", [self.endLoading timeIntervalSinceDate:self.startLoading]);
     [self.profileResult appendFormat:@" load %f", [self.endLoading timeIntervalSinceDate:self.startLoading]];
+}
+
+#pragma mark - UIViewController
+
+- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+    [super willRotateToInterfaceOrientation:toInterfaceOrientation duration:duration];
+    [self.view layoutSubviews];
+    [self.view setNeedsDisplay];
+    // i have no fucking idea why this hack is needed
+    // using 10.10 ios8 iPhone6 sim and the constraints are not followed until you first
+    // click on anywhere on the view
+    // same problem after rotating
+}
+
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{
+    [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
+    [self.view layoutSubviews];
+    [self.view setNeedsDisplay];
 }
 
 @end
