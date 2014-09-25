@@ -175,7 +175,7 @@
 {
     [super layoutSubviews];
     
-    if (!self.asset || self.renderingInProgress)
+    if (!self.asset || self.renderingInProgress || self.zoomEndSamples == 0)
         return;
     
     unsigned long int displayRange = self.zoomEndSamples - self.zoomStartSamples;
