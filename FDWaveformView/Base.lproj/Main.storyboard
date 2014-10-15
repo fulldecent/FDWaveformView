@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6245" systemVersion="14A343f" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="vXZ-lx-hvc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6245" systemVersion="14A388a" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="vXZ-lx-hvc">
     <dependencies>
         <deployment defaultVersion="1792" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
-        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
@@ -107,27 +106,27 @@
                         </subviews>
                         <color key="backgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.94901960784313721" alpha="1" colorSpace="deviceRGB"/>
                         <constraints>
-                            <constraint firstAttribute="trailingMargin" secondItem="6nS-uY-8MT" secondAttribute="trailing" constant="-16" id="0vs-ux-ijL"/>
+                            <constraint firstAttribute="trailing" secondItem="6nS-uY-8MT" secondAttribute="trailing" id="0vs-ux-ijL"/>
                             <constraint firstItem="xMU-Jn-XBZ" firstAttribute="top" secondItem="9hJ-tI-0Qm" secondAttribute="bottom" constant="8" id="1ea-Ws-pEk"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="wPy-LY-uJK" secondAttribute="trailing" id="2Oo-RB-6y8"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="9hJ-tI-0Qm" secondAttribute="trailing" constant="-16" id="2gR-eS-J8c"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="nef-Qp-sxn" secondAttribute="trailing" constant="-16" id="7Og-3v-n9d"/>
-                            <constraint firstItem="6nS-uY-8MT" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" constant="-16" id="Nny-Q1-G7z"/>
-                            <constraint firstItem="X4M-0m-agr" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" constant="-17" id="PvG-KA-WNg"/>
+                            <constraint firstAttribute="trailing" secondItem="wPy-LY-uJK" secondAttribute="trailing" id="2Oo-RB-6y8"/>
+                            <constraint firstAttribute="trailing" secondItem="9hJ-tI-0Qm" secondAttribute="trailing" id="2gR-eS-J8c"/>
+                            <constraint firstAttribute="trailing" secondItem="nef-Qp-sxn" secondAttribute="trailing" id="7Og-3v-n9d"/>
+                            <constraint firstItem="6nS-uY-8MT" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="Nny-Q1-G7z"/>
+                            <constraint firstItem="X4M-0m-agr" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="PvG-KA-WNg"/>
                             <constraint firstItem="q8T-hR-ehe" firstAttribute="top" secondItem="wPy-LY-uJK" secondAttribute="bottom" id="THB-Me-9bz"/>
-                            <constraint firstItem="9hJ-tI-0Qm" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" constant="-17" id="VAG-sD-VCS"/>
+                            <constraint firstItem="9hJ-tI-0Qm" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="VAG-sD-VCS"/>
                             <constraint firstItem="nef-Qp-sxn" firstAttribute="width" secondItem="X4M-0m-agr" secondAttribute="width" id="XOR-zK-cjs"/>
                             <constraint firstItem="9hJ-tI-0Qm" firstAttribute="top" secondItem="6nS-uY-8MT" secondAttribute="bottom" constant="8" id="ZZR-35-LNy"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="QAk-UM-QR2" secondAttribute="trailing" constant="-16" id="dln-zz-sSk"/>
+                            <constraint firstAttribute="trailing" secondItem="QAk-UM-QR2" secondAttribute="trailing" id="dln-zz-sSk"/>
                             <constraint firstItem="nef-Qp-sxn" firstAttribute="width" secondItem="h7t-dg-GCb" secondAttribute="width" id="g72-ER-E8U"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="xMU-Jn-XBZ" secondAttribute="trailing" constant="-16" id="gPl-Bp-meH"/>
+                            <constraint firstAttribute="trailing" secondItem="xMU-Jn-XBZ" secondAttribute="trailing" id="gPl-Bp-meH"/>
                             <constraint firstItem="h7t-dg-GCb" firstAttribute="leading" secondItem="X4M-0m-agr" secondAttribute="trailing" constant="8" id="lf3-2e-h8w"/>
                             <constraint firstItem="6nS-uY-8MT" firstAttribute="top" secondItem="QAk-UM-QR2" secondAttribute="bottom" constant="8" id="s9T-ro-B5C"/>
-                            <constraint firstItem="QAk-UM-QR2" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" constant="-16" id="vut-D7-0J4"/>
-                            <constraint firstItem="wPy-LY-uJK" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" id="wH8-7w-rXG"/>
+                            <constraint firstItem="QAk-UM-QR2" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="vut-D7-0J4"/>
+                            <constraint firstItem="wPy-LY-uJK" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="wH8-7w-rXG"/>
                             <constraint firstItem="wPy-LY-uJK" firstAttribute="top" secondItem="xMU-Jn-XBZ" secondAttribute="bottom" constant="8" id="wUw-N2-aXe"/>
-                            <constraint firstItem="xMU-Jn-XBZ" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" constant="-17" id="wyD-8P-wpP"/>
-                            <constraint firstItem="nef-Qp-sxn" firstAttribute="leading" secondItem="h7t-dg-GCb" secondAttribute="trailing" constant="8" id="yfM-x0-c1n"/>
+                            <constraint firstItem="xMU-Jn-XBZ" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="wyD-8P-wpP"/>
+                            <constraint firstItem="nef-Qp-sxn" firstAttribute="leading" secondItem="h7t-dg-GCb" secondAttribute="trailing" id="yfM-x0-c1n"/>
                             <constraint firstItem="QAk-UM-QR2" firstAttribute="top" secondItem="X4M-0m-agr" secondAttribute="bottom" constant="8" id="zJb-lc-qjA"/>
                         </constraints>
                     </view>
