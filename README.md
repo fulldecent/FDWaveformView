@@ -1,3 +1,6 @@
+NOTICE: Development on this project is on pause until CocoaPods releases full support for Swift. Then we will work to upgrade this project. See https://github.com/CocoaPods/CocoaPods/pull/2835
+
+
 FDWaveformView [![Build Status](https://travis-ci.org/fulldecent/FDWaveformView.svg?branch=master)](https://travis-ci.org/fulldecent/FDWaveformView)
 ==============
 
