@@ -79,30 +79,18 @@
     [self addGestureRecognizer:self.tapRecognizer];
 }
 
-- (id)initWithCoder:(NSCoder *)aCoder
+- (instancetype)initWithCoder:(NSCoder *)aCoder
 {
     if (self = [super initWithCoder:aCoder])
         [self initialize];
     return self;
 }
 
-- (id)initWithFrame:(CGRect)rect
+- (instancetype)initWithFrame:(CGRect)rect
 {
     if (self = [super initWithFrame:rect])
         [self initialize];
     return self;
-}
-
-- (void)dealloc
-{
-    self.delegate = nil;
-    self.audioURL = nil;
-    self.image = nil;
-    self.highlightedImage = nil;
-    self.clipping = nil;
-    self.asset = nil;
-    self.wavesColor = nil;
-    self.progressColor = nil;
 }
 
 - (void)setAudioURL:(NSURL *)audioURL
@@ -125,13 +113,15 @@
                 self.image.image = nil;
                 self.highlightedImage.image = nil;
                 self.totalSamples = (unsigned long int) self.asset.duration.value;
-                _progressSamples = 0; // skip custom setter
-                _zoomStartSamples = 0; // skip custom setter
-                _zoomEndSamples = (unsigned long int) self.asset.duration.value; // skip custom setter
+                _progressSamples = 0; // skip setter
+                _zoomStartSamples = 0; // skip setter
+                _zoomEndSamples = (unsigned long int) self.asset.duration.value; // skip setter
                 [self setNeedsDisplay];
                 [self performSelectorOnMainThread:@selector(setNeedsLayout) withObject:nil waitUntilDone:NO];
                 break;
                 
+            case AVKeyValueStatusUnknown:
+            case AVKeyValueStatusLoading:
             case AVKeyValueStatusFailed:
             case AVKeyValueStatusCancelled:
                 NSLog(@"FDWaveformView could not load asset: %@", error.localizedDescription);
@@ -208,9 +198,7 @@
         self.clipping.frame = CGRectMake(0,0,self.frame.size.width*scaledProgress,self.frame.size.height);
         self.clipping.hidden = self.progressSamples <= self.zoomStartSamples;
         return;
-    }
-
-    
+    }    
     
     self.renderingInProgress = YES;
     if ([self.delegate respondsToSelector:@selector(waveformViewWillRender:)])
@@ -285,22 +273,20 @@
 
     NSError *error = nil;
     AVAssetReader *reader = [[AVAssetReader alloc] initWithAsset:songAsset error:&error];
-    AVAssetTrack *songTrack = [songAsset.tracks objectAtIndex:0];
-    NSDictionary *outputSettingsDict = [[NSDictionary alloc] initWithObjectsAndKeys:
-                                        [NSNumber numberWithInt:kAudioFormatLinearPCM],AVFormatIDKey,
+    AVAssetTrack *songTrack = (songAsset.tracks)[0];
+    NSDictionary *outputSettingsDict = @{AVFormatIDKey: @(kAudioFormatLinearPCM),
                                         //     [NSNumber numberWithInt:44100.0],AVSampleRateKey, /*Not Supported*/
                                         //     [NSNumber numberWithInt: 2],AVNumberOfChannelsKey,    /*Not Supported*/
-                                        [NSNumber numberWithInt:16],AVLinearPCMBitDepthKey,
-                                        [NSNumber numberWithBool:NO],AVLinearPCMIsBigEndianKey,
-                                        [NSNumber numberWithBool:NO],AVLinearPCMIsFloatKey,
-                                        [NSNumber numberWithBool:NO],AVLinearPCMIsNonInterleaved,
-                                        nil];
+                                        AVLinearPCMBitDepthKey: @16,
+                                        AVLinearPCMIsBigEndianKey: @NO,
+                                        AVLinearPCMIsFloatKey: @NO,
+                                        AVLinearPCMIsNonInterleaved: @NO};
     AVAssetReaderTrackOutput *output = [[AVAssetReaderTrackOutput alloc] initWithTrack:songTrack outputSettings:outputSettingsDict];
     [reader addOutput:output];
     UInt32 channelCount;
     NSArray *formatDesc = songTrack.formatDescriptions;
     for(unsigned int i = 0; i < [formatDesc count]; ++i) {
-        CMAudioFormatDescriptionRef item = (__bridge CMAudioFormatDescriptionRef)[formatDesc objectAtIndex:i];
+        CMAudioFormatDescriptionRef item = (__bridge CMAudioFormatDescriptionRef)formatDesc[i];
         const AudioStreamBasicDescription* fmtDesc = CMAudioFormatDescriptionGetStreamBasicDescription(item);
         if (!fmtDesc) return; //!
         channelCount = fmtDesc->mChannelsPerFrame;
@@ -319,7 +305,7 @@
     [reader startReading];
     
     while (reader.status == AVAssetReaderStatusReading) {
-        AVAssetReaderTrackOutput * trackOutput = (AVAssetReaderTrackOutput *)[reader.outputs objectAtIndex:0];
+        AVAssetReaderTrackOutput * trackOutput = (AVAssetReaderTrackOutput *)(reader.outputs)[0];
         CMSampleBufferRef sampleBufferRef = [trackOutput copyNextSampleBuffer];
         if (sampleBufferRef) {
             CMBlockBufferRef blockBufferRef = CMSampleBufferGetDataBuffer(sampleBufferRef);
