@@ -50,13 +50,6 @@
 @end
 
 @implementation FDWaveformView
-@synthesize audioURL = _audioURL;
-@synthesize image = _image;
-@synthesize highlightedImage = _highlightedImage;
-@synthesize clipping = _clipping;
-@synthesize pinchRecognizer = _pinchRecognizer;
-@synthesize panRecognizer = _panRecognizer;
-@synthesize tapRecognizer = _tapRecognizer;
 
 - (void)initialize
 {
