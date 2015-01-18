@@ -1,6 +1,3 @@
-NOTICE: Development on this project is on pause until CocoaPods releases full support for Swift. Then we will work to upgrade this project. See https://github.com/CocoaPods/CocoaPods/pull/2835
-
-
 FDWaveformView [![Build Status](https://travis-ci.org/fulldecent/FDWaveformView.svg?branch=master)](https://travis-ci.org/fulldecent/FDWaveformView)
 ==============
 
@@ -70,6 +67,6 @@ Creates **antialiased waveforms** by drawing more pixels than are seen on screen
 Installation
 ------------
 
-  1. Add `pod 'FDWaveformView', '~> 0.2.0'` to your <a href="https://github.com/AFNetworking/AFNetworking/wiki/Getting-Started-with-AFNetworking">Podfile</a>
+  1. Add `pod 'FDWaveformView'` to your <a href="https://github.com/AFNetworking/AFNetworking/wiki/Getting-Started-with-AFNetworking">Podfile</a>
   2. The the API documentation under "Class Reference" at http://cocoadocs.org/docsets/FDWaveformView/
   3. Please add your project to "I USE THIS" at https://www.cocoacontrols.com/controls/fdwaveformview if you support this project
