@@ -98,7 +98,7 @@
     if ([self.delegate respondsToSelector:@selector(waveformViewWillLoad:)])
         [self.delegate waveformViewWillLoad:self];
     self.asset = [AVURLAsset URLAssetWithURL:audioURL options:nil];
-    self.assetTrack = [self.asset tracksWithMediaType:AVMediaTypeAudio][0];
+    self.assetTrack = [[self.asset tracksWithMediaType:AVMediaTypeAudio] firstObject];
 
     [self.asset loadValuesAsynchronouslyForKeys:@[@"duration"] completionHandler:^() {
         self.loadingInProgress = NO;
@@ -281,7 +281,7 @@
     
     NSInteger downsampleFactor = (end-start) / targetSamples;
     downsampleFactor = downsampleFactor<1 ? 1 : downsampleFactor;
-    NSMutableData *fullSongData = [[NSMutableData alloc] initWithCapacity:songAsset.duration.value/downsampleFactor*2]; // 16-bit samples
+    NSMutableData *fullSongData = [NSMutableData dataWithCapacity:(NSUInteger)songAsset.duration.value/downsampleFactor*2]; // 16-bit samples
     [reader startReading];
     
     while (reader.status == AVAssetReaderStatusReading) {
