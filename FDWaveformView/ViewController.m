@@ -24,8 +24,7 @@
 {
     [super viewDidLoad];
     NSBundle *thisBundle = [NSBundle bundleForClass:[self class]];
-    NSString *filePath = [thisBundle pathForResource:@"Submarine" ofType:@"aiff"];
-    NSURL *url = [NSURL fileURLWithPath:filePath];
+    NSURL *url = [thisBundle URLForResource:@"Submarine" withExtension:@"aiff"];
     
     // We wish to animate the waveformv iew in when it is rendered
     self.waveform.delegate = self;
