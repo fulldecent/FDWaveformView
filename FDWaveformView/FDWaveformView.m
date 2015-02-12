@@ -371,7 +371,7 @@
 
 - (void)handlePinchGesture:(UIPinchGestureRecognizer *)recognizer
 {
-    if (!self.doesAllowStretchAndScroll)
+    if (!self.doesAllowStretch)
         return;
     if (recognizer.scale == 1) return;
     
@@ -395,7 +395,10 @@
     CGPoint point = [recognizer translationInView:self];
     NSLog(@"translation: %f", point.x);
 
-    if (self.doesAllowStretchAndScroll) {
+    if (self.doesAllowScroll) {
+        if (recognizer.state == UIGestureRecognizerStateBegan && [self.delegate respondsToSelector:@selector(waveformDidBeginPanning:)])
+          [self.delegate waveformDidBeginPanning:self];
+      
         long translationSamples = (float)(self.zoomEndSamples-self.zoomStartSamples) * point.x / self.bounds.size.width;
         [recognizer setTranslation:CGPointZero inView:self];
         if ((float)self.zoomStartSamples - translationSamples < 0)
@@ -404,6 +407,10 @@
             translationSamples = self.zoomEndSamples - self.totalSamples;
         _zoomStartSamples -= translationSamples;
         _zoomEndSamples -= translationSamples;
+      
+        if (recognizer.state == UIGestureRecognizerStateEnded && [self.delegate respondsToSelector:@selector(waveformDidEndPanning:)])
+          [self.delegate waveformDidEndPanning:self];
+      
         [self setNeedsDisplay];
         [self setNeedsLayout];
     } else if (self.doesAllowScrubbing) {
