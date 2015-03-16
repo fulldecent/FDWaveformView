@@ -22,7 +22,7 @@ Pod::Spec.new do |s|
   s.source           = { :git => "https://github.com/fulldecent/FDWaveformView.git", :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/fulldecent'
 
-  s.platform     = :ios, '7.0'
+  s.platform     = :ios, '7.1'
   s.requires_arc = true
 
   s.source_files = 'Pod/Classes/**/*'
