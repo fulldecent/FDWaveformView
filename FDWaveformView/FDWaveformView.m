@@ -129,6 +129,8 @@
             case AVKeyValueStatusCancelled:
                 NSLog(@"FDWaveformView could not load asset: %@", error.localizedDescription);
                 break;
+            default:
+                break;
         }
     }];
 }
