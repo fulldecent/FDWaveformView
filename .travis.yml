@@ -13,7 +13,7 @@ before_install:
 - if brew outdated --quiet | grep -qx xctool; then brew upgrade xctool; fi
 
 script: 
-- xctool -project FDWaveformView.xcodeproj -scheme FDWaveformView -sdk iphonesimulator7.0 ONLY_ACTIVE_ARCH=NO clean build test 
+- xctool -project FDWaveformView.xcodeproj -scheme FDWaveformView -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO clean build test 
 
 
 notifications:
