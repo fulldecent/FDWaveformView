@@ -33,7 +33,8 @@
     self.waveform.audioURL = url;
     self.waveform.progressSamples = 10000;
     self.waveform.doesAllowScrubbing = YES;
-    self.waveform.doesAllowStretchAndScroll = YES;
+    self.waveform.doesAllowStretch = YES;
+    self.waveform.doesAllowScroll = YES;
 }
 
 - (void)doAnimation
