@@ -19,7 +19,8 @@
 @property (nonatomic, assign) unsigned long int zoomStartSamples;
 @property (nonatomic, assign) unsigned long int zoomEndSamples;
 @property (nonatomic) BOOL doesAllowScrubbing;
-@property (nonatomic) BOOL doesAllowStretchAndScroll;
+@property (nonatomic) BOOL doesAllowStretch;
+@property (nonatomic) BOOL doesAllowScroll;
 @property (nonatomic, copy) UIColor *wavesColor;
 @property (nonatomic, copy) UIColor *progressColor;
 @end
@@ -30,4 +31,6 @@
 - (void)waveformViewDidRender:(FDWaveformView *)waveformView;
 - (void)waveformViewWillLoad:(FDWaveformView *)waveformView;
 - (void)waveformViewDidLoad:(FDWaveformView *)waveformView;
+- (void)waveformDidBeginPanning:(FDWaveformView *)waveformView;
+- (void)waveformDidEndPanning:(FDWaveformView *)waveformView;
 @end

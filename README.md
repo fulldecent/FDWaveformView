@@ -44,8 +44,9 @@ self.waveform.zoomEndSamples = self.waveform.totalSamples / 4;
 
 **Enable gestures** for zooming in, panning around or scrubbing:
 
-self.waveform.doesAllowScrubbing = YES;
-self.waveform.doesAllowStretchAndScroll = YES;
+    self.waveform.doesAllowScrubbing = YES;
+    self.waveform.doesAllowStretch = YES;
+    self.waveform.doesAllowScroll = YES;
 
 <p align="center">
 <img src="https://i.imgur.com/8oR7cpq.gif" width=250 loop=infinite>
