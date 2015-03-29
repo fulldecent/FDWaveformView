@@ -1,21 +1,13 @@
+# references:
+# * http://www.objc.io/issue-6/travis-ci.html
+# * https://github.com/supermarin/xcpretty#usage
+
 language: objective-c
-
-#language: objective-c
-#xcode_project: FDSoundActivatedRecorder.xcodeproj
-#xcode_scheme: FDSoundActivatedRecorder
-#xcode_sdk: iphonesimulator7.0
-
-# PER https://github.com/travis-ci/travis-ci/issues/2197
-# https://github.com/jessesquires/BButton/blob/54a8b3eb1f237a502201910f455a030800956ebe/.travis.yml
-
-before_install: 
-- brew update
-- if brew outdated --quiet | grep -qx xctool; then brew upgrade xctool; fi
-
-script: 
-- xctool -project FDWaveformView.xcodeproj -scheme FDWaveformView -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO clean build test 
-
-
-notifications:
-  email:
-    fdwaveformview@phor.net
+# cache: cocoapods
+# podfile: Example/Podfile
+# before_install:
+# - gem install cocoapods # Since Travis is not always on latest version
+# - pod install --project-directory=Example
+script:
+- xctool -workspace Example/FDWaveformView.xcworkspace -scheme FDWaveformView-Example -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO clean build test 
+- pod lib lint --quick

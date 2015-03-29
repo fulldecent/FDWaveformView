@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14C1510" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="vXZ-lx-hvc">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6246"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="ufC-wZ-h7g">
+            <objects>
+                <viewController id="vXZ-lx-hvc" customClass="FDViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="Sp7-Cm-ral"/>
+                        <viewControllerLayoutGuide type="bottom" id="q8T-hR-ehe"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="kh9-bI-dsS">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wPy-LY-uJK" customClass="FDWaveformView">
+                                <rect key="frame" x="0.0" y="210" width="320" height="358"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="wavesColor">
+                                        <color key="value" red="0.17254901960784313" green="0.50980392156862742" blue="0.78823529411764703" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="X4M-0m-agr">
+                                <rect key="frame" x="0.0" y="20" width="101" height="30"/>
+                                <color key="backgroundColor" red="0.9882352941176471" green="0.37647058823529411" blue="0.25882352941176467" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal" title="Load AAC">
+                                    <color key="titleColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="doLoadAAC" destination="vXZ-lx-hvc" eventType="touchUpInside" id="8Tg-5p-aFJ"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="h7t-dg-GCb">
+                                <rect key="frame" x="109" y="20" width="102" height="30"/>
+                                <color key="backgroundColor" red="0.98823529409999999" green="0.37647058820000001" blue="0.25882352939999997" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal" title="Load MP3">
+                                    <color key="titleColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="doLoadMP3" destination="vXZ-lx-hvc" eventType="touchUpInside" id="pJl-2A-05Y"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nef-Qp-sxn">
+                                <rect key="frame" x="219" y="20" width="101" height="30"/>
+                                <color key="backgroundColor" red="0.98823529409999999" green="0.37647058820000001" blue="0.25882352939999997" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal" title="Load OGG">
+                                    <color key="titleColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="doLoadOGG" destination="vXZ-lx-hvc" eventType="touchUpInside" id="FJu-PS-P3c"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6nS-uY-8MT">
+                                <rect key="frame" x="0.0" y="96" width="320" height="30"/>
+                                <color key="backgroundColor" red="0.93333333333333335" green="0.90196078431372551" blue="0.3411764705882353" alpha="1" colorSpace="deviceRGB"/>
+                                <state key="normal" title="Zoom in">
+                                    <color key="titleColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="doZoomIn" destination="vXZ-lx-hvc" eventType="touchUpInside" id="87L-US-fct"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9hJ-tI-0Qm">
+                                <rect key="frame" x="0.0" y="134" width="320" height="30"/>
+                                <color key="backgroundColor" red="0.93333333333333335" green="0.90196078431372551" blue="0.3411764705882353" alpha="1" colorSpace="deviceRGB"/>
+                                <state key="normal" title="Zoom out">
+                                    <color key="titleColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="doZoomOut" destination="vXZ-lx-hvc" eventType="touchUpInside" id="Jg3-kI-IUy"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QAk-UM-QR2">
+                                <rect key="frame" x="0.0" y="58" width="320" height="30"/>
+                                <color key="backgroundColor" red="0.93333333330000001" green="0.90196078430000004" blue="0.3411764706" alpha="1" colorSpace="deviceRGB"/>
+                                <state key="normal" title="Randomly set play progress">
+                                    <color key="titleColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="doAnimation" destination="vXZ-lx-hvc" eventType="touchUpInside" id="Jao-Oh-4mr"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xMU-Jn-XBZ">
+                                <rect key="frame" x="0.0" y="172" width="320" height="30"/>
+                                <color key="backgroundColor" red="0.93333333330000001" green="0.90196078430000004" blue="0.3411764706" alpha="1" colorSpace="deviceRGB"/>
+                                <state key="normal" title="Run performance profiling">
+                                    <color key="titleColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="doRunPerformanceProfile" destination="vXZ-lx-hvc" eventType="touchUpInside" id="ebh-AO-elY"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.94901960784313721" alpha="1" colorSpace="deviceRGB"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="6nS-uY-8MT" secondAttribute="trailing" id="0vs-ux-ijL"/>
+                            <constraint firstItem="xMU-Jn-XBZ" firstAttribute="top" secondItem="9hJ-tI-0Qm" secondAttribute="bottom" constant="8" id="1ea-Ws-pEk"/>
+                            <constraint firstAttribute="trailing" secondItem="wPy-LY-uJK" secondAttribute="trailing" id="2Oo-RB-6y8"/>
+                            <constraint firstAttribute="trailing" secondItem="9hJ-tI-0Qm" secondAttribute="trailing" id="2gR-eS-J8c"/>
+                            <constraint firstAttribute="trailing" secondItem="nef-Qp-sxn" secondAttribute="trailing" id="7Og-3v-n9d"/>
+                            <constraint firstItem="X4M-0m-agr" firstAttribute="top" secondItem="Sp7-Cm-ral" secondAttribute="bottom" id="FME-Dw-IU6"/>
+                            <constraint firstItem="6nS-uY-8MT" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="Nny-Q1-G7z"/>
+                            <constraint firstItem="X4M-0m-agr" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="PvG-KA-WNg"/>
+                            <constraint firstItem="q8T-hR-ehe" firstAttribute="top" secondItem="wPy-LY-uJK" secondAttribute="bottom" id="THB-Me-9bz"/>
+                            <constraint firstItem="9hJ-tI-0Qm" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="VAG-sD-VCS"/>
+                            <constraint firstItem="nef-Qp-sxn" firstAttribute="width" secondItem="X4M-0m-agr" secondAttribute="width" id="XOR-zK-cjs"/>
+                            <constraint firstItem="9hJ-tI-0Qm" firstAttribute="top" secondItem="6nS-uY-8MT" secondAttribute="bottom" constant="8" id="ZZR-35-LNy"/>
+                            <constraint firstAttribute="trailing" secondItem="QAk-UM-QR2" secondAttribute="trailing" id="dln-zz-sSk"/>
+                            <constraint firstItem="nef-Qp-sxn" firstAttribute="width" secondItem="h7t-dg-GCb" secondAttribute="width" id="g72-ER-E8U"/>
+                            <constraint firstAttribute="trailing" secondItem="xMU-Jn-XBZ" secondAttribute="trailing" id="gPl-Bp-meH"/>
+                            <constraint firstItem="nef-Qp-sxn" firstAttribute="top" secondItem="X4M-0m-agr" secondAttribute="top" id="j9E-hb-ITq"/>
+                            <constraint firstItem="h7t-dg-GCb" firstAttribute="leading" secondItem="X4M-0m-agr" secondAttribute="trailing" constant="8" id="lf3-2e-h8w"/>
+                            <constraint firstItem="6nS-uY-8MT" firstAttribute="top" secondItem="QAk-UM-QR2" secondAttribute="bottom" constant="8" id="s9T-ro-B5C"/>
+                            <constraint firstItem="QAk-UM-QR2" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="vut-D7-0J4"/>
+                            <constraint firstItem="wPy-LY-uJK" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="wH8-7w-rXG"/>
+                            <constraint firstItem="wPy-LY-uJK" firstAttribute="top" secondItem="xMU-Jn-XBZ" secondAttribute="bottom" constant="8" id="wUw-N2-aXe"/>
+                            <constraint firstItem="nef-Qp-sxn" firstAttribute="top" secondItem="h7t-dg-GCb" secondAttribute="top" id="wrZ-Le-FKx"/>
+                            <constraint firstItem="xMU-Jn-XBZ" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="wyD-8P-wpP"/>
+                            <constraint firstItem="nef-Qp-sxn" firstAttribute="leading" secondItem="h7t-dg-GCb" secondAttribute="trailing" constant="8" id="yfM-x0-c1n"/>
+                            <constraint firstItem="QAk-UM-QR2" firstAttribute="top" secondItem="X4M-0m-agr" secondAttribute="bottom" constant="8" id="zJb-lc-qjA"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="playButton" destination="kh9-bI-dsS" id="ot4-17-fpG"/>
+                        <outlet property="waveform" destination="wPy-LY-uJK" id="XON-YS-Fax"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
+            </objects>
+        </scene>
+    </scenes>
+    <simulatedMetricsContainer key="defaultSimulatedMetrics">
+        <simulatedStatusBarMetrics key="statusBar"/>
+        <simulatedOrientationMetrics key="orientation"/>
+        <simulatedScreenMetrics key="destination" type="retina4"/>
+    </simulatedMetricsContainer>
+</document>
