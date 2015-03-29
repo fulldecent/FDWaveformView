@@ -9,5 +9,5 @@ language: objective-c
 # - gem install cocoapods # Since Travis is not always on latest version
 # - pod install --project-directory=Example
 script:
-- xctool -project FDWaveformView.xcodeproj -scheme FDWaveformView -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO clean build test 
+- xctool -workspace Example/FDWaveformView.xcworkspace -scheme FDWaveformView-Example -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO clean build test 
 - pod lib lint --quick
