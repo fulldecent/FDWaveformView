@@ -65,7 +65,7 @@ self.waveform.progressSamples = randomNumber;
 
 Creates **antialiased waveforms** by drawing more pixels than are seen on screen. Also, if you resize me (autolayout) I will render more detail if necessary to avoid pixelation.
 
-**Supports ARC** and **iOS5+**.
+**Supports ARC** and **iOS7+**.
 
 **Includes unit tests** which run successfully using Travis CI.
 
