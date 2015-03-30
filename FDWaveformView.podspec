@@ -9,7 +9,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "FDWaveformView"
-  s.version          = "0.3.0"
+  s.version          = "0.3.1"
   s.summary          = "Reads an audio file and displays the waveform"
   s.description      = <<-DESC
                        FDWaveformView is an easy way to display an audio waveform in your app.
@@ -22,7 +22,7 @@ Pod::Spec.new do |s|
   s.source           = { :git => "https://github.com/fulldecent/FDWaveformView.git", :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/fulldecent'
 
-  s.platform     = :ios, '7.1'
+  s.platform     = :ios, '7.0'
   s.requires_arc = true
 
   s.source_files = 'Pod/Classes/**/*'
