@@ -340,6 +340,7 @@
     CGSize imageSize = CGSizeMake(sampleCount, imageHeight);
     UIGraphicsBeginImageContext(imageSize);
     CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSetShouldAntialias(context, NO);
     CGContextSetAlpha(context,1.0);
     CGContextSetLineWidth(context, 1.0);
     CGContextSetStrokeColorWithColor(context, [self.wavesColor CGColor]);
