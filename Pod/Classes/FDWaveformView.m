@@ -352,6 +352,9 @@
     for (NSInteger intSample=0; intSample<sampleCount; intSample++) {
         Float32 sample = *samples++;
         float pixels = (sample - noiseFloor) * sampleAdjustmentFactor;
+        if (pixels == 0) {
+            pixels = 1;
+        }
         CGContextMoveToPoint(context, intSample, centerLeft-pixels);
         CGContextAddLineToPoint(context, intSample, centerLeft+pixels);
         CGContextStrokePath(context);
