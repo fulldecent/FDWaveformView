@@ -13,10 +13,12 @@ Usage
 
 To use it, add an `FDWaveformView` using Interface Builder or programmatically and then just load your audio as per this example. Note: if your audio file does not have file extension, see <a href="https://stackoverflow.com/questions/9290972/is-it-possible-to-make-avurlasset-work-without-a-file-extension">this SO question</a>.
 
+```objective-c
 NSBundle *thisBundle = [NSBundle bundleForClass:[self class]];
 NSString *filePath = [thisBundle pathForResource:@"Submarine" ofType:@"aiff"];
 NSURL *url = [NSURL fileURLWithPath:filePath];
 self.waveform.audioURL = url;
+```
 
 <p align="center">
 <img src="https://i.imgur.com/5N7ozog.png" width=250>
@@ -27,7 +29,9 @@ Features
 
 **Set play progress** to highlight part of the waveform:
 
+```objective-c
 self.waveform.progressSamples = self.waveform.totalSamples / 2;
+```
 
 <p align="center">
 <img src="https://i.imgur.com/fRrHiRP.png" width=250>
@@ -35,8 +39,10 @@ self.waveform.progressSamples = self.waveform.totalSamples / 2;
 
 **Zoom in** to show only part of the waveform, of course, zooming in will smoothly rerender to show progressively more detail:
 
+```objective-c
 self.waveform.zoomStartSamples = 0;
 self.waveform.zoomEndSamples = self.waveform.totalSamples / 4;
+```
 
 <p align="center">
 <img src="https://i.imgur.com/JQOKQ3o.png" width=250>
@@ -44,9 +50,11 @@ self.waveform.zoomEndSamples = self.waveform.totalSamples / 4;
 
 **Enable gestures** for zooming in, panning around or scrubbing:
 
-    self.waveform.doesAllowScrubbing = YES;
-    self.waveform.doesAllowStretch = YES;
-    self.waveform.doesAllowScroll = YES;
+```objective-c
+self.waveform.doesAllowScrubbing = YES;
+self.waveform.doesAllowStretch = YES;
+self.waveform.doesAllowScroll = YES;
+```
 
 <p align="center">
 <img src="https://i.imgur.com/8oR7cpq.gif" width=250 loop=infinite>
@@ -54,10 +62,12 @@ self.waveform.zoomEndSamples = self.waveform.totalSamples / 4;
 
 **Supports animation** for changing properties:
 
+```objective-c
 [UIView animateWithDuration:0.3 animations:^{
-NSInteger randomNumber = arc4random() % self.waveform.totalSamples;
-self.waveform.progressSamples = randomNumber;
+    NSInteger randomNumber = arc4random() % self.waveform.totalSamples;
+    self.waveform.progressSamples = randomNumber;
 }];
+```
 
 <p align="center">
 <img src="https://i.imgur.com/EgxXaCY.gif" width=250 loop=infinite>
