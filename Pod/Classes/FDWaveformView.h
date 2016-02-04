@@ -14,10 +14,10 @@
 @interface FDWaveformView : UIView
 @property (nonatomic, weak) id<FDWaveformViewDelegate> delegate;
 @property (nonatomic, strong) NSURL *audioURL;
-@property (nonatomic, assign, readonly) unsigned long int totalSamples;
-@property (nonatomic, assign) unsigned long int progressSamples;
-@property (nonatomic, assign) unsigned long int zoomStartSamples;
-@property (nonatomic, assign) unsigned long int zoomEndSamples;
+@property (nonatomic, assign, readonly) long int totalSamples;
+@property (nonatomic, assign) long int progressSamples;
+@property (nonatomic, assign) long int zoomStartSamples;
+@property (nonatomic, assign) long int zoomEndSamples;
 @property (nonatomic) BOOL doesAllowScrubbing;
 @property (nonatomic) BOOL doesAllowStretch;
 @property (nonatomic) BOOL doesAllowScroll;

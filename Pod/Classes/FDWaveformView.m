@@ -37,9 +37,9 @@
 @property (nonatomic, strong) UIView *clipping;
 @property (nonatomic, strong) AVAsset *asset;
 @property (nonatomic, strong) AVAssetTrack *assetTrack;
-@property (nonatomic, assign) unsigned long int totalSamples;
-@property (nonatomic, assign) unsigned long int cachedStartSamples;
-@property (nonatomic, assign) unsigned long int cachedEndSamples;
+@property (nonatomic, assign) long int totalSamples;
+@property (nonatomic, assign) long int cachedStartSamples;
+@property (nonatomic, assign) long int cachedEndSamples;
 @property (nonatomic, strong) UIPinchGestureRecognizer *pinchRecognizer;
 @property (nonatomic, strong) UIPanGestureRecognizer *panRecognizer;
 @property (nonatomic, strong) UITapGestureRecognizer *tapRecognizer;
@@ -135,7 +135,7 @@
     }];
 }
 
-- (void)setProgressSamples:(unsigned long)progressSamples
+- (void)setProgressSamples:(long)progressSamples
 {
     _progressSamples = progressSamples;
     if (self.totalSamples) {
@@ -145,14 +145,14 @@
     }
 }
 
-- (void)setZoomStartSamples:(unsigned long)startSamples
+- (void)setZoomStartSamples:(long)startSamples
 {
     _zoomStartSamples = startSamples;
     [self setNeedsDisplay];
     [self setNeedsLayout];
 }
 
-- (void)setZoomEndSamples:(unsigned long)endSamples
+- (void)setZoomEndSamples:(long)endSamples
 {
     _zoomEndSamples = endSamples;
     [self setNeedsDisplay];
