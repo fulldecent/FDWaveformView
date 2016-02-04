@@ -340,6 +340,7 @@
     CGSize imageSize = CGSizeMake(sampleCount, imageHeight);
     UIGraphicsBeginImageContext(imageSize);
     CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSetShouldAntialias(context, NO);
     CGContextSetAlpha(context,1.0);
     CGContextSetLineWidth(context, 1.0);
     CGContextSetStrokeColorWithColor(context, [self.wavesColor CGColor]);
@@ -351,6 +352,9 @@
     for (NSInteger intSample=0; intSample<sampleCount; intSample++) {
         Float32 sample = *samples++;
         float pixels = (sample - noiseFloor) * sampleAdjustmentFactor;
+        if (pixels == 0) {
+            pixels = 1;
+        }
         CGContextMoveToPoint(context, intSample, centerLeft-pixels);
         CGContextAddLineToPoint(context, intSample, centerLeft+pixels);
         CGContextStrokePath(context);
