@@ -53,10 +53,20 @@ EXPFixCategoriesBug(EXPMatcher##matcherName##Matcher); \
 #define _EXPMatcherImplementationEnd \
     } \
     [self applyMatcher:matcher to:&actual]; \
+    [[[NSThread currentThread] threadDictionary] removeObjectForKey:@"EXP_currentMatcher"]; \
   } copy]; \
   _EXP_release(matcher); \
   return _EXP_autorelease(matcherBlock); \
 } \
+@end
+
+#define _EXPMatcherAliasImplementation(newMatcherName, oldMatcherName, matcherArguments) \
+EXPFixCategoriesBug(EXPMatcher##newMatcherName##Matcher); \
+@implementation EXPExpect (newMatcherName##Matcher) \
+@dynamic newMatcherName;\
+- (void(^) matcherArguments) newMatcherName { \
+  return [self oldMatcherName]; \
+}\
 @end
 
 #ifdef __cplusplus
