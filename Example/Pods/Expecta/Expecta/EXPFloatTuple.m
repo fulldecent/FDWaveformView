@@ -1,6 +1,9 @@
 #import "EXPFloatTuple.h"
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-designated-initializers"
 @implementation EXPFloatTuple
+#pragma clang diagnostic pop
 
 @synthesize values = _values, size = _size;
 
@@ -28,6 +31,16 @@
         return YES;
     }
     return NO;
+}
+
+- (NSUInteger)hash
+{
+    NSUInteger prime = 31;
+    NSUInteger hash = 0;
+    for (int i=0; i<self.size; i++) {
+        hash = prime * hash + (NSUInteger)self.values[i];
+    }
+    return hash;
 }
 
 - (NSString *)description {
