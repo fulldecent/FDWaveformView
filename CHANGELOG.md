@@ -7,6 +7,9 @@ All notable changes to this project will be documented in this file.
 ## [Master](https://github.com/fulldecent/FDWaveformView/compare/0.3.2...master)
 
 #### Added
+- Full API documentation
+  - Added by [William Entriken](https://github.com/fulldecent) in Regards to Issue
+  [#53](https://github.com/fulldecent/FDWaveformView/issues/53).
 - Release process documentation
   - Added by [William Entriken](https://github.com/fulldecent) in Regards to Issue
   [#57](https://github.com/fulldecent/FDWaveformView/issues/57).
