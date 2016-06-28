@@ -33,3 +33,5 @@ DerivedData
 
 # Carthage
 Carthage/Build
+
+FDWaveformView.framework.zip
