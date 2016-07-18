@@ -14,9 +14,23 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "6003F589195388D20070C39A"
-               BuildableName = "FDWaveformView.app"
-               BlueprintName = "FDWaveformView"
+               BlueprintIdentifier = "607FACCF1AFB9204008FA782"
+               BuildableName = "FDWaveformView_Example.app"
+               BlueprintName = "FDWaveformView_Example"
+               ReferencedContainer = "container:FDWaveformView.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "607FACE41AFB9204008FA782"
+               BuildableName = "FDWaveformView_Tests.xctest"
+               BlueprintName = "FDWaveformView_Tests"
                ReferencedContainer = "container:FDWaveformView.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,9 +46,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "6003F5AD195388D20070C39A"
-               BuildableName = "Tests.xctest"
-               BlueprintName = "Tests"
+               BlueprintIdentifier = "607FACE41AFB9204008FA782"
+               BuildableName = "FDWaveformView_Tests.xctest"
+               BlueprintName = "FDWaveformView_Tests"
                ReferencedContainer = "container:FDWaveformView.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -42,9 +56,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6003F589195388D20070C39A"
-            BuildableName = "FDWaveformView.app"
-            BlueprintName = "FDWaveformView"
+            BlueprintIdentifier = "607FACCF1AFB9204008FA782"
+            BuildableName = "FDWaveformView_Example.app"
+            BlueprintName = "FDWaveformView_Example"
             ReferencedContainer = "container:FDWaveformView.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -65,9 +79,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6003F589195388D20070C39A"
-            BuildableName = "FDWaveformView.app"
-            BlueprintName = "FDWaveformView"
+            BlueprintIdentifier = "607FACCF1AFB9204008FA782"
+            BuildableName = "FDWaveformView_Example.app"
+            BlueprintName = "FDWaveformView_Example"
             ReferencedContainer = "container:FDWaveformView.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -84,9 +98,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6003F589195388D20070C39A"
-            BuildableName = "FDWaveformView.app"
-            BlueprintName = "FDWaveformView"
+            BlueprintIdentifier = "607FACCF1AFB9204008FA782"
+            BuildableName = "FDWaveformView_Example.app"
+            BlueprintName = "FDWaveformView_Example"
             ReferencedContainer = "container:FDWaveformView.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

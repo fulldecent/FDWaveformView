@@ -1,14 +1,11 @@
-source 'https://github.com/CocoaPods/Specs.git'
+use_frameworks!
 
-target 'FDWaveformView', :exclusive => true do
-  pod "FDWaveformView", :path => "../"
-end
+target 'FDWaveformView_Example' do
+  pod 'FDWaveformView', :path => '../'
 
-target 'Tests', :exclusive => true do
-  pod "FDWaveformView", :path => "../"
+  target 'FDWaveformView_Tests' do
+    inherit! :search_paths
 
-  pod 'Specta'
-  pod 'Expecta'
-  pod 'FBSnapshotTestCase', '1.5'
-  pod 'Expecta+Snapshots'
+    
+  end
 end

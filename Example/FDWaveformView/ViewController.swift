@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import FDWaveformView
 
 class ViewController: UIViewController {
     @IBOutlet weak var waveform: FDWaveformView!
