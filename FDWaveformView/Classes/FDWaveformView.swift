@@ -42,8 +42,8 @@ public class FDWaveformView: UIView {
                 let status = self.asset!.statusOfValueForKey("duration", error: &error)
                 switch status {
                 case .Loaded:
-                    self.image?.image = nil
-                    self.highlightedImage?.image = nil
+                    self.image.image = nil
+                    self.highlightedImage.image = nil
                     self.progressSamples = 0
                     self.zoomStartSamples = 0
                     let formatDesc = assetTrack.formatDescriptions
@@ -76,6 +76,7 @@ public class FDWaveformView: UIView {
     }
     
     //TODO:  MAKE THIS A RANGE, CAN IT BE ANIMATABLE??!
+    
     /// The first sample to render
     @IBInspectable public var zoomStartSamples: Int = 0 {
         didSet {
@@ -108,6 +109,34 @@ public class FDWaveformView: UIView {
     @IBInspectable public var progressColor = UIColor.blueColor()
     
     
+    //TODO MAKE PUBLIC
+    
+    // Drawing a larger image than needed to have it available for scrolling
+    private var horizontalMinimumBleed: CGFloat = 0.1
+    private var horizontalMaximumBleed: CGFloat = 3.0
+    private var horizontalTargetBleed: CGFloat = 0.5
+    
+    /// Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
+    private var horizontalMinimumOverdraw: CGFloat = 2.0
+    
+    /// Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
+    private var horizontalMaximumOverdraw: CGFloat = 5.0
+    
+    /// Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
+    private var horizontalTargetOverdraw: CGFloat = 3.0
+    
+    /// Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
+    private var verticalMinimumOverdraw: CGFloat = 1.0
+    
+    /// Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
+    private var verticalMaximumOverdraw: CGFloat = 3.0
+    
+    /// Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
+    private var verticalTargetOverdraw: CGFloat = 2.0
+    
+    /// The "zero" level (in dB)
+    private let noiseFloor: CGFloat = -50.0
+    
     
     
     // Mark - Private vars
@@ -117,45 +146,32 @@ public class FDWaveformView: UIView {
         return x < min ? min : x > max ? max : x
     }
     
-    private let noiseFloor: CGFloat = -50.0
     
     private func decibel(amplitude: CGFloat) -> CGFloat {
         return 20.0 * log10(abs(amplitude))
     }
     
-    //TODO MAKE PUBLIC
-    // Drawing a larger image than needed to have it available for scrolling
-    private var horizontalMinimumBleed: CGFloat = 0.1
-    private var horizontalMaximumBleed: CGFloat = 3.0
-    private var horizontalTargetBleed: CGFloat = 0.5
-    
-    // Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
-    private var horizontalMinimumOverdraw: CGFloat = 2.0
-    
-    // Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
-    private var horizontalMaximumOverdraw: CGFloat = 5.0
-    
-    // Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
-    private var horizontalTargetOverdraw: CGFloat = 3.0
-    
-    // Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
-    private var verticalMinimumOverdraw: CGFloat = 1.0
-    
-    // Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
-    private var verticalMaximumOverdraw: CGFloat = 3.0
-    
-    // Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
-    private var verticalTargetOverdraw: CGFloat = 2.0
-    
 
-    /// The rendered waveform
-    private var image: UIImageView? = nil
+    /// View for rendered waveform
+    private let image: UIImageView = {
+        let retval = UIImageView(frame: CGRect.zero)
+        retval.contentMode = .ScaleToFill
+        return retval
+    }()
     
-    /// The rendered waveform with a highlight effect
-    private var highlightedImage: UIImageView? = nil
+    /// View for rendered waveform showing progress
+    private let highlightedImage: UIImageView = {
+        let retval = UIImageView(frame: CGRect.zero)
+        retval.contentMode = .ScaleToFill
+        return retval
+    }()
     
     /// A view which hides part of the highlighted image
-    private var clipping = UIView()
+    private let clipping: UIView = {
+        let retval = UIView(frame: CGRect.zero)
+        retval.clipsToBounds = true
+        return retval
+    }()
     
     /// The audio asset we are analyzing
     private var asset: AVAsset?
@@ -163,7 +179,7 @@ public class FDWaveformView: UIView {
     /// The track (part of the asset) we will render
     private var assetTrack: AVAssetTrack? = nil
     
-    /// The range of sampled we rendered
+    /// The range of samples we rendered
     private var cachedSampleRange:Range<Int> = 0..<0
     
     /// Gesture recognizer
@@ -182,20 +198,12 @@ public class FDWaveformView: UIView {
     private var loadingInProgress = false
     
     func setup() {
-        //TODO: move in inits
-        self.image = UIImageView(frame: CGRectMake(0, 0, self.frame.size.width, self.frame.size.height))
-        self.image!.contentMode = .ScaleToFill
-        self.addSubview(self.image!)
+        addSubview(image)
+        clipping.addSubview(highlightedImage)
+        addSubview(clipping)
+        clipsToBounds = true
         
-        self.highlightedImage = UIImageView(frame: CGRectMake(0, 0, self.frame.size.width, self.frame.size.height))
-        self.highlightedImage!.contentMode = .ScaleToFill
-        self.clipping = UIView(frame: CGRectMake(0, 0, self.frame.size.width, self.frame.size.height))
-        self.clipping.addSubview(self.highlightedImage!)
-        self.clipping.clipsToBounds = true
-        self.addSubview(self.clipping)
-        self.clipsToBounds = true
-        self.wavesColor = UIColor.blackColor()
-        self.progressColor = UIColor.blueColor()
+        //TODO: try to do this in the lazy initializer above
         self.pinchRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(self.handlePinchGesture))
         self.pinchRecognizer.delegate = self
         self.addGestureRecognizer(self.pinchRecognizer)
@@ -218,13 +226,12 @@ public class FDWaveformView: UIView {
     
     /// If the cached image is insufficient for the current frame
     private func cacheIsDirty() -> Bool {
-        if image == nil {
+        if image.image == nil {
             return true
         }
         if cachedSampleRange.count == 0 {
             return true
         }
-        
         if cachedSampleRange.startIndex < minMaxX(zoomStartSamples - Int(CGFloat(cachedSampleRange.count) * horizontalMaximumBleed), min: 0, max: totalSamples) {
             return true
         }
@@ -237,16 +244,16 @@ public class FDWaveformView: UIView {
         if cachedSampleRange.endIndex > minMaxX(zoomEndSamples + Int(CGFloat(cachedSampleRange.count) * horizontalMaximumBleed), min: 0, max: totalSamples) {
             return true
         }
-        if image!.image?.size.width < frame.size.width * UIScreen.mainScreen().scale * CGFloat(horizontalMinimumOverdraw) {
+        if image.image?.size.width < frame.size.width * UIScreen.mainScreen().scale * CGFloat(horizontalMinimumOverdraw) {
             return true
         }
-        if image!.image?.size.width > frame.size.width * UIScreen.mainScreen().scale * CGFloat(horizontalMaximumOverdraw) {
+        if image.image?.size.width > frame.size.width * UIScreen.mainScreen().scale * CGFloat(horizontalMaximumOverdraw) {
             return true
         }
-        if image!.image?.size.height < frame.size.height * UIScreen.mainScreen().scale * CGFloat(verticalMinimumOverdraw) {
+        if image.image?.size.height < frame.size.height * UIScreen.mainScreen().scale * CGFloat(verticalMinimumOverdraw) {
             return true
         }
-        if image!.image?.size.height > frame.size.height * UIScreen.mainScreen().scale * CGFloat(verticalMaximumOverdraw) {
+        if image.image?.size.height > frame.size.height * UIScreen.mainScreen().scale * CGFloat(verticalMaximumOverdraw) {
             return true
         }
         return false
@@ -259,31 +266,32 @@ public class FDWaveformView: UIView {
         }
         let displayRange = self.zoomEndSamples - self.zoomStartSamples
         if cacheIsDirty() {
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
                 self.renderAsset()
-            })
+            }
             return
         }
         
-        // We need to place the images which have samples from cachedStart..cachedEnd
-        // inside our frame which represents startSamples..endSamples
-        // all figures are a portion of our frame size
+        // We need to place the images which have samples in `cachedSampleRange`
+        // inside our frame which represents `startSamples..<endSamples`
+        // all figures are a portion of our frame width
         var scaledStart: CGFloat = 0.0
         var scaledProgress: CGFloat = 0.0
         var scaledEnd: CGFloat = 1.0
         var scaledWidth: CGFloat = 1.0
         if cachedSampleRange.count > 0 {
-            scaledStart = CGFloat(cachedSampleRange.startIndex - zoomStartSamples) / CGFloat(zoomEndSamples - zoomStartSamples)
-            scaledEnd = CGFloat(cachedSampleRange.last! - zoomEndSamples) / CGFloat(zoomEndSamples - zoomStartSamples)
+            let zoomRange = CGFloat(zoomEndSamples - zoomStartSamples)
+            scaledStart = CGFloat(cachedSampleRange.startIndex - zoomStartSamples) / zoomRange
+            scaledEnd = CGFloat(cachedSampleRange.last! - zoomEndSamples) / zoomRange
             scaledWidth = scaledEnd - scaledStart
-            scaledProgress = CGFloat(progressSamples - zoomStartSamples) / CGFloat(zoomEndSamples - zoomStartSamples)
+            scaledProgress = CGFloat(progressSamples - zoomStartSamples) / zoomRange
         }
-        let frame = CGRectMake(self.frame.size.width * scaledStart, 0, self.frame.size.width * scaledWidth, self.frame.size.height)
-        ///TODO: make sure these unwraps are safe!
-        self.image!.frame = frame
-        self.highlightedImage!.frame = frame
-        self.clipping.frame = CGRectMake(0, 0, self.frame.size.width * scaledProgress, self.frame.size.height)
-        self.clipping.hidden = self.progressSamples <= self.zoomStartSamples
+        let childFrame = CGRectMake(frame.size.width * scaledStart, 0, frame.size.width * scaledWidth, frame.size.height)
+        image.frame = childFrame
+        highlightedImage.frame = childFrame
+        clipping.frame = CGRectMake(0, 0, self.frame.size.width * scaledProgress, self.frame.size.height)
+        clipping.hidden = self.progressSamples <= self.zoomStartSamples
+        print("\(frame) -- \(image.frame)")
     }
     
     func renderAsset() {
@@ -306,8 +314,8 @@ public class FDWaveformView: UIView {
             self.plotLogGraph(samples, maximumValue: sampleMax, zeroValue: self.noiseFloor, imageHeight: heightInPixels) {
                 (image, selectedImage) in
                 dispatch_async(dispatch_get_main_queue()) {
-                    self.image!.image = image
-                    self.highlightedImage!.image = selectedImage
+                    self.image.image = image
+                    self.highlightedImage.image = selectedImage
                     self.cachedSampleRange = renderStartSamples ..< renderEndSamples
                     self.renderingInProgress = false
                     self.layoutSubviews()
@@ -444,8 +452,6 @@ public class FDWaveformView: UIView {
 }
 
 extension FDWaveformView: UIGestureRecognizerDelegate {
-    // MARK: - Interaction
-    
     public func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
     }
