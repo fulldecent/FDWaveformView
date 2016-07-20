@@ -23,23 +23,21 @@ public class FDWaveformView: UIView {
     
     /// The audio file to render
     @IBInspectable public var audioURL: NSURL? = nil {
-        willSet {
-            loadingInProgress = true
-        }
         didSet {
             guard let audioURL = self.audioURL else {
-                loadingInProgress = false
+                NSLog("FDWaveformView failed to load URL")
                 return
             }
+            let asset = AVURLAsset(URL: audioURL, options: [AVURLAssetPreferPreciseDurationAndTimingKey: NSNumber(bool: true)])
+            self.asset = asset
+            guard let assetTrack = asset.tracksWithMediaType(AVMediaTypeAudio).first else {
+                NSLog("FDWaveformView failed to load AVAssetTrack")
+                return
+            }
+            self.assetTrack = assetTrack
+            loadingInProgress = true
             self.delegate?.waveformViewWillLoad?(self)
-
-            asset = AVURLAsset(URL: audioURL, options: [AVURLAssetPreferPreciseDurationAndTimingKey: true])
-            guard asset != nil else {
-                NSLog("FDWaveformView failed to load asset")
-                return
-            }
-            assetTrack = asset!.tracksWithMediaType(AVMediaTypeAudio).first! ///TODO: bail out if this fails
-            asset!.loadValuesAsynchronouslyForKeys(["duration"]) {
+            asset.loadValuesAsynchronouslyForKeys(["duration"]) {
                 var error: NSError? = nil
                 let status = self.asset!.statusOfValueForKey("duration", error: &error)
                 switch status {
@@ -48,8 +46,8 @@ public class FDWaveformView: UIView {
                     self.highlightedImage?.image = nil
                     self.progressSamples = 0
                     self.zoomStartSamples = 0
-                    let formatDesc: [AnyObject] = self.assetTrack.formatDescriptions
-                    let item: CMAudioFormatDescriptionRef = formatDesc.first as! CMAudioFormatDescriptionRef
+                    let formatDesc = assetTrack.formatDescriptions
+                    let item = formatDesc.first as! CMAudioFormatDescriptionRef
                     let asbd = CMAudioFormatDescriptionGetStreamBasicDescription(item)
                     let samples = asbd.memory.mSampleRate * Float64(self.asset!.duration.value) / Float64(self.asset!.duration.timescale)
                     self.totalSamples = Int(samples)
@@ -64,7 +62,7 @@ public class FDWaveformView: UIView {
     }
     
     /// The total number of audio samples in the file
-    public private(set) var totalSamples: Int = 0
+    public private(set) var totalSamples = 0
     
     /// A portion of the waveform rendering to be highlighted
     @IBInspectable public var progressSamples: Int = 0 {
@@ -86,7 +84,7 @@ public class FDWaveformView: UIView {
         }
     }
     
-    /// The last sample to render
+    /// One plus the last sample to render
     @IBInspectable public var zoomEndSamples: Int = 0 {
         didSet {
             self.setNeedsDisplay()
@@ -112,15 +110,7 @@ public class FDWaveformView: UIView {
     
     
     
-    
     // Mark - Private vars
-    
-    //TODO RENAME
-    /*
-     private func absX<T: Strideable>(x: T) -> T {
-     return x < T(0) ? -x : x
-     }
-     */
     
     //TODO RENAME
     private func minMaxX<T: Comparable>(x: T, min: T, max: T) -> T {
@@ -157,7 +147,7 @@ public class FDWaveformView: UIView {
     // Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
     private var verticalTargetOverdraw: CGFloat = 2.0
     
-    
+
     /// The rendered waveform
     private var image: UIImageView? = nil
     
@@ -171,7 +161,7 @@ public class FDWaveformView: UIView {
     private var asset: AVAsset?
     
     /// The track (part of the asset) we will render
-    private var assetTrack: AVAssetTrack! = nil
+    private var assetTrack: AVAssetTrack? = nil
     
     /// The range of sampled we rendered
     private var cachedSampleRange:Range<Int> = 0..<0
@@ -241,10 +231,10 @@ public class FDWaveformView: UIView {
         if cachedSampleRange.startIndex > minMaxX(zoomStartSamples - Int(CGFloat(cachedSampleRange.count) * horizontalMinimumBleed), min: 0, max: totalSamples) {
             return true
         }
-        if cachedSampleRange.last! < minMaxX(zoomEndSamples + Int(CGFloat(cachedSampleRange.count) * horizontalMinimumBleed), min: 0, max: totalSamples) {
+        if cachedSampleRange.endIndex < minMaxX(zoomEndSamples + Int(CGFloat(cachedSampleRange.count) * horizontalMinimumBleed), min: 0, max: totalSamples) {
             return true
         }
-        if cachedSampleRange.last! > minMaxX(zoomEndSamples + Int(CGFloat(cachedSampleRange.count) * horizontalMaximumBleed), min: 0, max: totalSamples) {
+        if cachedSampleRange.endIndex > minMaxX(zoomEndSamples + Int(CGFloat(cachedSampleRange.count) * horizontalMaximumBleed), min: 0, max: totalSamples) {
             return true
         }
         if image!.image?.size.width < frame.size.width * UIScreen.mainScreen().scale * CGFloat(horizontalMinimumOverdraw) {
@@ -311,7 +301,7 @@ public class FDWaveformView: UIView {
         let widthInPixels = Int(frame.size.width * UIScreen.mainScreen().scale * horizontalTargetOverdraw)
         let heightInPixels = frame.size.height * UIScreen.mainScreen().scale * horizontalTargetOverdraw
         
-        sliceAndDownsampleAsset(self.asset!, track: self.assetTrack, slice: renderStartSamples..<renderEndSamples, toSize: widthInPixels) {
+        sliceAsset(withRange: renderStartSamples..<renderEndSamples, andDownsampleTo: widthInPixels) {
             (samples, sampleMax) in
             self.plotLogGraph(samples, maximumValue: sampleMax, zeroValue: self.noiseFloor, imageHeight: heightInPixels) {
                 (image, selectedImage) in
@@ -328,13 +318,21 @@ public class FDWaveformView: UIView {
     }
     
     /// Read the asset and create create a lower resolution set of samples
-    func sliceAndDownsampleAsset(songAsset: AVAsset, track songTrack: AVAssetTrack, slice: Range<Int>, toSize targetSamples: Int, done: (samples: [CGFloat],sampleMax: CGFloat) -> Void) {
+    func sliceAsset(withRange slice: Range<Int>, andDownsampleTo targetSamples: Int, done: (samples: [CGFloat], sampleMax: CGFloat) -> Void) {
         guard slice.count > 0 else {
             return
         }
+        guard let asset = asset else {
+            return
+        }
+        guard let assetTrack = assetTrack else {
+            return
+        }
         var error: NSError? = nil
-        let reader: AVAssetReader = try! AVAssetReader(asset: songAsset)
-        reader.timeRange = CMTimeRangeMake(CMTimeMake(Int64(slice.first!), songAsset.duration.timescale), CMTimeMake(Int64(slice.count), songAsset.duration.timescale))
+        guard let reader = try? AVAssetReader(asset: asset) else {
+            return
+        }
+        reader.timeRange = CMTimeRangeMake(CMTimeMake(Int64(slice.startIndex), asset.duration.timescale), CMTimeMake(Int64(slice.count), asset.duration.timescale))
         let outputSettingsDict: [String : AnyObject] = [
             AVFormatIDKey: Int(kAudioFormatLinearPCM),
             AVLinearPCMBitDepthKey: 16,
@@ -342,23 +340,23 @@ public class FDWaveformView: UIView {
             AVLinearPCMIsFloatKey: false,
             AVLinearPCMIsNonInterleaved: false
         ]
-        let readerOutput = AVAssetReaderTrackOutput(track: songTrack, outputSettings: outputSettingsDict)
+        let readerOutput = AVAssetReaderTrackOutput(track: assetTrack, outputSettings: outputSettingsDict)
         readerOutput.alwaysCopiesSampleData = false
         reader.addOutput(readerOutput)
-        var channelCount: UInt32 = 1
-        var formatDesc: [AnyObject] = songTrack.formatDescriptions
+        var channelCount = 1
+        var formatDesc: [AnyObject] = assetTrack.formatDescriptions
         for item in formatDesc {
             let fmtDesc = CMAudioFormatDescriptionGetStreamBasicDescription(item as! CMAudioFormatDescription)
             guard fmtDesc != nil else {
                 return
             }
-            channelCount = fmtDesc.memory.mChannelsPerFrame
+            channelCount = Int(fmtDesc.memory.mChannelsPerFrame)
         }
-        let bytesPerInputSample = 2 * channelCount
+        let bytesPerInputSample = sizeof(Int16)
         var sampleMax = noiseFloor
         var tally: CGFloat = 0.0
         var tallyCount = 0
-        var samplesPerPixel = (Int(slice.count)) / targetSamples
+        var samplesPerPixel = slice.count / targetSamples
         if samplesPerPixel < 1 {
             samplesPerPixel = 1
         }
@@ -380,7 +378,7 @@ public class FDWaveformView: UIView {
             let data = NSMutableData(length: readBufferLength)
             CMBlockBufferCopyDataBytes(readBuffer, 0, readBufferLength, data!.mutableBytes)
             CMSampleBufferInvalidate(readSampleBuffer)
-            let sampleCount = readBufferLength / Int(bytesPerInputSample)
+            let sampleCount = readBufferLength / sizeof(Int16)
             let samples = UnsafeMutablePointer<Int16>(data!.mutableBytes)
             
             for i in 0 ..< sampleCount {
@@ -480,7 +478,6 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
     
     func handlePanGesture(recognizer: UIPanGestureRecognizer) {
         var point: CGPoint = recognizer.translationInView(self)
-        print("translation: \(point.x)")
         if self.doesAllowScroll {
             if recognizer.state == .Began {
                 delegate?.waveformDidEndPanning?(self)
