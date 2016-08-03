@@ -4,7 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Master](https://github.com/fulldecent/FDWaveformView/compare/1.0.0...master)
+## [Master](https://github.com/fulldecent/FDWaveformView/compare/1.0.1...master)
+
+---
+
+## [1.0.1](https://github.com/fulldecent/FDWaveformView/releases/tag/1.0.1)
+Released on 2016-08-02.
+
+#### Fixed
+- Fixed Podspec for Swift files
+  - Added by [William Entriken](https://github.com/fulldecent) in Regards to Issue
+  [#61](https://github.com/fulldecent/FDWaveformView/issues/61).
 
 ---
 
