@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Master](https://github.com/fulldecent/FDWaveformView/compare/1.0.1...master)
 
+#### Fixed
+- Corrected rendering, fixed typo
+  - Added by [William Entriken](https://github.com/fulldecent)
+
 ---
 
 ## [1.0.1](https://github.com/fulldecent/FDWaveformView/releases/tag/1.0.1)
