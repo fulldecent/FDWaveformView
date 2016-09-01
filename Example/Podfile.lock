@@ -1,5 +1,5 @@
 PODS:
-  - FDWaveformView (1.0.0)
+  - FDWaveformView (0.1.0)
 
 DEPENDENCIES:
   - FDWaveformView (from `../`)
@@ -9,8 +9,8 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  FDWaveformView: 968dd37d1fa97c1838cd1b0455d63120a20f05d3
+  FDWaveformView: c01037968f5fc8e957c3fc7908a48e02c7fba028
 
-PODFILE CHECKSUM: 889ff0afdea558866276794e5dbec5d8e489afed
+PODFILE CHECKSUM: 581eecc34345aa134cb62d3225e28251f3c1c4ef
 
 COCOAPODS: 1.0.1

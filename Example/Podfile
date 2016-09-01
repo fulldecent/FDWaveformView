@@ -1,11 +1,10 @@
 use_frameworks!
 
-target 'FDWaveformView_Example' do
+target 'iOS Example' do
   pod 'FDWaveformView', :path => '../'
 
-  target 'FDWaveformView_Tests' do
+  target 'Tests' do
     inherit! :search_paths
-
     
   end
 end

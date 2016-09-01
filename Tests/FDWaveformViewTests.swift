@@ -1,8 +1,15 @@
-import UIKit
-import XCTest
-import FDWaveformView
+//
+//  FDWaveformViewTests.swift
+//  FDWaveformViewTests
+//
+//  Created by FDWaveformView_OWNER on TODAYS_DATE.
+//  Copyright  2016 FDWaveformView_OWNER. All rights reserved.
+//
 
-class Tests: XCTestCase {
+import XCTest
+@testable import FDWaveformView
+
+class FDWaveformViewTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
@@ -15,15 +22,8 @@ class Tests: XCTestCase {
     }
 
     func testExample() {
+        XCTAssert(true)
         // This is an example of a functional test case.
-        XCTAssert(true, "Pass")
+        // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
-
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measureBlock() {
-            // Put the code you want to measure the time of here.
-        }
-    }
-
 }
