@@ -16,7 +16,7 @@ import Accelerate
 //TODO: find and remove all !
 
 /// A view for rendering audio waveforms
-@IBDesignable
+//@IBDesignable
 public class FDWaveformView: UIView {
     /// A delegate to accept progress reporting
     @IBInspectable public weak var delegate: FDWaveformViewDelegate? = nil
@@ -105,7 +105,7 @@ public class FDWaveformView: UIView {
     /// The color of the waveform
     @IBInspectable public var wavesColor = UIColor.blackColor()
     
-    /// The corol of the highlighted waveform (see `progressSamples`
+    /// The color of the highlighted waveform (see `progressSamples`
     @IBInspectable public var progressColor = UIColor.blueColor()
     
     
@@ -151,7 +151,7 @@ public class FDWaveformView: UIView {
         return 20.0 * log10(abs(amplitude))
     }
     
-
+    
     /// View for rendered waveform
     private let image: UIImageView = {
         let retval = UIImageView(frame: CGRect.zero)
@@ -264,7 +264,6 @@ public class FDWaveformView: UIView {
         guard self.assetTrack != nil && !self.renderingInProgress && self.zoomEndSamples > 0 else {
             return
         }
-        let displayRange = self.zoomEndSamples - self.zoomStartSamples
         if cacheIsDirty() {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
                 self.renderAsset()
@@ -272,24 +271,24 @@ public class FDWaveformView: UIView {
             return
         }
         
+        let zoomSamples = zoomStartSamples ..< zoomEndSamples
+        
         // We need to place the images which have samples in `cachedSampleRange`
         // inside our frame which represents `startSamples..<endSamples`
         // all figures are a portion of our frame width
-        var scaledStart: CGFloat = 0.0
-        var scaledProgress: CGFloat = 0.0
-        var scaledEnd: CGFloat = 1.0
+        var scaledX: CGFloat = 0.0
+        var scaledProgressWidth: CGFloat = 0.0
         var scaledWidth: CGFloat = 1.0
-        if cachedSampleRange.count > 0 {
-            let zoomRange = CGFloat(zoomEndSamples - zoomStartSamples)
-            scaledStart = CGFloat(cachedSampleRange.startIndex - zoomStartSamples) / zoomRange
-            scaledEnd = CGFloat(cachedSampleRange.last! - zoomEndSamples) / zoomRange
-            scaledWidth = scaledEnd - scaledStart
-            scaledProgress = CGFloat(progressSamples - zoomStartSamples) / zoomRange
+        if cachedSampleRange.count > 0 && zoomSamples.count > 0 {
+            scaledX = CGFloat(cachedSampleRange.startIndex - zoomSamples.startIndex) / CGFloat(zoomSamples.count)
+            scaledWidth = CGFloat(cachedSampleRange.last! - zoomSamples.startIndex) / CGFloat(zoomSamples.count)
+            scaledProgressWidth = CGFloat(progressSamples - zoomSamples.startIndex) / CGFloat(zoomSamples.count)
         }
-        let childFrame = CGRectMake(frame.size.width * scaledStart, 0, frame.size.width * scaledWidth, frame.size.height)
+        let childFrame = CGRectMake(frame.size.width * scaledX, 0, frame.size.width * scaledWidth, frame.size.height)
+        let iv = image.image
         image.frame = childFrame
         highlightedImage.frame = childFrame
-        clipping.frame = CGRectMake(0, 0, self.frame.size.width * scaledProgress, self.frame.size.height)
+        clipping.frame = CGRectMake(0, 0, self.frame.size.width * scaledProgressWidth, self.frame.size.height)
         clipping.hidden = self.progressSamples <= self.zoomStartSamples
         print("\(frame) -- \(image.frame)")
     }
@@ -318,7 +317,7 @@ public class FDWaveformView: UIView {
                     self.highlightedImage.image = selectedImage
                     self.cachedSampleRange = renderStartSamples ..< renderEndSamples
                     self.renderingInProgress = false
-                    self.layoutSubviews()
+                    self.setNeedsLayout()
                     self.delegate?.waveformViewDidRender?(self)
                 }
             }
@@ -336,7 +335,6 @@ public class FDWaveformView: UIView {
         guard let assetTrack = assetTrack else {
             return
         }
-        var error: NSError? = nil
         guard let reader = try? AVAssetReader(asset: asset) else {
             return
         }
@@ -352,7 +350,7 @@ public class FDWaveformView: UIView {
         readerOutput.alwaysCopiesSampleData = false
         reader.addOutput(readerOutput)
         var channelCount = 1
-        var formatDesc: [AnyObject] = assetTrack.formatDescriptions
+        let formatDesc: [AnyObject] = assetTrack.formatDescriptions
         for item in formatDesc {
             let fmtDesc = CMAudioFormatDescriptionGetStreamBasicDescription(item as! CMAudioFormatDescription)
             guard fmtDesc != nil else {
@@ -360,7 +358,7 @@ public class FDWaveformView: UIView {
             }
             channelCount = Int(fmtDesc.memory.mChannelsPerFrame)
         }
-        let bytesPerInputSample = sizeof(Int16)
+        _ = sizeof(Int16)
         var sampleMax = noiseFloor
         var tally: CGFloat = 0.0
         var tallyCount = 0
@@ -394,7 +392,7 @@ public class FDWaveformView: UIView {
                     continue // only use the first channel
                 }
                 let rawData = samples[i]
-                let sample = minMaxX(decibel(CGFloat(rawData)), min: noiseFloor, max: 0.0)
+                let sample = minMaxX(decibel(CGFloat(rawData) / 32768.0), min: noiseFloor, max: 0.0)
                 tally += sample
                 tallyCount += 1
                 if Int(tallyCount) == samplesPerPixel {
@@ -423,27 +421,22 @@ public class FDWaveformView: UIView {
         CGContextSetLineWidth(context, 1.0)
         CGContextSetStrokeColorWithColor(context, self.wavesColor.CGColor)
         
-        let verticalMiddle = imageHeight / 2
-        let halfGraphHeight = imageHeight / 2
-        let centerLeft = halfGraphHeight
         let sampleDrawingScale: CGFloat
         if max == min {
             sampleDrawingScale = 0
         } else {
-            sampleDrawingScale = imageHeight / (max - min) / 2
+            sampleDrawingScale = imageHeight / 2 / (max - min)
         }
-        for sample in samples {
-            var height = CGFloat((sample - min) * sampleDrawingScale)
-            if height == 0 {
-                height = 1
-            }
-            CGContextMoveToPoint(context, sample, verticalMiddle - height)
-            CGContextAddLineToPoint(context, sample, verticalMiddle + height)
+        let verticalMiddle = imageHeight / 2
+        for (x, sample) in samples.enumerate() {
+            let height = CGFloat(sample - min) * sampleDrawingScale
+            CGContextMoveToPoint(context, CGFloat(x), verticalMiddle - height)
+            CGContextAddLineToPoint(context, CGFloat(x), verticalMiddle + height)
             CGContextStrokePath(context);
         }
         let image = UIGraphicsGetImageFromCurrentImageContext()
         let drawRect = CGRectMake(0, 0, image.size.width, image.size.height)
-        progressColor.set()
+        CGContextSetFillColorWithColor(context, progressColor.CGColor)
         UIRectFillUsingBlendMode(drawRect, .SourceAtop)
         let tintedImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
@@ -483,7 +476,7 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
     }
     
     func handlePanGesture(recognizer: UIPanGestureRecognizer) {
-        var point: CGPoint = recognizer.translationInView(self)
+        let point = recognizer.translationInView(self)
         if self.doesAllowScroll {
             if recognizer.state == .Began {
                 delegate?.waveformDidEndPanning?(self)
