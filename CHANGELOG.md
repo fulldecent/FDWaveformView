@@ -8,7 +8,8 @@ All notable changes to this project will be documented in this file.
 
 #### Fixed
 - Corrected rendering, fixed typo
-  - Added by [William Entriken](https://github.com/fulldecent)
+  - Added by [William Entriken](https://github.com/fulldecent) in Regards to Issue
+  [#62](https://github.com/fulldecent/FDWaveformView/issues/62).
 
 ---
 
