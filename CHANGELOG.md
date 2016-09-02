@@ -4,7 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Master](https://github.com/fulldecent/FDWaveformView/compare/1.0.1...master)
+## [Master](https://github.com/fulldecent/FDWaveformView/compare/1.0.2...master)
+
+---
+
+## [1.0.2](https://github.com/fulldecent/FDWaveformView/releases/tag/1.0.2)
+Released on 2016-09-02.
 
 #### Fixed
 - Corrected rendering, fixed typo
