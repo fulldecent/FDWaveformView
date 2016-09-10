@@ -20,7 +20,7 @@ import Accelerate
 public class FDWaveformView: UIView {
     /// A delegate to accept progress reporting
     @IBInspectable public weak var delegate: FDWaveformViewDelegate? = nil
-    
+
     /// The audio file to render
     @IBInspectable public var audioURL: NSURL? = nil {
         didSet {
@@ -28,12 +28,15 @@ public class FDWaveformView: UIView {
                 NSLog("FDWaveformView failed to load URL")
                 return
             }
+
             let asset = AVURLAsset(URL: audioURL, options: [AVURLAssetPreferPreciseDurationAndTimingKey: NSNumber(bool: true)])
             self.asset = asset
+
             guard let assetTrack = asset.tracksWithMediaType(AVMediaTypeAudio).first else {
                 NSLog("FDWaveformView failed to load AVAssetTrack")
                 return
             }
+
             self.assetTrack = assetTrack
             loadingInProgress = true
             self.delegate?.waveformViewWillLoad?(self)
@@ -60,10 +63,10 @@ public class FDWaveformView: UIView {
             }
         }
     }
-    
+
     /// The total number of audio samples in the file
     public private(set) var totalSamples = 0
-    
+
     /// A portion of the waveform rendering to be highlighted
     @IBInspectable public var progressSamples: Int = 0 {
         didSet {
@@ -74,9 +77,9 @@ public class FDWaveformView: UIView {
             }
         }
     }
-    
+
     //TODO:  MAKE THIS A RANGE, CAN IT BE ANIMATABLE??!
-    
+
     /// The first sample to render
     @IBInspectable public var zoomStartSamples: Int = 0 {
         didSet {
@@ -84,7 +87,7 @@ public class FDWaveformView: UIView {
             self.setNeedsLayout()
         }
     }
-    
+
     /// One plus the last sample to render
     @IBInspectable public var zoomEndSamples: Int = 0 {
         didSet {
@@ -92,117 +95,120 @@ public class FDWaveformView: UIView {
             self.setNeedsLayout()
         }
     }
-    
+
     /// Whether to all the scrub gesture
     @IBInspectable public var doesAllowScrubbing = true
-    
+
     /// Whether to allow the stretch gesture
     @IBInspectable public var doesAllowStretch = true
-    
+
     /// Whether to allow the scroll gesture
     @IBInspectable public var doesAllowScroll = true
-    
+
     /// The color of the waveform
     @IBInspectable public var wavesColor = UIColor.blackColor()
-    
+
     /// The color of the highlighted waveform (see `progressSamples`
     @IBInspectable public var progressColor = UIColor.blueColor()
-    
-    
+
+
     //TODO MAKE PUBLIC
-    
+
     // Drawing a larger image than needed to have it available for scrolling
     private var horizontalMinimumBleed: CGFloat = 0.1
     private var horizontalMaximumBleed: CGFloat = 3.0
     private var horizontalTargetBleed: CGFloat = 0.5
-    
+
     /// Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
     private var horizontalMinimumOverdraw: CGFloat = 2.0
-    
+
     /// Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
     private var horizontalMaximumOverdraw: CGFloat = 5.0
-    
+
     /// Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
     private var horizontalTargetOverdraw: CGFloat = 3.0
-    
+
     /// Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
     private var verticalMinimumOverdraw: CGFloat = 1.0
-    
+
     /// Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
     private var verticalMaximumOverdraw: CGFloat = 3.0
-    
+
     /// Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
     private var verticalTargetOverdraw: CGFloat = 2.0
-    
+
     /// The "zero" level (in dB)
     private let noiseFloor: CGFloat = -50.0
-    
-    
-    
+
+
+
     // Mark - Private vars
-    
+
     //TODO RENAME
     private func minMaxX<T: Comparable>(x: T, min: T, max: T) -> T {
         return x < min ? min : x > max ? max : x
     }
-    
-    
+
     private func decibel(amplitude: CGFloat) -> CGFloat {
         return 20.0 * log10(abs(amplitude))
     }
-    
-    
+
     /// View for rendered waveform
     private let image: UIImageView = {
         let retval = UIImageView(frame: CGRect.zero)
         retval.contentMode = .ScaleToFill
         return retval
     }()
-    
+
     /// View for rendered waveform showing progress
     private let highlightedImage: UIImageView = {
         let retval = UIImageView(frame: CGRect.zero)
         retval.contentMode = .ScaleToFill
         return retval
     }()
-    
+
     /// A view which hides part of the highlighted image
     private let clipping: UIView = {
         let retval = UIView(frame: CGRect.zero)
         retval.clipsToBounds = true
         return retval
     }()
-    
+
     /// The audio asset we are analyzing
     private var asset: AVAsset?
-    
+
     /// The track (part of the asset) we will render
     private var assetTrack: AVAssetTrack? = nil
-    
+
     /// The range of samples we rendered
     private var cachedSampleRange:Range<Int> = 0..<0
-    
+
     /// Gesture recognizer
     private var pinchRecognizer = UIPinchGestureRecognizer()
-    
+
     /// Gesture recognizer
     private var panRecognizer = UIPanGestureRecognizer()
-    
+
     /// Gesture recognizer
     private var tapRecognizer = UITapGestureRecognizer()
-    
+
     /// Whether rendering is happening asynchronously
     private var renderingInProgress = false
-    
+
     /// Whether loading is happening asynchronously
     private var loadingInProgress = false
-    
+
     func setup() {
         addSubview(image)
         clipping.addSubview(highlightedImage)
         addSubview(clipping)
         clipsToBounds = true
-        
+
+        self.setupGestureRecognizers()
+        self.addGestureRecognizer(self.tapRecognizer)
+    }
+
+    private func setupGestureRecognizers() {
         //TODO: try to do this in the lazy initializer above
         self.pinchRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(self.handlePinchGesture))
         self.pinchRecognizer.delegate = self
@@ -211,19 +217,18 @@ public class FDWaveformView: UIView {
         self.panRecognizer.delegate = self
         self.addGestureRecognizer(self.panRecognizer)
         self.tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.handleTapGesture))
-        self.addGestureRecognizer(self.tapRecognizer)
     }
-    
+
     required public init?(coder aCoder: NSCoder) {
         super.init(coder: aCoder)
         self.setup()
     }
-    
+
     override init(frame rect: CGRect) {
         super.init(frame: rect)
         self.setup()
     }
-    
+
     /// If the cached image is insufficient for the current frame
     private func cacheIsDirty() -> Bool {
         if image.image == nil {
@@ -258,21 +263,22 @@ public class FDWaveformView: UIView {
         }
         return false
     }
-    
+
     override public func layoutSubviews() {
         super.layoutSubviews()
         guard self.assetTrack != nil && !self.renderingInProgress && self.zoomEndSamples > 0 else {
             return
         }
+
         if cacheIsDirty() {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
                 self.renderAsset()
             }
             return
         }
-        
+
         let zoomSamples = zoomStartSamples ..< zoomEndSamples
-        
+
         // We need to place the images which have samples in `cachedSampleRange`
         // inside our frame which represents `startSamples..<endSamples`
         // all figures are a portion of our frame width
@@ -292,22 +298,21 @@ public class FDWaveformView: UIView {
         clipping.hidden = self.progressSamples <= self.zoomStartSamples
         print("\(frame) -- \(image.frame)")
     }
-    
+
     func renderAsset() {
-        guard !renderingInProgress else {
-            return
-        }
+        guard !renderingInProgress else { return }
+
         renderingInProgress = true
         delegate?.waveformViewWillRender?(self)
         let displayRange = zoomEndSamples - zoomStartSamples
-        guard displayRange > 0 else {
-            return
-        }
+
+        guard displayRange > 0 else { return }
+
         let renderStartSamples = minMaxX(zoomStartSamples - Int(CGFloat(displayRange) * horizontalTargetBleed), min: 0, max: totalSamples)
         let renderEndSamples = minMaxX(zoomEndSamples + Int(CGFloat(displayRange) * horizontalTargetBleed), min: 0, max: totalSamples)
         let widthInPixels = Int(frame.size.width * UIScreen.mainScreen().scale * horizontalTargetOverdraw)
         let heightInPixels = frame.size.height * UIScreen.mainScreen().scale * horizontalTargetOverdraw
-        
+
         sliceAsset(withRange: renderStartSamples..<renderEndSamples, andDownsampleTo: widthInPixels) {
             (samples, sampleMax) in
             self.plotLogGraph(samples, maximumValue: sampleMax, zeroValue: self.noiseFloor, imageHeight: heightInPixels) {
@@ -323,21 +328,14 @@ public class FDWaveformView: UIView {
             }
         }
     }
-    
+
     /// Read the asset and create create a lower resolution set of samples
     func sliceAsset(withRange slice: Range<Int>, andDownsampleTo targetSamples: Int, done: (samples: [CGFloat], sampleMax: CGFloat) -> Void) {
-        guard slice.count > 0 else {
-            return
-        }
-        guard let asset = asset else {
-            return
-        }
-        guard let assetTrack = assetTrack else {
-            return
-        }
-        guard let reader = try? AVAssetReader(asset: asset) else {
-            return
-        }
+        guard slice.count > 0 else { return }
+        guard let asset = asset else { return }
+        guard let assetTrack = assetTrack else { return }
+        guard let reader = try? AVAssetReader(asset: asset) else { return }
+
         reader.timeRange = CMTimeRangeMake(CMTimeMake(Int64(slice.startIndex), asset.duration.timescale), CMTimeMake(Int64(slice.count), asset.duration.timescale))
         let outputSettingsDict: [String : AnyObject] = [
             AVFormatIDKey: Int(kAudioFormatLinearPCM),
@@ -346,6 +344,7 @@ public class FDWaveformView: UIView {
             AVLinearPCMIsFloatKey: false,
             AVLinearPCMIsNonInterleaved: false
         ]
+
         let readerOutput = AVAssetReaderTrackOutput(track: assetTrack, outputSettings: outputSettingsDict)
         readerOutput.alwaysCopiesSampleData = false
         reader.addOutput(readerOutput)
@@ -353,9 +352,7 @@ public class FDWaveformView: UIView {
         let formatDesc: [AnyObject] = assetTrack.formatDescriptions
         for item in formatDesc {
             let fmtDesc = CMAudioFormatDescriptionGetStreamBasicDescription(item as! CMAudioFormatDescription)
-            guard fmtDesc != nil else {
-                return
-            }
+            guard fmtDesc != nil else { return }
             channelCount = Int(fmtDesc.memory.mChannelsPerFrame)
         }
         _ = sizeof(Int16)
@@ -366,27 +363,26 @@ public class FDWaveformView: UIView {
         if samplesPerPixel < 1 {
             samplesPerPixel = 1
         }
-        
+
         var outputSamples = [CGFloat]()
-        
+
         // 16-bit samples
         reader.startReading()
-        
+
         while reader.status == .Reading {
-            guard let readSampleBuffer = readerOutput.copyNextSampleBuffer() else {
-                break
+            guard let readSampleBuffer = readerOutput.copyNextSampleBuffer(),
+                readBuffer = CMSampleBufferGetDataBuffer(readSampleBuffer) else {
+                    break
             }
-            guard let readBuffer = CMSampleBufferGetDataBuffer(readSampleBuffer) else {
-                break
-            }
+
             let readBufferLength = CMBlockBufferGetDataLength(readBuffer)
-            
+
             let data = NSMutableData(length: readBufferLength)
             CMBlockBufferCopyDataBytes(readBuffer, 0, readBufferLength, data!.mutableBytes)
             CMSampleBufferInvalidate(readSampleBuffer)
             let sampleCount = readBufferLength / sizeof(Int16)
             let samples = UnsafeMutablePointer<Int16>(data!.mutableBytes)
-            
+
             for i in 0 ..< sampleCount {
                 guard i % Int(channelCount) == 0 else {
                     continue // only use the first channel
@@ -410,7 +406,7 @@ public class FDWaveformView: UIView {
             done(samples: outputSamples, sampleMax: sampleMax)
         }
     }
-    
+
     // TODO: switch to a synchronous function that paints onto a given context? (for issue #2)
     func plotLogGraph(samples: [CGFloat], maximumValue max: CGFloat, zeroValue min: CGFloat, imageHeight: CGFloat, done: (image: UIImage, selectedImage: UIImage)->Void) {
         let imageSize = CGSizeMake(CGFloat(samples.count), imageHeight)
@@ -420,7 +416,7 @@ public class FDWaveformView: UIView {
         CGContextSetAlpha(context, 1.0)
         CGContextSetLineWidth(context, 1.0)
         CGContextSetStrokeColorWithColor(context, self.wavesColor.CGColor)
-        
+
         let sampleDrawingScale: CGFloat
         if max == min {
             sampleDrawingScale = 0
@@ -448,7 +444,7 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
     public func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
     }
-    
+
     func handlePinchGesture(recognizer: UIPinchGestureRecognizer) {
         if !self.doesAllowStretch {
             return
@@ -474,7 +470,7 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
         self.setNeedsLayout()
         recognizer.scale = 1
     }
-    
+
     func handlePanGesture(recognizer: UIPanGestureRecognizer) {
         let point = recognizer.translationInView(self)
         if self.doesAllowScroll {
@@ -502,7 +498,7 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
             }
         }
     }
-    
+
     func handleTapGesture(recognizer: UITapGestureRecognizer) {
         if self.doesAllowScrubbing {
             let rangeSamples = CGFloat(zoomEndSamples - zoomStartSamples)
@@ -515,19 +511,19 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
 @objc public protocol FDWaveformViewDelegate: NSObjectProtocol {
     /// Rendering will begin
     optional func waveformViewWillRender(waveformView: FDWaveformView)
-    
+
     /// Rendering did complete
     optional func waveformViewDidRender(waveformView: FDWaveformView)
-    
+
     /// An audio file will be loaded
     optional func waveformViewWillLoad(waveformView: FDWaveformView)
-    
+
     /// An audio file was loaded
     optional func waveformViewDidLoad(waveformView: FDWaveformView)
-    
+
     /// The panning gesture did begin
     optional func waveformDidBeginPanning(waveformView: FDWaveformView)
-    
+
     /// The panning gesture did end
     optional func waveformDidEndPanning(waveformView: FDWaveformView)
 }
