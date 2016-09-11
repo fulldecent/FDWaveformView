@@ -415,19 +415,19 @@ public class FDWaveformView: UIView {
                         vDSP_Length(samplesPerPixel))
 
             let range = nextDataOffset..<(nextDataOffset+downSampledLength)
-            var downSampledDataCG = downSampledData.map { CGFloat($0) }
-            if let newMax = downSampledDataCG.maxElement() where newMax > sampleMax {
-                sampleMax = newMax
+            var downSampledDataCG = downSampledData.map { (value: Float) -> CGFloat in
+                let element = CGFloat(value)
+                if element > sampleMax { sampleMax = element }
+                return element
             }
 
-            outputSamples += downSampledDataCG.prefix(downSampledLength)
+            outputSamples += downSampledDataCG
             nextDataOffset += downSampledLength
         }
         // if (reader.status == AVAssetReaderStatusFailed || reader.status == AVAssetReaderStatusUnknown)
         // Something went wrong. Handle it.
         if reader.status == .Completed {
-            let outputSamplesCG = outputSamples.map { CGFloat($0) }
-            done(samples: outputSamplesCG, sampleMax: sampleMax)
+            done(samples: outputSamples, sampleMax: sampleMax)
         } else {
             print(reader.status)
         }
