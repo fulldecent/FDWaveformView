@@ -363,6 +363,7 @@ public class FDWaveformView: UIView {
         }
 
         var outputSamples = [CGFloat]()
+        var nextDataOffset = 0
 
         // 16-bit samples
         reader.startReading()
@@ -380,31 +381,57 @@ public class FDWaveformView: UIView {
             CMSampleBufferInvalidate(readSampleBuffer)
 
             let samples = UnsafeMutablePointer<Int16>(data!.mutableBytes)
+            let samplesToProcess = readBufferLength / sizeof(Int16)
 
-            for i in 0 ..< sampleCount {
-                guard i % Int(channelCount) == 0 else {
-                    continue // only use the first channel
-                }
-                let rawData = samples[i]
-                let sample = minMaxX(decibel(CGFloat(rawData) / 32768.0), min: noiseFloor, max: 0.0)
-                tally += sample
-                tallyCount += 1
-                if Int(tallyCount) == samplesPerPixel {
-                    let sample = tally / CGFloat(tallyCount)
-                    sampleMax = sampleMax > sample ? sampleMax : sample
-                    outputSamples.append(sample)
-                    tally = 0
-                    tallyCount = 0
-                }
+
+            let filter = [Float](count: samplesPerPixel, repeatedValue: 1.0 / Float(samplesPerPixel))
+            var processingBuffer = [Float](count: samplesToProcess, repeatedValue: 0.0)
+
+            let sampleCount = vDSP_Length(samplesToProcess)
+
+            //Convert 16bit int samples to floats
+            vDSP_vflt16(samples, 1, &processingBuffer, 1, sampleCount)
+
+            //Take the absolute values to get amplitude
+            vDSP_vabs(processingBuffer, 1, &processingBuffer, 1, sampleCount)
+
+            //Convert to dB
+            var zero: Float = 32768.0
+            vDSP_vdbcon(processingBuffer, 1, &zero, &processingBuffer, 1, sampleCount, 1)
+
+            //Clip to [noiseFloor, 0]
+            var ceil: Float = 0.0
+            var noiseFloorFloat = Float(noiseFloor)
+            vDSP_vclip(processingBuffer, 1, &noiseFloorFloat, &ceil, &processingBuffer, 1, sampleCount)
+
+            //Downsample and average
+            let downSampledLength = samplesToProcess / samplesPerPixel
+            var downSampledData = [Float](count: downSampledLength, repeatedValue: 0.0)
+
+            vDSP_desamp(processingBuffer,
+                        vDSP_Stride(samplesPerPixel),
+                        filter, &downSampledData,
+                        vDSP_Length(downSampledLength),
+                        vDSP_Length(samplesPerPixel))
+
+            let range = nextDataOffset..<(nextDataOffset+downSampledLength)
+            var downSampledDataCG = downSampledData.map { CGFloat($0) }
+            if let newMax = downSampledDataCG.maxElement() where newMax > sampleMax {
+                sampleMax = newMax
             }
+
+            outputSamples += downSampledDataCG.prefix(downSampledLength)
+            nextDataOffset += downSampledLength
         }
         // if (reader.status == AVAssetReaderStatusFailed || reader.status == AVAssetReaderStatusUnknown)
         // Something went wrong. Handle it.
         if reader.status == .Completed {
-            done(samples: outputSamples, sampleMax: sampleMax)
+            let outputSamplesCG = outputSamples.map { CGFloat($0) }
+            done(samples: outputSamplesCG, sampleMax: sampleMax)
+        } else {
+            print(reader.status)
         }
     }
-
 
     // TODO: switch to a synchronous function that paints onto a given context? (for issue #2)
     func plotLogGraph(samples: [CGFloat], maximumValue max: CGFloat, zeroValue min: CGFloat, imageHeight: CGFloat, done: (image: UIImage, selectedImage: UIImage)->Void) {
