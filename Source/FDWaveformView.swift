@@ -291,7 +291,6 @@ public class FDWaveformView: UIView {
             scaledProgressWidth = CGFloat(progressSamples - zoomSamples.startIndex) / CGFloat(zoomSamples.count)
         }
         let childFrame = CGRectMake(frame.size.width * scaledX, 0, frame.size.width * scaledWidth, frame.size.height)
-        let iv = image.image
         image.frame = childFrame
         highlightedImage.frame = childFrame
         clipping.frame = CGRectMake(0, 0, self.frame.size.width * scaledProgressWidth, self.frame.size.height)
@@ -348,6 +347,7 @@ public class FDWaveformView: UIView {
         let readerOutput = AVAssetReaderTrackOutput(track: assetTrack, outputSettings: outputSettingsDict)
         readerOutput.alwaysCopiesSampleData = false
         reader.addOutput(readerOutput)
+
         var channelCount = 1
         let formatDesc: [AnyObject] = assetTrack.formatDescriptions
         for item in formatDesc {
@@ -355,11 +355,9 @@ public class FDWaveformView: UIView {
             guard fmtDesc != nil else { return }
             channelCount = Int(fmtDesc.memory.mChannelsPerFrame)
         }
-        _ = sizeof(Int16)
+
         var sampleMax = noiseFloor
-        var tally: CGFloat = 0.0
-        var tallyCount = 0
-        var samplesPerPixel = slice.count / targetSamples
+        var samplesPerPixel = channelCount * slice.count / targetSamples
         if samplesPerPixel < 1 {
             samplesPerPixel = 1
         }
@@ -380,7 +378,7 @@ public class FDWaveformView: UIView {
             let data = NSMutableData(length: readBufferLength)
             CMBlockBufferCopyDataBytes(readBuffer, 0, readBufferLength, data!.mutableBytes)
             CMSampleBufferInvalidate(readSampleBuffer)
-            let sampleCount = readBufferLength / sizeof(Int16)
+
             let samples = UnsafeMutablePointer<Int16>(data!.mutableBytes)
 
             for i in 0 ..< sampleCount {
@@ -407,6 +405,7 @@ public class FDWaveformView: UIView {
         }
     }
 
+
     // TODO: switch to a synchronous function that paints onto a given context? (for issue #2)
     func plotLogGraph(samples: [CGFloat], maximumValue max: CGFloat, zeroValue min: CGFloat, imageHeight: CGFloat, done: (image: UIImage, selectedImage: UIImage)->Void) {
         let imageSize = CGSizeMake(CGFloat(samples.count), imageHeight)
@@ -425,7 +424,7 @@ public class FDWaveformView: UIView {
         }
         let verticalMiddle = imageHeight / 2
         for (x, sample) in samples.enumerate() {
-            let height = CGFloat(sample - min) * sampleDrawingScale
+            let height = (sample - min) * sampleDrawingScale
             CGContextMoveToPoint(context, CGFloat(x), verticalMiddle - height)
             CGContextAddLineToPoint(context, CGFloat(x), verticalMiddle + height)
             CGContextStrokePath(context);
