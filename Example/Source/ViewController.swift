@@ -14,15 +14,15 @@ class ViewController: UIViewController {
     @IBOutlet weak var waveform: FDWaveformView!
     @IBOutlet var playButton: UIView!
     
-    private var startRendering = NSDate()
-    private var endRendering = NSDate()
-    private var startLoading = NSDate()
-    private var endLoading = NSDate()
-    private var profilingAlert: UIAlertView? = nil
-    private var profileResult = ""
+    fileprivate var startRendering = Date()
+    fileprivate var endRendering = Date()
+    fileprivate var startLoading = Date()
+    fileprivate var endLoading = Date()
+    fileprivate var profilingAlert: UIAlertView? = nil
+    fileprivate var profileResult = ""
     
     @IBAction func doAnimation() {
-        UIView.animateWithDuration(0.3, animations: {
+        UIView.animate(withDuration: 0.3, animations: {
             let randomNumber = Int(arc4random()) % self.waveform.totalSamples
             self.waveform.progressSamples = randomNumber
         })
@@ -46,23 +46,23 @@ class ViewController: UIViewController {
         
         self.profileResult = ""
         // Delay execution of my block for 1 seconds.
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(1) * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
-            self.profileResult.appendContentsOf("AAC:")
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(1) * Int64(NSEC_PER_SEC)) / Double(NSEC_PER_SEC), execute: {
+            self.profileResult.append("AAC:")
             self.doLoadAAC()
         })
         // Delay execution of my block for 5 seconds.
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(5) * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
-            self.profileResult.appendContentsOf(" MP3:")
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(5) * Int64(NSEC_PER_SEC)) / Double(NSEC_PER_SEC), execute: {
+            self.profileResult.append(" MP3:")
             self.doLoadMP3()
         })
         // Delay execution of my block for 9 seconds.
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(9) * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
-            self.profileResult.appendContentsOf(" OGG:")
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(9) * Int64(NSEC_PER_SEC)) / Double(NSEC_PER_SEC), execute: {
+            self.profileResult.append(" OGG:")
             self.doLoadOGG()
         })
         // Delay execution of my block for 14 seconds.
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(14) * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
-            self.profilingAlert?.dismissWithClickedButtonIndex(-1, animated: false)
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(14) * Int64(NSEC_PER_SEC)) / Double(NSEC_PER_SEC), execute: {
+            self.profilingAlert?.dismiss(withClickedButtonIndex: -1, animated: false)
             let alert = UIAlertView(title: "PLEASE POST TO github.com/fulldecent/FDWaveformView/wiki", message: self.profileResult, delegate: nil, cancelButtonTitle: "Done", otherButtonTitles: "")
             alert.show()
             self.profilingAlert = alert
@@ -70,27 +70,27 @@ class ViewController: UIViewController {
     }
     
     @IBAction func doLoadAAC() {
-        let thisBundle = NSBundle(forClass: self.dynamicType)
-        let url = thisBundle.URLForResource("TchaikovskyExample2", withExtension: "m4a")
+        let thisBundle = Bundle(for: type(of: self))
+        let url = thisBundle.url(forResource: "TchaikovskyExample2", withExtension: "m4a")
         self.waveform.audioURL = url
     }
     
     @IBAction func doLoadMP3() {
-        let thisBundle = NSBundle(forClass: self.dynamicType)
-        let url = thisBundle.URLForResource("TchaikovskyExample2", withExtension: "mp3")
+        let thisBundle = Bundle(for: type(of: self))
+        let url = thisBundle.url(forResource: "TchaikovskyExample2", withExtension: "mp3")
         self.waveform.audioURL = url
     }
     
     @IBAction func doLoadOGG() {
-        let thisBundle = NSBundle(forClass: self.dynamicType)
-        let url = thisBundle.URLForResource("TchaikovskyExample2", withExtension: "ogg")
+        let thisBundle = Bundle(for: type(of: self))
+        let url = thisBundle.url(forResource: "TchaikovskyExample2", withExtension: "ogg")
         self.waveform.audioURL = url
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let thisBundle = NSBundle(forClass: self.dynamicType)
-        let url = thisBundle.URLForResource("Submarine", withExtension: "aiff")
+        let thisBundle = Bundle(for: type(of: self))
+        let url = thisBundle.url(forResource: "Submarine", withExtension: "aiff")
         // Animate the waveforme view in when it is rendered
         self.waveform.delegate = self
         self.waveform.alpha = 0.0
@@ -103,26 +103,26 @@ class ViewController: UIViewController {
 }
 
 extension ViewController: FDWaveformViewDelegate {
-    func waveformViewWillRender(waveformView: FDWaveformView) {
-        self.startRendering = NSDate()
+    func waveformViewWillRender(_ waveformView: FDWaveformView) {
+        self.startRendering = Date()
     }
     
-    func waveformViewDidRender(waveformView: FDWaveformView) {
-        self.endRendering = NSDate()
-        NSLog("FDWaveformView rendering done, took %f seconds", self.endRendering.timeIntervalSinceDate(self.startRendering))
-        self.profileResult.appendContentsOf(" render \(self.endRendering.timeIntervalSinceDate(self.startRendering))")
-        UIView.animateWithDuration(0.25, animations: {() -> Void in
+    func waveformViewDidRender(_ waveformView: FDWaveformView) {
+        self.endRendering = Date()
+        NSLog("FDWaveformView rendering done, took %f seconds", self.endRendering.timeIntervalSince(self.startRendering))
+        self.profileResult.append(" render \(self.endRendering.timeIntervalSince(self.startRendering))")
+        UIView.animate(withDuration: 0.25, animations: {() -> Void in
             waveformView.alpha = 1.0
         })
     }
     
-    func waveformViewWillLoad(waveformView: FDWaveformView) {
-        self.startLoading = NSDate()
+    func waveformViewWillLoad(_ waveformView: FDWaveformView) {
+        self.startLoading = Date()
     }
     
-    func waveformViewDidLoad(waveformView: FDWaveformView) {
-        self.endLoading = NSDate()
-        NSLog("FDWaveformView loading done, took %f seconds", self.endLoading.timeIntervalSinceDate(self.startLoading))
-        self.profileResult.appendContentsOf(" load \(self.endLoading.timeIntervalSinceDate(self.startLoading))")
+    func waveformViewDidLoad(_ waveformView: FDWaveformView) {
+        self.endLoading = Date()
+        NSLog("FDWaveformView loading done, took %f seconds", self.endLoading.timeIntervalSince(self.startLoading))
+        self.profileResult.append(" load \(self.endLoading.timeIntervalSince(self.startLoading))")
     }
 }
