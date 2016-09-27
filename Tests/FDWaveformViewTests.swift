@@ -46,8 +46,8 @@ class FDWaveformViewTests: XCTestCase {
     }
 
     func testColors() {
-        XCTAssert(fd?.wavesColor == UIColor.blackColor())
-        XCTAssert(fd?.progressColor == UIColor.blueColor())
+        XCTAssert(fd?.wavesColor == UIColor.black)
+        XCTAssert(fd?.progressColor == UIColor.blue)
     }
 
 }
