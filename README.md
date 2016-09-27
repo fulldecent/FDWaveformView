@@ -14,11 +14,10 @@ Usage
 
 To use it, add an `FDWaveformView` using Interface Builder or programmatically and then just load your audio as per this example. Note: if your audio file does not have file extension, see <a href="https://stackoverflow.com/questions/9290972/is-it-possible-to-make-avurlasset-work-without-a-file-extension">this SO question</a>.
 
-```objective-c
-NSBundle *thisBundle = [NSBundle bundleForClass:[self class]];
-NSString *filePath = [thisBundle pathForResource:@"Submarine" ofType:@"aiff"];
-NSURL *url = [NSURL fileURLWithPath:filePath];
-self.waveform.audioURL = url;
+```swift
+let thisBundle = Bundle(for: type(of: self))
+let url = thisBundle.url(forResource: "Submarine", withExtension: "aiff")
+self.waveform.audioURL = url
 ```
 
 <p align="center">
@@ -30,8 +29,8 @@ Features
 
 **Set play progress** to highlight part of the waveform:
 
-```objective-c
-self.waveform.progressSamples = self.waveform.totalSamples / 2;
+```swift
+self.waveform.progressSamples = self.waveform.totalSamples / 2
 ```
 
 <p align="center">
@@ -40,9 +39,9 @@ self.waveform.progressSamples = self.waveform.totalSamples / 2;
 
 **Zoom in** to show only part of the waveform, of course, zooming in will smoothly rerender to show progressively more detail:
 
-```objective-c
-self.waveform.zoomStartSamples = 0;
-self.waveform.zoomEndSamples = self.waveform.totalSamples / 4;
+```swift
+self.waveform.zoomStartSamples = 0
+self.waveform.zoomEndSamples = self.waveform.totalSamples / 4
 ```
 
 <p align="center">
@@ -51,10 +50,10 @@ self.waveform.zoomEndSamples = self.waveform.totalSamples / 4;
 
 **Enable gestures** for zooming in, panning around or scrubbing:
 
-```objective-c
-self.waveform.doesAllowScrubbing = YES;
-self.waveform.doesAllowStretch = YES;
-self.waveform.doesAllowScroll = YES;
+```swift
+self.waveform.doesAllowScrubbing = true
+self.waveform.doesAllowStretch = true
+self.waveform.doesAllowScroll = true
 ```
 
 <p align="center">
@@ -63,11 +62,11 @@ self.waveform.doesAllowScroll = YES;
 
 **Supports animation** for changing properties:
 
-```objective-c
-[UIView animateWithDuration:0.3 animations:^{
-    NSInteger randomNumber = arc4random() % self.waveform.totalSamples;
-    self.waveform.progressSamples = randomNumber;
-}];
+```swift
+UIView.animate(withDuration: 0.3) {
+    let randomNumber = arc4random() % self.waveform.totalSamples
+    self.waveform.progressSamples = randomNumber
+}
 ```
 
 <p align="center">
@@ -77,7 +76,7 @@ self.waveform.doesAllowScroll = YES;
 
 Creates **antialiased waveforms** by drawing more pixels than are seen on screen. Also, if you resize me (autolayout) I will render more detail if necessary to avoid pixelation.
 
-**Supports ARC** and **iOS7+**.
+Supports **iOS8+** and Swift 3.
 
 **Includes unit tests** which run successfully using Travis CI.
 

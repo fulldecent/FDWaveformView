@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'FDWaveformView'
-  s.version = '1.0.2'
+  s.version = '2.0.0'
   s.license = { :type => 'MIT', :file => 'LICENSE' }
   s.summary = 'Reads an audio file and displays the waveform'
   s.description      = <<-DESC

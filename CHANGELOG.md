@@ -4,10 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Master](https://github.com/fulldecent/FDWaveformView/compare/1.0.2...master)
+## [Master](https://github.com/fulldecent/FDWaveformView/compare/2.0.0...master)
+
+---
+
+## [2.0.0](https://github.com/fulldecent/FDWaveformView/releases/tag/2.0.0)
+Released on 2016-09-27.
+
 #### Added
- Automated CocoaPods Quality Indexes testing
+- Automated CocoaPods Quality Indexes testing
    Added by [Hayden Holligan](https://github.com/haydenholligan)
+- Use GPU to process waveforms
+  Added by [Hayden Holligan](https://github.com/haydenholligan)
 ---
 
 ## [1.0.2](https://github.com/fulldecent/FDWaveformView/releases/tag/1.0.2)
