@@ -13,8 +13,6 @@ import Accelerate
 // DO SEE http://stackoverflow.com/questions/1191868/uiimageview-scaling-interpolation
 // see http://stackoverflow.com/questions/3514066/how-to-tint-a-transparent-png-image-in-iphone
 
-// TODO: find and remove all !
-
 /// A view for rendering audio waveforms
 // @IBDesignable
 open class FDWaveformView: UIView {
@@ -42,21 +40,25 @@ open class FDWaveformView: UIView {
             delegate?.waveformViewWillLoad?(self)
             asset.loadValuesAsynchronously(forKeys: ["duration"]) {
                 var error: NSError? = nil
-                let status = self.asset!.statusOfValue(forKey: "duration", error: &error)
+                let status = asset.statusOfValue(forKey: "duration", error: &error)
                 switch status {
                 case .loaded:
-                    self.imageView.image = nil
-                    self.highlightedImage.image = nil
-                    self.progressSamples = 0
-                    self.zoomStartSamples = 0
-                    let formatDesc = assetTrack.formatDescriptions
-                    let item = formatDesc.first as! CMAudioFormatDescription
-                    let asbd = CMAudioFormatDescriptionGetStreamBasicDescription(item)
-                    let samples = (asbd?.pointee.mSampleRate)! * Float64(self.asset!.duration.value) / Float64(self.asset!.duration.timescale)
-                    self.totalSamples = Int(samples)
-                    self.zoomEndSamples = Int(samples)
-                    self.setNeedsDisplay()
-                    self.performSelector(onMainThread: #selector(self.setNeedsLayout), with: nil, waitUntilDone: false)
+                    if let audioFormatDesc = assetTrack.formatDescriptions.first {
+                        guard type(of: audioFormatDesc) == CMAudioFormatDescription.self else { return }
+                        let item = audioFormatDesc as! CMAudioFormatDescription     // forced downcast will always succeed
+                        if let asbd = CMAudioFormatDescriptionGetStreamBasicDescription(item) {
+                            let samples = (asbd.pointee.mSampleRate) * Float64(asset.duration.value) / Float64(asset.duration.timescale)
+                            
+                            self.imageView.image = nil
+                            self.highlightedImage.image = nil
+                            self.progressSamples = 0
+                            self.zoomStartSamples = 0
+                            self.totalSamples = Int(samples)
+                            self.zoomEndSamples = Int(samples)
+                            self.setNeedsDisplay()
+                            self.performSelector(onMainThread: #selector(self.setNeedsLayout), with: nil, waitUntilDone: false)
+                        }
+                    }
                 case .failed, .cancelled, .loading, .unknown:
                     print("FDWaveformView could not load asset: \(error?.localizedDescription)")
                 }
@@ -286,7 +288,7 @@ open class FDWaveformView: UIView {
         var scaledWidth: CGFloat = 1.0
         if cachedSampleRange.count > 0 && zoomSamples.count > 0 {
             scaledX = CGFloat(cachedSampleRange.lowerBound - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)
-            scaledWidth = CGFloat(cachedSampleRange.last! - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)
+            scaledWidth = CGFloat(cachedSampleRange.last! - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)    // forced unwrap is safe
             scaledProgressWidth = CGFloat(progressSamples - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)
         }
         let childFrame = CGRect(x: frame.width * scaledX, y: 0, width: frame.width * scaledWidth, height: frame.height)
@@ -348,11 +350,11 @@ open class FDWaveformView: UIView {
         reader.add(readerOutput)
 
         var channelCount = 1
-        let formatDesc: [AnyObject] = assetTrack.formatDescriptions as [AnyObject]
+        let formatDesc = assetTrack.formatDescriptions
         for item in formatDesc {
-            let fmtDesc = CMAudioFormatDescriptionGetStreamBasicDescription(item as! CMAudioFormatDescription)
-            guard fmtDesc != nil else { return }
-            channelCount = Int((fmtDesc?.pointee.mChannelsPerFrame)!)
+            guard type(of: item) == CMAudioFormatDescription.self else { return }
+            guard let fmtDesc = CMAudioFormatDescriptionGetStreamBasicDescription(item as! CMAudioFormatDescription) else { return }    // the forced downcast in here will always succeed
+            channelCount = Int(fmtDesc.pointee.mChannelsPerFrame)
         }
 
         var sampleMax = noiseFloor
@@ -436,9 +438,13 @@ open class FDWaveformView: UIView {
 
     // TODO: switch to a synchronous function that paints onto a given context? (for issue #2)
     func plotLogGraph(_ samples: [CGFloat], maximumValue max: CGFloat, zeroValue min: CGFloat, imageHeight: CGFloat, done: (_ image: UIImage, _ selectedImage: UIImage)->Void) {
+        guard let context = UIGraphicsGetCurrentContext() else {
+            NSLog("FDWaveformView failed to get graphics context")
+            return
+        }
+        
         let imageSize = CGSize(width: CGFloat(samples.count), height: imageHeight)
         UIGraphicsBeginImageContext(imageSize)
-        let context = UIGraphicsGetCurrentContext()!
         context.setShouldAntialias(false)
         context.setAlpha(1.0)
         context.setLineWidth(1.0)
@@ -457,13 +463,20 @@ open class FDWaveformView: UIView {
             context.addLine(to: CGPoint(x: CGFloat(x), y: verticalMiddle + height))
             context.strokePath();
         }
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        let drawRect = CGRect(x: 0, y: 0, width: (image?.size.width)!, height: (image?.size.height)!)
+        guard let image = UIGraphicsGetImageFromCurrentImageContext() else {
+            NSLog("FDWaveformView failed to get waveform image from context")
+            return
+        }
+        
+        let drawRect = CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height)
         context.setFillColor(progressColor.cgColor)
         UIRectFillUsingBlendMode(drawRect, .sourceAtop)
-        let tintedImage = UIGraphicsGetImageFromCurrentImageContext()
+        guard let tintedImage = UIGraphicsGetImageFromCurrentImageContext() else {
+            NSLog("FDWaveformView failed to get tinted image from context")
+            return
+        }
         UIGraphicsEndImageContext()
-        done(image!, tintedImage!)
+        done(image, tintedImage)
     }
 }
 
