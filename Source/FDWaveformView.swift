@@ -271,8 +271,10 @@ open class FDWaveformView: UIView {
         }
 
         if cacheIsDirty() {
-            DispatchQueue.global(qos: .background).async {
-                self.renderAsset()
+            if #available(iOS 8.0, *) {
+                DispatchQueue.global(qos: .background).async { self.renderAsset() }
+            } else {
+                DispatchQueue.global(priority: .background).async { self.renderAsset() }
             }
             return
         }
