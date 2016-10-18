@@ -436,13 +436,12 @@ open class FDWaveformView: UIView {
 
     // TODO: switch to a synchronous function that paints onto a given context? (for issue #2)
     func plotLogGraph(_ samples: [CGFloat], maximumValue max: CGFloat, zeroValue min: CGFloat, imageHeight: CGFloat, done: (_ image: UIImage, _ selectedImage: UIImage)->Void) {
+        let imageSize = CGSize(width: CGFloat(samples.count), height: imageHeight)
+        UIGraphicsBeginImageContext(imageSize)
         guard let context = UIGraphicsGetCurrentContext() else {
             NSLog("FDWaveformView failed to get graphics context")
             return
         }
-        
-        let imageSize = CGSize(width: CGFloat(samples.count), height: imageHeight)
-        UIGraphicsBeginImageContext(imageSize)
         context.setShouldAntialias(false)
         context.setAlpha(1.0)
         context.setLineWidth(1.0)
