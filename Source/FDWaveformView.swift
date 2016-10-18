@@ -270,7 +270,7 @@ open class FDWaveformView: UIView {
         }
 
         if cacheIsDirty() {
-            DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.background).async {
+            DispatchQueue.global(qos: .background).async {
                 self.renderAsset()
             }
             return
@@ -415,8 +415,7 @@ open class FDWaveformView: UIView {
                             vDSP_Length(downSampledLength),
                             vDSP_Length(samplesPerPixel))
                 
-                let range = nextDataOffset..<(nextDataOffset+downSampledLength)
-                var downSampledDataCG = downSampledData.map { (value: Float) -> CGFloat in
+                let downSampledDataCG = downSampledData.map { (value: Float) -> CGFloat in
                     let element = CGFloat(value)
                     if element > sampleMax { sampleMax = element }
                     return element
