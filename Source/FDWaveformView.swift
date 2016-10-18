@@ -8,26 +8,6 @@ import UIKit
 import MediaPlayer
 import AVFoundation
 import Accelerate
-fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
-  switch (lhs, rhs) {
-  case let (l?, r?):
-    return l < r
-  case (nil, _?):
-    return true
-  default:
-    return false
-  }
-}
-
-fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
-  switch (lhs, rhs) {
-  case let (l?, r?):
-    return l > r
-  default:
-    return rhs < lhs
-  }
-}
-
 
 // FROM http://stackoverflow.com/questions/5032775/drawing-waveform-with-avassetreader
 // DO SEE http://stackoverflow.com/questions/1191868/uiimageview-scaling-interpolation
@@ -251,9 +231,8 @@ open class FDWaveformView: UIView {
 
     /// If the cached image is insufficient for the current frame
     fileprivate func cacheIsDirty() -> Bool {
-        if image.image == nil {
-            return true
-        }
+        guard let image = image.image else { return true }
+        
         if cachedSampleRange.count == 0 {
             return true
         }
@@ -269,16 +248,16 @@ open class FDWaveformView: UIView {
         if cachedSampleRange.upperBound > minMaxX(zoomEndSamples + Int(CGFloat(cachedSampleRange.count) * horizontalMaximumBleed), min: 0, max: totalSamples) {
             return true
         }
-        if image.image?.size.width < frame.size.width * UIScreen.main.scale * CGFloat(horizontalMinimumOverdraw) {
+        if image.size.width < frame.size.width * UIScreen.main.scale * CGFloat(horizontalMinimumOverdraw) {
             return true
         }
-        if image.image?.size.width > frame.size.width * UIScreen.main.scale * CGFloat(horizontalMaximumOverdraw) {
+        if image.size.width > frame.size.width * UIScreen.main.scale * CGFloat(horizontalMaximumOverdraw) {
             return true
         }
-        if image.image?.size.height < frame.size.height * UIScreen.main.scale * CGFloat(verticalMinimumOverdraw) {
+        if image.size.height < frame.size.height * UIScreen.main.scale * CGFloat(verticalMinimumOverdraw) {
             return true
         }
-        if image.image?.size.height > frame.size.height * UIScreen.main.scale * CGFloat(verticalMaximumOverdraw) {
+        if image.size.height > frame.size.height * UIScreen.main.scale * CGFloat(verticalMaximumOverdraw) {
             return true
         }
         return false
