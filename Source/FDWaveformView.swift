@@ -337,12 +337,12 @@ open class FDWaveformView: UIView {
         guard let reader = try? AVAssetReader(asset: asset) else { return }
 
         reader.timeRange = CMTimeRangeMake(CMTimeMake(Int64(slice.lowerBound), asset.duration.timescale), CMTimeMake(Int64(slice.count), asset.duration.timescale))
-        let outputSettingsDict: [String : AnyObject] = [
-            AVFormatIDKey: Int(kAudioFormatLinearPCM) as AnyObject,
-            AVLinearPCMBitDepthKey: 16 as AnyObject,
-            AVLinearPCMIsBigEndianKey: false as AnyObject,
-            AVLinearPCMIsFloatKey: false as AnyObject,
-            AVLinearPCMIsNonInterleaved: false as AnyObject
+        let outputSettingsDict: [String : Any] = [
+            AVFormatIDKey: Int(kAudioFormatLinearPCM),
+            AVLinearPCMBitDepthKey: 16,
+            AVLinearPCMIsBigEndianKey: false,
+            AVLinearPCMIsFloatKey: false,
+            AVLinearPCMIsNonInterleaved: false
         ]
 
         let readerOutput = AVAssetReaderTrackOutput(track: assetTrack, outputSettings: outputSettingsDict)
