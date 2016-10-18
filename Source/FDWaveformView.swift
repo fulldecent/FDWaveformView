@@ -69,7 +69,7 @@ open class FDWaveformView: UIView {
     open fileprivate(set) var totalSamples = 0
 
     /// A portion of the waveform rendering to be highlighted
-    @IBInspectable open var progressSamples: Int = 0 {
+    @IBInspectable open var progressSamples = 0 {
         didSet {
             if totalSamples > 0 {
                 let progress = CGFloat(progressSamples) / CGFloat(totalSamples)
@@ -82,7 +82,7 @@ open class FDWaveformView: UIView {
     //TODO:  MAKE THIS A RANGE, CAN IT BE ANIMATABLE??!
 
     /// The first sample to render
-    @IBInspectable open var zoomStartSamples: Int = 0 {
+    @IBInspectable open var zoomStartSamples = 0 {
         didSet {
             setNeedsDisplay()
             setNeedsLayout()
@@ -90,7 +90,7 @@ open class FDWaveformView: UIView {
     }
 
     /// One plus the last sample to render
-    @IBInspectable open var zoomEndSamples: Int = 0 {
+    @IBInspectable open var zoomEndSamples = 0 {
         didSet {
             setNeedsDisplay()
             setNeedsLayout()
