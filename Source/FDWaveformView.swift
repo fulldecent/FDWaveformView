@@ -45,7 +45,7 @@ open class FDWaveformView: UIView {
                 let status = self.asset!.statusOfValue(forKey: "duration", error: &error)
                 switch status {
                 case .loaded:
-                    self.image.image = nil
+                    self.imageView.image = nil
                     self.highlightedImage.image = nil
                     self.progressSamples = 0
                     self.zoomStartSamples = 0
@@ -154,7 +154,7 @@ open class FDWaveformView: UIView {
     }
 
     /// View for rendered waveform
-    fileprivate let image: UIImageView = {
+    fileprivate let imageView: UIImageView = {
         let retval = UIImageView(frame: CGRect.zero)
         retval.contentMode = .scaleToFill
         return retval
@@ -199,7 +199,7 @@ open class FDWaveformView: UIView {
     fileprivate var loadingInProgress = false
 
     func setup() {
-        addSubview(image)
+        addSubview(imageView)
         clipping.addSubview(highlightedImage)
         addSubview(clipping)
         clipsToBounds = true
@@ -231,7 +231,7 @@ open class FDWaveformView: UIView {
 
     /// If the cached image is insufficient for the current frame
     fileprivate func cacheIsDirty() -> Bool {
-        guard let image = image.image else { return true }
+        guard let image = imageView.image else { return true }
         
         if cachedSampleRange.count == 0 {
             return true
@@ -290,11 +290,11 @@ open class FDWaveformView: UIView {
             scaledProgressWidth = CGFloat(progressSamples - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)
         }
         let childFrame = CGRect(x: frame.size.width * scaledX, y: 0, width: frame.size.width * scaledWidth, height: frame.size.height)
-        image.frame = childFrame
+        imageView.frame = childFrame
         highlightedImage.frame = childFrame
         clipping.frame = CGRect(x: 0, y: 0, width: frame.size.width * scaledProgressWidth, height: frame.size.height)
         clipping.isHidden = progressSamples <= zoomStartSamples
-        print("\(frame) -- \(image.frame)")
+        print("\(frame) -- \(imageView.frame)")
     }
 
     func renderAsset() {
@@ -316,7 +316,7 @@ open class FDWaveformView: UIView {
             self.plotLogGraph(samples, maximumValue: sampleMax, zeroValue: self.noiseFloor, imageHeight: heightInPixels) {
                 (image, selectedImage) in
                 DispatchQueue.main.async {
-                    self.image.image = image
+                    self.imageView.image = image
                     self.highlightedImage.image = selectedImage
                     self.cachedSampleRange = renderStartSamples ..< renderEndSamples
                     self.renderingInProgress = false
