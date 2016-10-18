@@ -206,7 +206,6 @@ open class FDWaveformView: UIView {
         clipsToBounds = true
 
         setupGestureRecognizers()
-        addGestureRecognizer(tapRecognizer)
     }
 
     fileprivate func setupGestureRecognizers() {
@@ -218,6 +217,7 @@ open class FDWaveformView: UIView {
         panRecognizer.delegate = self
         addGestureRecognizer(panRecognizer)
         tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTapGesture))
+        addGestureRecognizer(tapRecognizer)
     }
 
     required public init?(coder aCoder: NSCoder) {
