@@ -541,10 +541,10 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
                 self.setNeedsDisplay()
                 self.setNeedsLayout()
             }
-            else if self.doesAllowScrubbing {
-                let rangeSamples = CGFloat(zoomEndSamples - zoomStartSamples)
-                progressSamples = Int(CGFloat(zoomStartSamples) + rangeSamples * recognizer.location(in: self).x / self.bounds.size.width)
-            }
+        }
+        else if self.doesAllowScrubbing {
+            let rangeSamples = CGFloat(zoomEndSamples - zoomStartSamples)
+            progressSamples = Int(CGFloat(zoomStartSamples) + rangeSamples * recognizer.location(in: self).x / self.bounds.size.width)
         }
     }
 
