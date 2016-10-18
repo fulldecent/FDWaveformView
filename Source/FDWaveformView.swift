@@ -13,10 +13,10 @@ import Accelerate
 // DO SEE http://stackoverflow.com/questions/1191868/uiimageview-scaling-interpolation
 // see http://stackoverflow.com/questions/3514066/how-to-tint-a-transparent-png-image-in-iphone
 
-//TODO: find and remove all !
+// TODO: find and remove all !
 
 /// A view for rendering audio waveforms
-//@IBDesignable
+// @IBDesignable
 open class FDWaveformView: UIView {
     /// A delegate to accept progress reporting
     @IBInspectable open weak var delegate: FDWaveformViewDelegate? = nil
@@ -72,7 +72,7 @@ open class FDWaveformView: UIView {
         didSet {
             if totalSamples > 0 {
                 let progress = CGFloat(progressSamples) / CGFloat(totalSamples)
-                clipping.frame = CGRect(x: 0, y: 0, width: frame.size.width * progress, height: frame.size.height)
+                clipping.frame = CGRect(x: 0, y: 0, width: frame.width * progress, height: frame.height)
                 setNeedsLayout()
             }
         }
@@ -248,16 +248,16 @@ open class FDWaveformView: UIView {
         if cachedSampleRange.upperBound > minMaxX(zoomEndSamples + Int(CGFloat(cachedSampleRange.count) * horizontalMaximumBleed), min: 0, max: totalSamples) {
             return true
         }
-        if image.size.width < frame.size.width * UIScreen.main.scale * CGFloat(horizontalMinimumOverdraw) {
+        if image.size.width < frame.width * UIScreen.main.scale * CGFloat(horizontalMinimumOverdraw) {
             return true
         }
-        if image.size.width > frame.size.width * UIScreen.main.scale * CGFloat(horizontalMaximumOverdraw) {
+        if image.size.width > frame.width * UIScreen.main.scale * CGFloat(horizontalMaximumOverdraw) {
             return true
         }
-        if image.size.height < frame.size.height * UIScreen.main.scale * CGFloat(verticalMinimumOverdraw) {
+        if image.size.height < frame.height * UIScreen.main.scale * CGFloat(verticalMinimumOverdraw) {
             return true
         }
-        if image.size.height > frame.size.height * UIScreen.main.scale * CGFloat(verticalMaximumOverdraw) {
+        if image.size.height > frame.height * UIScreen.main.scale * CGFloat(verticalMaximumOverdraw) {
             return true
         }
         return false
@@ -289,10 +289,10 @@ open class FDWaveformView: UIView {
             scaledWidth = CGFloat(cachedSampleRange.last! - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)
             scaledProgressWidth = CGFloat(progressSamples - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)
         }
-        let childFrame = CGRect(x: frame.size.width * scaledX, y: 0, width: frame.size.width * scaledWidth, height: frame.size.height)
+        let childFrame = CGRect(x: frame.width * scaledX, y: 0, width: frame.width * scaledWidth, height: frame.height)
         imageView.frame = childFrame
         highlightedImage.frame = childFrame
-        clipping.frame = CGRect(x: 0, y: 0, width: frame.size.width * scaledProgressWidth, height: frame.size.height)
+        clipping.frame = CGRect(x: 0, y: 0, width: frame.width * scaledProgressWidth, height: frame.height)
         clipping.isHidden = progressSamples <= zoomStartSamples
         print("\(frame) -- \(imageView.frame)")
     }
@@ -308,8 +308,8 @@ open class FDWaveformView: UIView {
 
         let renderStartSamples = minMaxX(zoomStartSamples - Int(CGFloat(displayRange) * horizontalTargetBleed), min: 0, max: totalSamples)
         let renderEndSamples = minMaxX(zoomEndSamples + Int(CGFloat(displayRange) * horizontalTargetBleed), min: 0, max: totalSamples)
-        let widthInPixels = Int(frame.size.width * UIScreen.main.scale * horizontalTargetOverdraw)
-        let heightInPixels = frame.size.height * UIScreen.main.scale * horizontalTargetOverdraw
+        let widthInPixels = Int(frame.width * UIScreen.main.scale * horizontalTargetOverdraw)
+        let heightInPixels = frame.height * UIScreen.main.scale * horizontalTargetOverdraw
 
         sliceAsset(withRange: renderStartSamples..<renderEndSamples, andDownsampleTo: widthInPixels) {
             (samples, sampleMax) in
@@ -504,7 +504,7 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
             if recognizer.state == .began {
                 delegate?.waveformDidEndPanning?(self)
             }
-            var translationSamples = Int(CGFloat(zoomEndSamples - zoomStartSamples) * point.x / bounds.size.width)
+            var translationSamples = Int(CGFloat(zoomEndSamples - zoomStartSamples) * point.x / bounds.width)
             recognizer.setTranslation(CGPoint.zero, in: self)
             if zoomStartSamples - translationSamples < 0 {
                 translationSamples = zoomStartSamples
@@ -521,7 +521,7 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
             }
             else if doesAllowScrubbing {
                 let rangeSamples = CGFloat(zoomEndSamples - zoomStartSamples)
-                progressSamples = Int(CGFloat(zoomStartSamples) + rangeSamples * recognizer.location(in: self).x / bounds.size.width)
+                progressSamples = Int(CGFloat(zoomStartSamples) + rangeSamples * recognizer.location(in: self).x / bounds.width)
             }
         }
     }
@@ -529,7 +529,7 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
     func handleTapGesture(_ recognizer: UITapGestureRecognizer) {
         if doesAllowScrubbing {
             let rangeSamples = CGFloat(zoomEndSamples - zoomStartSamples)
-            progressSamples = Int(CGFloat(zoomStartSamples) + rangeSamples * recognizer.location(in: self).x / bounds.size.width)
+            progressSamples = Int(CGFloat(zoomStartSamples) + rangeSamples * recognizer.location(in: self).x / bounds.width)
         }
     }
 }
