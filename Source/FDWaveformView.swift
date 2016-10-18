@@ -17,10 +17,10 @@ import Accelerate
 // @IBDesignable
 open class FDWaveformView: UIView {
     /// A delegate to accept progress reporting
-    @IBInspectable open weak var delegate: FDWaveformViewDelegate? = nil
+    @IBInspectable open weak var delegate: FDWaveformViewDelegate?
 
     /// The audio file to render
-    @IBInspectable open var audioURL: URL? = nil {
+    @IBInspectable open var audioURL: URL? {
         didSet {
             guard let audioURL = self.audioURL else {
                 NSLog("FDWaveformView failed to load URL")
@@ -39,7 +39,7 @@ open class FDWaveformView: UIView {
             loadingInProgress = true
             delegate?.waveformViewWillLoad?(self)
             asset.loadValuesAsynchronously(forKeys: ["duration"]) {
-                var error: NSError? = nil
+                var error: NSError?
                 let status = asset.statusOfValue(forKey: "duration", error: &error)
                 switch status {
                 case .loaded:
@@ -179,10 +179,10 @@ open class FDWaveformView: UIView {
     fileprivate var asset: AVAsset?
 
     /// The track (part of the asset) we will render
-    fileprivate var assetTrack: AVAssetTrack? = nil
+    fileprivate var assetTrack: AVAssetTrack?
 
     /// The range of samples we rendered
-    fileprivate var cachedSampleRange:CountableRange<Int> = 0..<0
+    fileprivate var cachedSampleRange = 0..<0
 
     /// Gesture recognizer
     fileprivate var pinchRecognizer = UIPinchGestureRecognizer()
