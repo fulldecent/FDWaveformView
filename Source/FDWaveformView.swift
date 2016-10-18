@@ -39,7 +39,7 @@ open class FDWaveformView: UIView {
 
             self.assetTrack = assetTrack
             loadingInProgress = true
-            self.delegate?.waveformViewWillLoad?(self)
+            delegate?.waveformViewWillLoad?(self)
             asset.loadValuesAsynchronously(forKeys: ["duration"]) {
                 var error: NSError? = nil
                 let status = self.asset!.statusOfValue(forKey: "duration", error: &error)
@@ -70,10 +70,10 @@ open class FDWaveformView: UIView {
     /// A portion of the waveform rendering to be highlighted
     @IBInspectable open var progressSamples: Int = 0 {
         didSet {
-            if self.totalSamples > 0 {
-                let progress = CGFloat(self.progressSamples) / CGFloat(self.totalSamples)
-                self.clipping.frame = CGRect(x: 0, y: 0, width: self.frame.size.width * progress, height: self.frame.size.height)
-                self.setNeedsLayout()
+            if totalSamples > 0 {
+                let progress = CGFloat(progressSamples) / CGFloat(totalSamples)
+                clipping.frame = CGRect(x: 0, y: 0, width: frame.size.width * progress, height: frame.size.height)
+                setNeedsLayout()
             }
         }
     }
@@ -83,16 +83,16 @@ open class FDWaveformView: UIView {
     /// The first sample to render
     @IBInspectable open var zoomStartSamples: Int = 0 {
         didSet {
-            self.setNeedsDisplay()
-            self.setNeedsLayout()
+            setNeedsDisplay()
+            setNeedsLayout()
         }
     }
 
     /// One plus the last sample to render
     @IBInspectable open var zoomEndSamples: Int = 0 {
         didSet {
-            self.setNeedsDisplay()
-            self.setNeedsLayout()
+            setNeedsDisplay()
+            setNeedsLayout()
         }
     }
 
@@ -204,29 +204,29 @@ open class FDWaveformView: UIView {
         addSubview(clipping)
         clipsToBounds = true
 
-        self.setupGestureRecognizers()
-        self.addGestureRecognizer(self.tapRecognizer)
+        setupGestureRecognizers()
+        addGestureRecognizer(tapRecognizer)
     }
 
     fileprivate func setupGestureRecognizers() {
         //TODO: try to do this in the lazy initializer above
-        self.pinchRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(self.handlePinchGesture))
-        self.pinchRecognizer.delegate = self
-        self.addGestureRecognizer(self.pinchRecognizer)
-        self.panRecognizer = UIPanGestureRecognizer(target: self, action: #selector(self.handlePanGesture))
-        self.panRecognizer.delegate = self
-        self.addGestureRecognizer(self.panRecognizer)
-        self.tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.handleTapGesture))
+        pinchRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(handlePinchGesture))
+        pinchRecognizer.delegate = self
+        addGestureRecognizer(pinchRecognizer)
+        panRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture))
+        panRecognizer.delegate = self
+        addGestureRecognizer(panRecognizer)
+        tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTapGesture))
     }
 
     required public init?(coder aCoder: NSCoder) {
         super.init(coder: aCoder)
-        self.setup()
+        setup()
     }
 
     override init(frame rect: CGRect) {
         super.init(frame: rect)
-        self.setup()
+        setup()
     }
 
     /// If the cached image is insufficient for the current frame
@@ -265,7 +265,7 @@ open class FDWaveformView: UIView {
 
     override open func layoutSubviews() {
         super.layoutSubviews()
-        guard self.assetTrack != nil && !self.renderingInProgress && self.zoomEndSamples > 0 else {
+        guard assetTrack != nil && !renderingInProgress && zoomEndSamples > 0 else {
             return
         }
 
@@ -292,8 +292,8 @@ open class FDWaveformView: UIView {
         let childFrame = CGRect(x: frame.size.width * scaledX, y: 0, width: frame.size.width * scaledWidth, height: frame.size.height)
         image.frame = childFrame
         highlightedImage.frame = childFrame
-        clipping.frame = CGRect(x: 0, y: 0, width: self.frame.size.width * scaledProgressWidth, height: self.frame.size.height)
-        clipping.isHidden = self.progressSamples <= self.zoomStartSamples
+        clipping.frame = CGRect(x: 0, y: 0, width: frame.size.width * scaledProgressWidth, height: frame.size.height)
+        clipping.isHidden = progressSamples <= zoomStartSamples
         print("\(frame) -- \(image.frame)")
     }
 
@@ -442,7 +442,7 @@ open class FDWaveformView: UIView {
         context.setShouldAntialias(false)
         context.setAlpha(1.0)
         context.setLineWidth(1.0)
-        context.setStrokeColor(self.wavesColor.cgColor)
+        context.setStrokeColor(wavesColor.cgColor)
 
         let sampleDrawingScale: CGFloat
         if max == min {
@@ -473,63 +473,63 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
     }
 
     func handlePinchGesture(_ recognizer: UIPinchGestureRecognizer) {
-        if !self.doesAllowStretch {
+        if !doesAllowStretch {
             return
         }
         if recognizer.scale == 1 {
             return
         }
         let middleSamples = CGFloat((zoomStartSamples + zoomEndSamples) / 2)
-        let rangeSamples = CGFloat(self.zoomEndSamples - self.zoomStartSamples)
+        let rangeSamples = CGFloat(zoomEndSamples - zoomStartSamples)
         if middleSamples - 1.0 / recognizer.scale * CGFloat(rangeSamples) >= 0 {
-            self.zoomStartSamples = Int(CGFloat(middleSamples) - 1.0 / recognizer.scale * CGFloat(rangeSamples) / 2)
+            zoomStartSamples = Int(CGFloat(middleSamples) - 1.0 / recognizer.scale * CGFloat(rangeSamples) / 2)
         }
         else {
-            self.zoomStartSamples = 0
+            zoomStartSamples = 0
         }
         if middleSamples + 1 / recognizer.scale * CGFloat(rangeSamples) / 2 <= CGFloat(totalSamples) {
-            self.zoomEndSamples = Int(middleSamples + 1.0 / recognizer.scale * rangeSamples / 2)
+            zoomEndSamples = Int(middleSamples + 1.0 / recognizer.scale * rangeSamples / 2)
         }
         else {
-            self.zoomEndSamples = self.totalSamples
+            zoomEndSamples = totalSamples
         }
-        self.setNeedsDisplay()
-        self.setNeedsLayout()
+        setNeedsDisplay()
+        setNeedsLayout()
         recognizer.scale = 1
     }
 
     func handlePanGesture(_ recognizer: UIPanGestureRecognizer) {
         let point = recognizer.translation(in: self)
-        if self.doesAllowScroll {
+        if doesAllowScroll {
             if recognizer.state == .began {
                 delegate?.waveformDidEndPanning?(self)
             }
-            var translationSamples = Int(CGFloat(self.zoomEndSamples - self.zoomStartSamples) * point.x / self.bounds.size.width)
+            var translationSamples = Int(CGFloat(zoomEndSamples - zoomStartSamples) * point.x / bounds.size.width)
             recognizer.setTranslation(CGPoint.zero, in: self)
-            if self.zoomStartSamples - translationSamples < 0 {
-                translationSamples = self.zoomStartSamples
+            if zoomStartSamples - translationSamples < 0 {
+                translationSamples = zoomStartSamples
             }
-            if self.zoomEndSamples - translationSamples > self.totalSamples {
-                translationSamples = self.zoomEndSamples - self.totalSamples
+            if zoomEndSamples - translationSamples > totalSamples {
+                translationSamples = zoomEndSamples - totalSamples
             }
-            self.zoomStartSamples -= translationSamples
-            self.zoomEndSamples -= translationSamples
+            zoomStartSamples -= translationSamples
+            zoomEndSamples -= translationSamples
             if recognizer.state == .ended {
                 delegate?.waveformDidEndPanning?(self)
-                self.setNeedsDisplay()
-                self.setNeedsLayout()
+                setNeedsDisplay()
+                setNeedsLayout()
             }
-            else if self.doesAllowScrubbing {
+            else if doesAllowScrubbing {
                 let rangeSamples = CGFloat(zoomEndSamples - zoomStartSamples)
-                progressSamples = Int(CGFloat(zoomStartSamples) + rangeSamples * recognizer.location(in: self).x / self.bounds.size.width)
+                progressSamples = Int(CGFloat(zoomStartSamples) + rangeSamples * recognizer.location(in: self).x / bounds.size.width)
             }
         }
     }
 
     func handleTapGesture(_ recognizer: UITapGestureRecognizer) {
-        if self.doesAllowScrubbing {
+        if doesAllowScrubbing {
             let rangeSamples = CGFloat(zoomEndSamples - zoomStartSamples)
-            progressSamples = Int(CGFloat(zoomStartSamples) + rangeSamples * recognizer.location(in: self).x / self.bounds.size.width)
+            progressSamples = Int(CGFloat(zoomStartSamples) + rangeSamples * recognizer.location(in: self).x / bounds.size.width)
         }
     }
 }
