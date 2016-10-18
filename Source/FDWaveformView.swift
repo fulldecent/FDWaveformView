@@ -44,8 +44,7 @@ open class FDWaveformView: UIView {
                 switch status {
                 case .loaded:
                     if let audioFormatDesc = assetTrack.formatDescriptions.first {
-                        guard type(of: audioFormatDesc) == CMAudioFormatDescription.self else { return }
-                        let item = audioFormatDesc as! CMAudioFormatDescription     // forced downcast will always succeed
+                        let item = audioFormatDesc as! CMAudioFormatDescription     // TODO: Can this be safer?
                         if let asbd = CMAudioFormatDescriptionGetStreamBasicDescription(item) {
                             let samples = (asbd.pointee.mSampleRate) * Float64(asset.duration.value) / Float64(asset.duration.timescale)
                             
@@ -352,8 +351,7 @@ open class FDWaveformView: UIView {
         var channelCount = 1
         let formatDesc = assetTrack.formatDescriptions
         for item in formatDesc {
-            guard type(of: item) == CMAudioFormatDescription.self else { return }
-            guard let fmtDesc = CMAudioFormatDescriptionGetStreamBasicDescription(item as! CMAudioFormatDescription) else { return }    // the forced downcast in here will always succeed
+            guard let fmtDesc = CMAudioFormatDescriptionGetStreamBasicDescription(item as! CMAudioFormatDescription) else { return }    // TODO: Can the forced downcast in here be safer?
             channelCount = Int(fmtDesc.pointee.mChannelsPerFrame)
         }
 
