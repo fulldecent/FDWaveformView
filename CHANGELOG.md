@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## [Master](https://github.com/fulldecent/FDWaveformView/compare/2.0.0...master)
+#### Added
+- Allow scrubbing independantly of scrolling
+  - Added by [Doug Earnshaw](https://github.com/haydenholligan)
+- Tidy up Swift 3.0 conversion, remove some forced unwraps & generally make more Swifty
+  - Added by [Doug Earnshaw](https://github.com/haydenholligan)
 
 ---
 
@@ -13,9 +18,10 @@ Released on 2016-09-27.
 
 #### Added
 - Automated CocoaPods Quality Indexes testing
-   Added by [Hayden Holligan](https://github.com/haydenholligan)
+  - Added by [Hayden Holligan](https://github.com/haydenholligan)
 - Use GPU to process waveforms
-  Added by [Hayden Holligan](https://github.com/haydenholligan)
+  - Added by [Hayden Holligan](https://github.com/haydenholligan)
+
 ---
 
 ## [1.0.2](https://github.com/fulldecent/FDWaveformView/releases/tag/1.0.2)
