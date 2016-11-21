@@ -358,13 +358,11 @@ open class FDWaveformView: UIView {
         }
 
         var sampleMax = noiseFloor
-        var samplesPerPixel = channelCount * slice.count / targetSamples
-        if samplesPerPixel < 1 {
-            samplesPerPixel = 1
-        }
+        var samplesPerPixel = max(1, channelCount * slice.count / targetSamples)
+        let filter = [Float](repeating: 1.0 / Float(samplesPerPixel), count: samplesPerPixel)
 
+        var recentValues = [Float]()
         var outputSamples = [CGFloat]()
-        var nextDataOffset = 0
 
         // 16-bit samples
         reader.startReading()
@@ -387,7 +385,6 @@ open class FDWaveformView: UIView {
                 
                 let samplesToProcess = readBufferLength / MemoryLayout<Int16>.size
                 
-                let filter = [Float](repeating: 1.0 / Float(samplesPerPixel), count: samplesPerPixel)
                 var processingBuffer = [Float](repeating: 0.0, count: samplesToProcess)
                 
                 let sampleCount = vDSP_Length(samplesToProcess)
@@ -408,7 +405,13 @@ open class FDWaveformView: UIView {
                 vDSP_vclip(processingBuffer, 1, &noiseFloorFloat, &ceil, &processingBuffer, 1, sampleCount)
                 
                 //Downsample and average
-                let downSampledLength = samplesToProcess / samplesPerPixel
+                processingBuffer = recentValues + processingBuffer
+                let downSampledLength = processingBuffer.count / samplesPerPixel
+                if downSampledLength == 0 {
+                    recentValues = processingBuffer
+                    return
+                }
+                
                 var downSampledData = [Float](repeating: 0.0, count: downSampledLength)
                 
                 vDSP_desamp(processingBuffer,
@@ -423,10 +426,30 @@ open class FDWaveformView: UIView {
                     return element
                 }
                 
+                recentValues = Array(processingBuffer.dropFirst(samplesPerPixel * downSampledLength))
                 outputSamples += downSampledDataCG
-                nextDataOffset += downSampledLength
             }
         }
+        
+        if recentValues.count > 0 {
+            let filter = [Float](repeating: 1.0 / Float(recentValues.count), count: recentValues.count)
+            
+            var downSampledData = [Float](repeating: 0.0, count: 1)
+            
+            vDSP_desamp(recentValues,
+                        vDSP_Stride(recentValues.count),
+                        filter, &downSampledData,
+                        vDSP_Length(1),
+                        vDSP_Length(recentValues.count))
+            
+            let downSampledDataCG = downSampledData.map { (value: Float) -> CGFloat in
+                let element = CGFloat(value)
+                if element > sampleMax { sampleMax = element }
+                return element
+            }
+            outputSamples += downSampledDataCG
+        }
+        
         // if (reader.status == AVAssetReaderStatusFailed || reader.status == AVAssetReaderStatusUnknown)
         // Something went wrong. Handle it.
         if reader.status == .completed {
