@@ -48,14 +48,16 @@ open class FDWaveformView: UIView {
                         if let asbd = CMAudioFormatDescriptionGetStreamBasicDescription(item) {
                             let samples = (asbd.pointee.mSampleRate) * Float64(asset.duration.value) / Float64(asset.duration.timescale)
                             
-                            self.imageView.image = nil
-                            self.highlightedImage.image = nil
-                            self.progressSamples = 0
-                            self.zoomStartSamples = 0
-                            self.totalSamples = Int(samples)
-                            self.zoomEndSamples = Int(samples)
-                            self.setNeedsDisplay()
-                            self.performSelector(onMainThread: #selector(self.setNeedsLayout), with: nil, waitUntilDone: false)
+                            DispatchQueue.main.async {
+                                self.imageView.image = nil
+                                self.highlightedImage.image = nil
+                                self.progressSamples = 0
+                                self.zoomStartSamples = 0
+                                self.totalSamples = Int(samples)
+                                self.zoomEndSamples = Int(samples)
+                                self.setNeedsDisplay()
+                                self.setNeedsLayout()
+                            }
                         }
                     }
                 case .failed, .cancelled, .loading, .unknown:
