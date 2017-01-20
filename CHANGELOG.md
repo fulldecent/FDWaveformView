@@ -10,7 +10,11 @@ All notable changes to this project will be documented in this file.
   - Added by [Doug Earnshaw](https://github.com/haydenholligan)
 - Tidy up Swift 3.0 conversion, remove some forced unwraps & generally make more Swifty
   - Added by [Doug Earnshaw](https://github.com/haydenholligan)
-
+- Improved accuracy of waveform rendering
+  - Added by [Kip Nicol](https://github.com/ospr)
+- Fixed waveform rendering for large audio files
+  - Added by [Kip Nicol](https://github.com/ospr)
+  
 ---
 
 ## [2.0.0](https://github.com/fulldecent/FDWaveformView/releases/tag/2.0.0)
