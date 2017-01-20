@@ -16,6 +16,10 @@ Released on 2017-02-16.
   - Added by [Doug Earnshaw](https://github.com/haydenholligan)
 - Tidy up Swift 3.0 conversion, remove some forced unwraps & generally make more Swifty
   - Added by [Doug Earnshaw](https://github.com/haydenholligan)
+- Improved accuracy of waveform rendering
+  - Added by [Kip Nicol](https://github.com/ospr)
+- Fixed waveform rendering for large audio files
+  - Added by [Kip Nicol](https://github.com/ospr)
 
 ---
 

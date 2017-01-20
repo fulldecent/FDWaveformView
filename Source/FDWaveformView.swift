@@ -360,13 +360,11 @@ open class FDWaveformView: UIView {
         }
 
         var sampleMax = noiseFloor
-        var samplesPerPixel = channelCount * slice.count / targetSamples
-        if samplesPerPixel < 1 {
-            samplesPerPixel = 1
-        }
+        let samplesPerPixel = max(1, channelCount * slice.count / targetSamples)
+        let filter = [Float](repeating: 1.0 / Float(samplesPerPixel), count: samplesPerPixel)
 
         var outputSamples = [CGFloat]()
-        var nextDataOffset = 0
+        var sampleBuffer = Data()
 
         // 16-bit samples
         reader.startReading()
@@ -377,64 +375,92 @@ open class FDWaveformView: UIView {
                     break
             }
 
-            let readBufferLength = CMBlockBufferGetDataLength(readBuffer)
+            // Append audio sample buffer into our current sample buffer
+            var readBufferLength = 0
+            var readBufferPointer: UnsafeMutablePointer<Int8>?
+            CMBlockBufferGetDataPointer(readBuffer, 0, &readBufferLength, nil, &readBufferPointer)
+            sampleBuffer.append(UnsafeBufferPointer(start: readBufferPointer, count: readBufferLength))
+            CMSampleBufferInvalidate(readSampleBuffer)
 
-            var data = Data(capacity: readBufferLength)
-            data.withUnsafeMutableBytes {
-                (bytes: UnsafeMutablePointer<Int16>) in
-                CMBlockBufferCopyDataBytes(readBuffer, 0, readBufferLength, bytes)
-                let samples = UnsafeMutablePointer<Int16>(bytes)
-                
-                CMSampleBufferInvalidate(readSampleBuffer)
-                
-                let samplesToProcess = readBufferLength / MemoryLayout<Int16>.size
-                
-                let filter = [Float](repeating: 1.0 / Float(samplesPerPixel), count: samplesPerPixel)
-                var processingBuffer = [Float](repeating: 0.0, count: samplesToProcess)
-                
-                let sampleCount = vDSP_Length(samplesToProcess)
-                
-                //Convert 16bit int samples to floats
-                vDSP_vflt16(samples, 1, &processingBuffer, 1, sampleCount)
-                
-                //Take the absolute values to get amplitude
-                vDSP_vabs(processingBuffer, 1, &processingBuffer, 1, sampleCount)
-                
-                //Convert to dB
-                var zero: Float = 32768.0
-                vDSP_vdbcon(processingBuffer, 1, &zero, &processingBuffer, 1, sampleCount, 1)
-                
-                //Clip to [noiseFloor, 0]
-                var ceil: Float = 0.0
-                var noiseFloorFloat = Float(noiseFloor)
-                vDSP_vclip(processingBuffer, 1, &noiseFloorFloat, &ceil, &processingBuffer, 1, sampleCount)
-                
-                //Downsample and average
-                let downSampledLength = samplesToProcess / samplesPerPixel
-                var downSampledData = [Float](repeating: 0.0, count: downSampledLength)
-                
-                vDSP_desamp(processingBuffer,
-                            vDSP_Stride(samplesPerPixel),
-                            filter, &downSampledData,
-                            vDSP_Length(downSampledLength),
-                            vDSP_Length(samplesPerPixel))
-                
-                let downSampledDataCG = downSampledData.map { (value: Float) -> CGFloat in
-                    let element = CGFloat(value)
-                    if element > sampleMax { sampleMax = element }
-                    return element
-                }
-                
-                outputSamples += downSampledDataCG
-                nextDataOffset += downSampledLength
-            }
+            let totalSamples = sampleBuffer.count / MemoryLayout<Int16>.size
+            let downSampledLength = totalSamples / samplesPerPixel
+            let samplesToProcess = downSampledLength * samplesPerPixel
+
+            guard samplesToProcess > 0 else { continue }
+            
+            processSamples(fromData: &sampleBuffer,
+                           sampleMax: &sampleMax,
+                           outputSamples: &outputSamples,
+                           samplesToProcess: samplesToProcess,
+                           downSampledLength: downSampledLength,
+                           samplesPerPixel: samplesPerPixel,
+                           filter: filter)
         }
+        
+        // Process the remaining samples at the end which didn't fit into samplesPerPixel
+        let samplesToProcess = sampleBuffer.count / MemoryLayout<Int16>.size
+        if samplesToProcess > 0 {
+            let downSampledLength = 1
+            let samplesPerPixel = samplesToProcess
+            let filter = [Float](repeating: 1.0 / Float(samplesPerPixel), count: samplesPerPixel)
+            
+            processSamples(fromData: &sampleBuffer,
+                           sampleMax: &sampleMax,
+                           outputSamples: &outputSamples,
+                           samplesToProcess: samplesToProcess,
+                           downSampledLength: downSampledLength,
+                           samplesPerPixel: samplesPerPixel,
+                           filter: filter)
+        }
+        
         // if (reader.status == AVAssetReaderStatusFailed || reader.status == AVAssetReaderStatusUnknown)
         // Something went wrong. Handle it.
         if reader.status == .completed {
             done(outputSamples, sampleMax)
         } else {
             print(reader.status)
+        }
+    }
+    
+    func processSamples(fromData sampleBuffer: inout Data, sampleMax: inout CGFloat, outputSamples: inout [CGFloat], samplesToProcess: Int, downSampledLength: Int, samplesPerPixel: Int, filter: [Float]) {
+        sampleBuffer.withUnsafeBytes { (samples: UnsafePointer<Int16>) in
+            var processingBuffer = [Float](repeating: 0.0, count: samplesToProcess)
+            
+            let sampleCount = vDSP_Length(samplesToProcess)
+            
+            //Convert 16bit int samples to floats
+            vDSP_vflt16(samples, 1, &processingBuffer, 1, sampleCount)
+            
+            //Take the absolute values to get amplitude
+            vDSP_vabs(processingBuffer, 1, &processingBuffer, 1, sampleCount)
+            
+            //Convert to dB
+            var zero: Float = 32768.0
+            vDSP_vdbcon(processingBuffer, 1, &zero, &processingBuffer, 1, sampleCount, 1)
+            
+            //Clip to [noiseFloor, 0]
+            var ceil: Float = 0.0
+            var noiseFloorFloat = Float(noiseFloor)
+            vDSP_vclip(processingBuffer, 1, &noiseFloorFloat, &ceil, &processingBuffer, 1, sampleCount)
+            
+            //Downsample and average
+            var downSampledData = [Float](repeating: 0.0, count: downSampledLength)
+            vDSP_desamp(processingBuffer,
+                        vDSP_Stride(samplesPerPixel),
+                        filter, &downSampledData,
+                        vDSP_Length(downSampledLength),
+                        vDSP_Length(samplesPerPixel))
+            
+            let downSampledDataCG = downSampledData.map { (value: Float) -> CGFloat in
+                let element = CGFloat(value)
+                if element > sampleMax { sampleMax = element }
+                return element
+            }
+            
+            // Remove processed samples
+            sampleBuffer.removeFirst(samplesToProcess * MemoryLayout<Int16>.size)
+            
+            outputSamples += downSampledDataCG
         }
     }
 
