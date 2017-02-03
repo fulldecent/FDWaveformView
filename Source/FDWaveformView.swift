@@ -93,10 +93,18 @@ open class FDWaveformView: UIView {
     @IBInspectable open var doesAllowScroll = true
 
     /// The color of the waveform
-    @IBInspectable open var wavesColor = UIColor.black
+    @IBInspectable open var wavesColor = UIColor.black {
+        didSet {
+            imageView.tintColor = wavesColor
+        }
+    }
 
     /// The color of the highlighted waveform (see `progressSamples`
-    @IBInspectable open var progressColor = UIColor.blue
+    @IBInspectable open var progressColor = UIColor.blue {
+        didSet {
+            highlightedImage.tintColor = progressColor
+        }
+    }
 
 
     //TODO MAKE PUBLIC
@@ -134,8 +142,7 @@ open class FDWaveformView: UIView {
     /// Current audio context to be used for rendering
     private var audioContext: FDAudioContext? {
         didSet {
-            imageView.image = nil
-            highlightedImage.image = nil
+            waveformImage = nil
             progressSamples = 0
             zoomStartSamples = 0
             zoomEndSamples = totalSamples
@@ -148,6 +155,15 @@ open class FDWaveformView: UIView {
     /// Currently running waveformRenderTask
     private var waveformRenderTask: FDWaveformRenderTask?
     
+    /// Image of waveform
+    private var waveformImage: UIImage? {
+        get { return imageView.image }
+        set {
+            imageView.image = newValue?.withRenderingMode(.alwaysTemplate)
+            highlightedImage.image = imageView.image
+        }
+    }
+    
     //TODO RENAME
     fileprivate func minMaxX<T: Comparable>(_ x: T, min: T, max: T) -> T {
         return x < min ? min : x > max ? max : x
@@ -158,16 +174,18 @@ open class FDWaveformView: UIView {
     }
 
     /// View for rendered waveform
-    fileprivate let imageView: UIImageView = {
+    lazy fileprivate var imageView: UIImageView = {
         let retval = UIImageView(frame: CGRect.zero)
         retval.contentMode = .scaleToFill
+        retval.tintColor = self.wavesColor
         return retval
     }()
 
     /// View for rendered waveform showing progress
-    fileprivate let highlightedImage: UIImageView = {
+    lazy fileprivate var highlightedImage: UIImageView = {
         let retval = UIImageView(frame: CGRect.zero)
         retval.contentMode = .scaleToFill
+        retval.tintColor = self.progressColor
         return retval
     }()
 
@@ -229,7 +247,7 @@ open class FDWaveformView: UIView {
 
     /// If the cached image is insufficient for the current frame
     fileprivate func cacheIsDirty() -> Bool {
-        guard let image = imageView.image else { return true }
+        guard let image = waveformImage else { return true }
         
         if cachedSampleRange.count == 0 {
             return true
@@ -307,24 +325,22 @@ open class FDWaveformView: UIView {
 
         let renderStartSamples = minMaxX(zoomStartSamples - Int(CGFloat(displayRange) * horizontalTargetBleed), min: 0, max: totalSamples)
         let renderEndSamples = minMaxX(zoomEndSamples + Int(CGFloat(displayRange) * horizontalTargetBleed), min: 0, max: totalSamples)
+        let renderSampleRange = renderStartSamples..<renderEndSamples
         let widthInPixels = floor(frame.width * UIScreen.main.scale * horizontalTargetOverdraw)
         let heightInPixels = frame.height * UIScreen.main.scale * horizontalTargetOverdraw // TODO: Vertical target overdraw?
 
         let waveformRenderTask = FDWaveformRenderTask(audioContext: audioContext) { image in
             DispatchQueue.main.async {
-                self.imageView.image = image
-                // TODO: highlight image
-//                self.highlightedImage.image = selectedImage
-                self.cachedSampleRange = renderStartSamples ..< renderEndSamples
+                self.waveformImage = image
+                self.cachedSampleRange = renderSampleRange
                 self.renderingInProgress = false
                 self.setNeedsLayout()
                 self.delegate?.waveformViewDidRender?(self)
             }
         }
         // TODO: set other values here or require a context to be passed in
-        waveformRenderTask.sampleRange = renderStartSamples..<renderEndSamples
+        waveformRenderTask.sampleRange = renderSampleRange
         waveformRenderTask.imageSize = CGSize(width: widthInPixels, height: heightInPixels)
-        waveformRenderTask.wavesColor = wavesColor // TOOD: could be optimized?
         waveformRenderTask.horizontalTargetOverdraw = horizontalTargetOverdraw
         waveformRenderTask.verticalTargetOverdraw = verticalTargetOverdraw
         waveformRenderTask.noiseFloor = noiseFloor
