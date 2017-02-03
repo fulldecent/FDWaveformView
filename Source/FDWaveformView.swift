@@ -30,7 +30,7 @@ open class FDWaveformView: UIView {
             }
 
             loadingInProgress = true
-            delegate?.waveformViewWillLoad?(self)// tODO: will need to hook into renderer for this properly
+            delegate?.waveformViewWillLoad?(self)
             
             // TODO: weak self here?
             // TODO: need to cancel previous loads? Can use nsoperation with block to cancel?
