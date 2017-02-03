@@ -22,53 +22,37 @@ open class FDWaveformView: UIView {
     /// The audio file to render
     @IBInspectable open var audioURL: URL? {
         didSet {
-            guard let audioURL = self.audioURL else {
-                NSLog("FDWaveformView failed to load URL")
+            guard let audioURL = audioURL else {
+                NSLog("FDWaveformView received nil audioURL")
+                self.audioContext = nil
+                // TODO: cancel existing rendering
                 return
             }
 
-            let asset = AVURLAsset(url: audioURL, options: [AVURLAssetPreferPreciseDurationAndTimingKey: NSNumber(value: true as Bool)])
-            self.asset = asset
-
-            guard let assetTrack = asset.tracks(withMediaType: AVMediaTypeAudio).first else {
-                NSLog("FDWaveformView failed to load AVAssetTrack")
-                return
-            }
-
-            self.assetTrack = assetTrack
             loadingInProgress = true
-            delegate?.waveformViewWillLoad?(self)
-            asset.loadValuesAsynchronously(forKeys: ["duration"]) {
-                var error: NSError?
-                let status = asset.statusOfValue(forKey: "duration", error: &error)
-                switch status {
-                case .loaded:
-                    if let audioFormatDesc = assetTrack.formatDescriptions.first {
-                        let item = audioFormatDesc as! CMAudioFormatDescription     // TODO: Can this be safer?
-                        if let asbd = CMAudioFormatDescriptionGetStreamBasicDescription(item) {
-                            let samples = (asbd.pointee.mSampleRate) * Float64(asset.duration.value) / Float64(asset.duration.timescale)
-                            
-                            DispatchQueue.main.async {
-                                self.imageView.image = nil
-                                self.highlightedImage.image = nil
-                                self.progressSamples = 0
-                                self.zoomStartSamples = 0
-                                self.totalSamples = Int(samples)
-                                self.zoomEndSamples = Int(samples)
-                                self.setNeedsDisplay()
-                                self.setNeedsLayout()
-                            }
-                        }
+            delegate?.waveformViewWillLoad?(self)// tODO: will need to hook into renderer for this properly
+            
+            // TODO: weak self here?
+            // TODO: need to cancel previous loads? Can use nsoperation with block to cancel?
+            FDAudioContext.load(fromAudioURL: audioURL) { audioContext in
+                DispatchQueue.main.async {
+                    if audioContext == nil {
+                        NSLog("FDWaveformView failed to load URL")
                     }
-                case .failed, .cancelled, .loading, .unknown:
-                    print("FDWaveformView could not load asset: \(error?.localizedDescription)")
+                    
+                    self.audioContext = audioContext // This will reset the view and kick off a layout
+                    
+                    self.loadingInProgress = false
+                    self.delegate?.waveformViewDidLoad?(self)
                 }
             }
         }
     }
 
     /// The total number of audio samples in the file
-    open fileprivate(set) var totalSamples = 0
+    open var totalSamples: Int {
+        return audioContext?.totalSamples ?? 0
+    }
 
     /// A portion of the waveform rendering to be highlighted
     @IBInspectable open var progressSamples = 0 {
@@ -147,6 +131,23 @@ open class FDWaveformView: UIView {
 
     // Mark - Private vars
 
+    /// Current audio context to be used for rendering
+    private var audioContext: FDAudioContext? {
+        didSet {
+            imageView.image = nil
+            highlightedImage.image = nil
+            progressSamples = 0
+            zoomStartSamples = 0
+            zoomEndSamples = totalSamples
+            
+            setNeedsDisplay()
+            setNeedsLayout()
+        }
+    }
+    
+    /// Currently running waveformRenderTask
+    private var waveformRenderTask: FDWaveformRenderTask?
+    
     //TODO RENAME
     fileprivate func minMaxX<T: Comparable>(_ x: T, min: T, max: T) -> T {
         return x < min ? min : x > max ? max : x
@@ -176,12 +177,6 @@ open class FDWaveformView: UIView {
         retval.clipsToBounds = true
         return retval
     }()
-
-    /// The audio asset we are analyzing
-    fileprivate var asset: AVAsset?
-
-    /// The track (part of the asset) we will render
-    fileprivate var assetTrack: AVAssetTrack?
 
     /// The range of samples we rendered
     fileprivate var cachedSampleRange = 0..<0
@@ -268,16 +263,12 @@ open class FDWaveformView: UIView {
 
     override open func layoutSubviews() {
         super.layoutSubviews()
-        guard assetTrack != nil && !renderingInProgress && zoomEndSamples > 0 else {
+        guard audioContext != nil && !renderingInProgress && zoomEndSamples > 0 else {
             return
         }
 
-        if cacheIsDirty() {
-            if #available(iOS 8.0, *) {
-                DispatchQueue.global(qos: .background).async { self.renderAsset() }
-            } else {
-                DispatchQueue.global(priority: .background).async { self.renderAsset() }
-            }
+        guard !cacheIsDirty() else {
+            renderWaveform()
             return
         }
 
@@ -302,44 +293,178 @@ open class FDWaveformView: UIView {
         print("\(frame) -- \(imageView.frame)")
     }
 
-    func renderAsset() {
-        guard !renderingInProgress else { return }
+    func renderWaveform() {
+        guard
+            !renderingInProgress,
+            let audioContext = audioContext
+            else { return }
 
         renderingInProgress = true
         delegate?.waveformViewWillRender?(self)
+        
         let displayRange = zoomEndSamples - zoomStartSamples
-
         guard displayRange > 0 else { return }
 
         let renderStartSamples = minMaxX(zoomStartSamples - Int(CGFloat(displayRange) * horizontalTargetBleed), min: 0, max: totalSamples)
         let renderEndSamples = minMaxX(zoomEndSamples + Int(CGFloat(displayRange) * horizontalTargetBleed), min: 0, max: totalSamples)
-        let widthInPixels = Int(frame.width * UIScreen.main.scale * horizontalTargetOverdraw)
-        let heightInPixels = frame.height * UIScreen.main.scale * horizontalTargetOverdraw
+        let widthInPixels = floor(frame.width * UIScreen.main.scale * horizontalTargetOverdraw)
+        let heightInPixels = frame.height * UIScreen.main.scale * horizontalTargetOverdraw // TODO: Vertical target overdraw?
 
-        sliceAsset(withRange: renderStartSamples..<renderEndSamples, andDownsampleTo: widthInPixels) {
+        let waveformRenderTask = FDWaveformRenderTask(audioContext: audioContext) { image in
+            DispatchQueue.main.async {
+                self.imageView.image = image
+                // TODO: highlight image
+//                self.highlightedImage.image = selectedImage
+                self.cachedSampleRange = renderStartSamples ..< renderEndSamples
+                self.renderingInProgress = false
+                self.setNeedsLayout()
+                self.delegate?.waveformViewDidRender?(self)
+            }
+        }
+        // TODO: set other values here or require a context to be passed in
+        waveformRenderTask.sampleRange = renderStartSamples..<renderEndSamples
+        waveformRenderTask.imageSize = CGSize(width: widthInPixels, height: heightInPixels)
+        waveformRenderTask.wavesColor = wavesColor // TOOD: could be optimized?
+        waveformRenderTask.horizontalTargetOverdraw = horizontalTargetOverdraw
+        waveformRenderTask.verticalTargetOverdraw = verticalTargetOverdraw
+        waveformRenderTask.noiseFloor = noiseFloor
+
+        waveformRenderTask.start()
+        self.waveformRenderTask = waveformRenderTask
+    }
+}
+
+// TODO: needed?
+struct FDWaveformRenderContext {
+    
+    public var imageSize: CGSize = .zero // TODO: better starting value? Require it for init?
+    
+    /// The color of the waveform
+    public var wavesColor = UIColor.black
+    
+}
+
+final public class FDAudioContext {
+    
+    public let audioURL: URL
+    
+    fileprivate let totalSamples: Int
+    fileprivate let asset: AVAsset
+    fileprivate let assetTrack: AVAssetTrack
+    
+    private init(audioURL: URL, totalSamples: Int, asset: AVAsset, assetTrack: AVAssetTrack) {
+        self.audioURL = audioURL
+        self.totalSamples = totalSamples
+        self.asset = asset
+        self.assetTrack = assetTrack
+    }
+    
+    public static func load(fromAudioURL audioURL: URL, completionHandler: @escaping (_ audioContext: FDAudioContext?) -> ()) {
+        let asset = AVURLAsset(url: audioURL, options: [AVURLAssetPreferPreciseDurationAndTimingKey: NSNumber(value: true as Bool)])
+        
+        guard let assetTrack = asset.tracks(withMediaType: AVMediaTypeAudio).first else {
+            NSLog("FDWaveformView failed to load AVAssetTrack")
+            completionHandler(nil)
+            return
+        }
+
+        asset.loadValuesAsynchronously(forKeys: ["duration"]) {
+            var error: NSError?
+            let status = asset.statusOfValue(forKey: "duration", error: &error)
+            switch status {
+            case .loaded:
+                guard
+                    let audioFormatDesc = assetTrack.formatDescriptions.first,
+                    let asbd = CMAudioFormatDescriptionGetStreamBasicDescription(audioFormatDesc as! CMAudioFormatDescription) // TODO: Can this be safer?
+                    else { break }
+                
+                let totalSamples = Int((asbd.pointee.mSampleRate) * Float64(asset.duration.value) / Float64(asset.duration.timescale))
+                let audioContext = FDAudioContext(audioURL: audioURL, totalSamples: totalSamples, asset: asset, assetTrack: assetTrack)
+                completionHandler(audioContext)
+                return
+                
+            case .failed, .cancelled, .loading, .unknown:
+                print("FDWaveformView could not load asset: \(error?.localizedDescription)")
+            }
+            
+            completionHandler(nil)
+        }
+    }
+}
+
+// TODO: ++++++++++++++ Consider having a separate class to load the audio file? And that's passed in here?
+//       Or passed into the render function? Although that will still have the same issue where there is shared
+//       state between render calls.
+//       What we need is some way to turn these into discrete operations or tasks that are only run once and are cancellable.
+//       How long does it take to get the duration? If it's not long it's not a big deal to load the asset every time, right?
+final public class FDWaveformRenderTask {
+    
+    // TODO: document and clean up
+    public let audioContext: FDAudioContext
+    private let completionHandler: (UIImage?) -> ()
+    
+    public var sampleRange: CountableRange<Int>
+    public var imageSize: CGSize = .zero
+    public var wavesColor: UIColor = .black
+
+    // TODO: need to set these three below when rendering
+    /// Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
+    fileprivate var horizontalTargetOverdraw: CGFloat = 3.0
+    
+    /// Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
+    fileprivate var verticalTargetOverdraw: CGFloat = 2.0 // TODO: not used??
+    
+    /// The "zero" level (in dB)
+    fileprivate var noiseFloor: CGFloat = -50.0
+    
+    public init(audioContext: FDAudioContext, completionHandler: @escaping (_ image: UIImage?) -> ()) {
+        self.audioContext = audioContext
+        self.completionHandler = completionHandler
+        
+        self.sampleRange = 0..<audioContext.totalSamples
+    }
+    
+    public func start() {
+        // TODO: needed if we go to nsoperation?
+        if #available(iOS 8.0, *) {
+            DispatchQueue.global(qos: .background).async { self.render() }
+        } else {
+            DispatchQueue.global(priority: .background).async { self.render() }
+        }
+    }
+    
+    private func finish(with image: UIImage?) {
+        // TODO: nil this out or use a finished flag to not call this mulitple times?
+        completionHandler(image)
+    }
+    
+    private func render() {
+        guard !sampleRange.isEmpty else {
+            finish(with: nil)
+            return
+        }
+        
+        sliceAsset(withRange: sampleRange, andDownsampleTo: Int(imageSize.width)) {
             (samples, sampleMax) in
-            self.plotLogGraph(samples, maximumValue: sampleMax, zeroValue: self.noiseFloor, imageHeight: heightInPixels) {
-                (image, selectedImage) in
-                DispatchQueue.main.async {
-                    self.imageView.image = image
-                    self.highlightedImage.image = selectedImage
-                    self.cachedSampleRange = renderStartSamples ..< renderEndSamples
-                    self.renderingInProgress = false
-                    self.setNeedsLayout()
-                    self.delegate?.waveformViewDidRender?(self)
-                }
+            self.plotLogGraph(samples, maximumValue: sampleMax, zeroValue: self.noiseFloor, imageHeight: self.imageSize.height) {
+                (image) in
+                finish(with: image)
             }
         }
     }
 
     /// Read the asset and create create a lower resolution set of samples
-    func sliceAsset(withRange slice: Range<Int>, andDownsampleTo targetSamples: Int, done: (_ samples: [CGFloat], _ sampleMax: CGFloat) -> Void) {
-        guard slice.count > 0 else { return }
-        guard let asset = asset else { return }
-        guard let assetTrack = assetTrack else { return }
-        guard let reader = try? AVAssetReader(asset: asset) else { return }
-
-        reader.timeRange = CMTimeRange(start: CMTime(value: Int64(slice.lowerBound), timescale: asset.duration.timescale), duration: CMTime(value: Int64(slice.count), timescale: asset.duration.timescale))
+    func sliceAsset(withRange slice: CountableRange<Int>, andDownsampleTo targetSamples: Int, done: (_ samples: [CGFloat], _ sampleMax: CGFloat) -> Void) {
+        guard
+            !slice.isEmpty,
+            let reader = try? AVAssetReader(asset: audioContext.asset)
+            else {
+                finish(with: nil)
+                return
+        }
+        
+        reader.timeRange = CMTimeRange(start: CMTime(value: Int64(slice.lowerBound), timescale: audioContext.asset.duration.timescale),
+                                       duration: CMTime(value: Int64(slice.count), timescale: audioContext.asset.duration.timescale))
         let outputSettingsDict: [String : Any] = [
             AVFormatIDKey: Int(kAudioFormatLinearPCM),
             AVLinearPCMBitDepthKey: 16,
@@ -348,18 +473,20 @@ open class FDWaveformView: UIView {
             AVLinearPCMIsNonInterleaved: false
         ]
 
-        let readerOutput = AVAssetReaderTrackOutput(track: assetTrack, outputSettings: outputSettingsDict)
+        let readerOutput = AVAssetReaderTrackOutput(track: audioContext.assetTrack, outputSettings: outputSettingsDict)
         readerOutput.alwaysCopiesSampleData = false
         reader.add(readerOutput)
 
         var channelCount = 1
-        let formatDesc = assetTrack.formatDescriptions
+        let formatDesc = audioContext.assetTrack.formatDescriptions
         for item in formatDesc {
+            // TODO: handle error here
             guard let fmtDesc = CMAudioFormatDescriptionGetStreamBasicDescription(item as! CMAudioFormatDescription) else { return }    // TODO: Can the forced downcast in here be safer?
             channelCount = Int(fmtDesc.pointee.mChannelsPerFrame)
         }
 
         var sampleMax = noiseFloor
+        // TODO: bad things happen if target samples is 0
         let samplesPerPixel = max(1, channelCount * slice.count / targetSamples)
         let filter = [Float](repeating: 1.0 / Float(samplesPerPixel), count: samplesPerPixel)
 
@@ -465,7 +592,7 @@ open class FDWaveformView: UIView {
     }
 
     // TODO: switch to a synchronous function that paints onto a given context? (for issue #2)
-    func plotLogGraph(_ samples: [CGFloat], maximumValue max: CGFloat, zeroValue min: CGFloat, imageHeight: CGFloat, done: (_ image: UIImage, _ selectedImage: UIImage)->Void) {
+    func plotLogGraph(_ samples: [CGFloat], maximumValue max: CGFloat, zeroValue min: CGFloat, imageHeight: CGFloat, done: (_ image: UIImage) -> Void) {
         let imageSize = CGSize(width: CGFloat(samples.count), height: imageHeight)
         UIGraphicsBeginImageContext(imageSize)
         guard let context = UIGraphicsGetCurrentContext() else {
@@ -494,16 +621,17 @@ open class FDWaveformView: UIView {
             NSLog("FDWaveformView failed to get waveform image from context")
             return
         }
-        
-        let drawRect = CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height)
-        context.setFillColor(progressColor.cgColor)
-        UIRectFillUsingBlendMode(drawRect, .sourceAtop)
-        guard let tintedImage = UIGraphicsGetImageFromCurrentImageContext() else {
-            NSLog("FDWaveformView failed to get tinted image from context")
-            return
-        }
-        UIGraphicsEndImageContext()
-        done(image, tintedImage)
+
+        // TODO: handle the progress image differently?
+//        let drawRect = CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height)
+//        context.setFillColor(progressColor.cgColor)
+//        UIRectFillUsingBlendMode(drawRect, .sourceAtop)
+//        guard let tintedImage = UIGraphicsGetImageFromCurrentImageContext() else {
+//            NSLog("FDWaveformView failed to get tinted image from context")
+//            return
+//        }
+//        UIGraphicsEndImageContext()
+        done(image)
     }
 }
 
