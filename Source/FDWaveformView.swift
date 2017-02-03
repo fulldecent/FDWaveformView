@@ -444,24 +444,24 @@ final public class FDWaveformRenderTask {
             return
         }
         
-        sliceAsset(withRange: sampleRange, andDownsampleTo: Int(imageSize.width)) {
-            (samples, sampleMax) in
-            self.plotLogGraph(samples, maximumValue: sampleMax, zeroValue: self.noiseFloor, imageHeight: self.imageSize.height) {
-                (image) in
-                finish(with: image)
-            }
-        }
+        let image: UIImage? = {
+            guard
+                let (samples, sampleMax) = sliceAsset(withRange: sampleRange, andDownsampleTo: Int(imageSize.width)),
+                let image = plotLogGraph(samples, maximumValue: sampleMax, zeroValue: self.noiseFloor, imageHeight: self.imageSize.height)
+            else { return nil }
+            
+            return image
+        }()
+        
+        finish(with: image)
     }
 
     /// Read the asset and create create a lower resolution set of samples
-    func sliceAsset(withRange slice: CountableRange<Int>, andDownsampleTo targetSamples: Int, done: (_ samples: [CGFloat], _ sampleMax: CGFloat) -> Void) {
+    func sliceAsset(withRange slice: CountableRange<Int>, andDownsampleTo targetSamples: Int) -> (samples: [CGFloat], sampleMax: CGFloat)? {
         guard
             !slice.isEmpty,
             let reader = try? AVAssetReader(asset: audioContext.asset)
-            else {
-                finish(with: nil)
-                return
-        }
+            else { return nil }
         
         reader.timeRange = CMTimeRange(start: CMTime(value: Int64(slice.lowerBound), timescale: audioContext.asset.duration.timescale),
                                        duration: CMTime(value: Int64(slice.count), timescale: audioContext.asset.duration.timescale))
@@ -481,7 +481,7 @@ final public class FDWaveformRenderTask {
         let formatDesc = audioContext.assetTrack.formatDescriptions
         for item in formatDesc {
             // TODO: handle error here
-            guard let fmtDesc = CMAudioFormatDescriptionGetStreamBasicDescription(item as! CMAudioFormatDescription) else { return }    // TODO: Can the forced downcast in here be safer?
+            guard let fmtDesc = CMAudioFormatDescriptionGetStreamBasicDescription(item as! CMAudioFormatDescription) else { return nil }    // TODO: Can the forced downcast in here be safer?
             channelCount = Int(fmtDesc.pointee.mChannelsPerFrame)
         }
 
@@ -543,9 +543,10 @@ final public class FDWaveformRenderTask {
         // if (reader.status == AVAssetReaderStatusFailed || reader.status == AVAssetReaderStatusUnknown)
         // Something went wrong. Handle it.
         if reader.status == .completed {
-            done(outputSamples, sampleMax)
+            return (outputSamples, sampleMax)
         } else {
             print(reader.status)
+            return nil
         }
     }
     
@@ -592,12 +593,12 @@ final public class FDWaveformRenderTask {
     }
 
     // TODO: switch to a synchronous function that paints onto a given context? (for issue #2)
-    func plotLogGraph(_ samples: [CGFloat], maximumValue max: CGFloat, zeroValue min: CGFloat, imageHeight: CGFloat, done: (_ image: UIImage) -> Void) {
+    func plotLogGraph(_ samples: [CGFloat], maximumValue max: CGFloat, zeroValue min: CGFloat, imageHeight: CGFloat) -> UIImage? {
         let imageSize = CGSize(width: CGFloat(samples.count), height: imageHeight)
         UIGraphicsBeginImageContext(imageSize)
         guard let context = UIGraphicsGetCurrentContext() else {
             NSLog("FDWaveformView failed to get graphics context")
-            return
+            return nil
         }
         context.setShouldAntialias(false)
         context.setAlpha(1.0)
@@ -619,8 +620,10 @@ final public class FDWaveformRenderTask {
         }
         guard let image = UIGraphicsGetImageFromCurrentImageContext() else {
             NSLog("FDWaveformView failed to get waveform image from context")
-            return
+            return nil
         }
+        
+        return image
 
         // TODO: handle the progress image differently?
 //        let drawRect = CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height)
@@ -631,7 +634,6 @@ final public class FDWaveformRenderTask {
 //            return
 //        }
 //        UIGraphicsEndImageContext()
-        done(image)
     }
 }
 
