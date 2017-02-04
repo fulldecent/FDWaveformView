@@ -683,8 +683,6 @@ final public class FDWaveformRenderOperation: Operation {
             return nil
         }
         
-        UIGraphicsEndImageContext()
-        
         return image
     }
 }
