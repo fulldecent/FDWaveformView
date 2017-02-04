@@ -148,6 +148,7 @@ open class FDWaveformView: UIView {
             zoomStartSamples = 0
             zoomEndSamples = totalSamples
             waveformRenderOperation = nil
+            renderForCurrentAssetFailed = false
             
             setNeedsDisplay()
             setNeedsLayout()
@@ -160,7 +161,6 @@ open class FDWaveformView: UIView {
             if newValue !== waveformRenderOperation {
                 print("cancelling")
                 waveformRenderOperation?.cancel()
-                renderForCurrentAssetFailed = false
             }
         }
     }
