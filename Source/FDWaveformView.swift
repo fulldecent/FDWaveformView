@@ -679,16 +679,6 @@ final public class FDWaveformRenderOperation: Operation {
         UIGraphicsEndImageContext()
         
         return image
-
-        // TODO: handle the progress image differently?
-//        let drawRect = CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height)
-//        context.setFillColor(progressColor.cgColor)
-//        UIRectFillUsingBlendMode(drawRect, .sourceAtop)
-//        guard let tintedImage = UIGraphicsGetImageFromCurrentImageContext() else {
-//            NSLog("FDWaveformView failed to get tinted image from context")
-//            return
-//        }
-//        UIGraphicsEndImageContext()
     }
 }
 
