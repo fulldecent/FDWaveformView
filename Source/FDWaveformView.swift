@@ -640,6 +640,8 @@ final public class FDWaveformRenderTask {
             return nil
         }
         
+        UIGraphicsEndImageContext()
+        
         return image
 
         // TODO: handle the progress image differently?
