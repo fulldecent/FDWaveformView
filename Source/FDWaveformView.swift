@@ -336,8 +336,10 @@ open class FDWaveformView: UIView {
         let renderSampleRange = renderStartSamples..<renderEndSamples
         let widthInPixels = floor(frame.width * UIScreen.main.scale * horizontalTargetOverdraw)
         let heightInPixels = frame.height * UIScreen.main.scale * horizontalTargetOverdraw // TODO: Vertical target overdraw?
-
-        let waveformRenderOperation = FDWaveformRenderOperation(audioContext: audioContext) { image in
+        let imageSize = CGSize(width: widthInPixels, height: heightInPixels)
+        let renderFormat = FDWaveformRenderFormat(wavesColor: .black, noiseFloor: noiseFloor)
+        
+        let waveformRenderOperation = FDWaveformRenderOperation(audioContext: audioContext, imageSize: imageSize, sampleRange: renderSampleRange) { image in
             DispatchQueue.main.async {
                 self.renderForCurrentAssetFailed = (image == nil)
                 print("done")
@@ -349,29 +351,13 @@ open class FDWaveformView: UIView {
                 self.delegate?.waveformViewDidRender?(self)
             }
         }
-        // TODO: set other values here or require a context to be passed in
-        waveformRenderOperation.sampleRange = renderSampleRange
-        waveformRenderOperation.imageSize = CGSize(width: widthInPixels, height: heightInPixels)
-        waveformRenderOperation.horizontalTargetOverdraw = horizontalTargetOverdraw
-        waveformRenderOperation.verticalTargetOverdraw = verticalTargetOverdraw
-        waveformRenderOperation.noiseFloor = noiseFloor
-        
         self.waveformRenderOperation = waveformRenderOperation
+        
         renderingInProgress = true
         delegate?.waveformViewWillRender?(self)
 
         waveformRenderOperation.start()
     }
-}
-
-// TODO: needed?
-struct FDWaveformRenderContext {
-    
-    public var imageSize: CGSize = .zero // TODO: better starting value? Require it for init?
-    
-    /// The color of the waveform
-    public var wavesColor = UIColor.black
-    
 }
 
 final public class FDAudioContext {
@@ -422,24 +408,23 @@ final public class FDAudioContext {
     }
 }
 
+public struct FDWaveformRenderFormat {
+    
+    /// The color of the waveform
+    public var wavesColor = UIColor.black
+    
+    fileprivate var noiseFloor: CGFloat = -50.0
+}
+
 final public class FDWaveformRenderOperation: Operation {
     
     // TODO: document and clean up
     public let audioContext: FDAudioContext
     private let completionHandler: (UIImage?) -> ()
-    
-    public var sampleRange: CountableRange<Int>
-    public var imageSize: CGSize = .zero
-    public var wavesColor: UIColor = .black
 
-    /// Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
-    fileprivate var horizontalTargetOverdraw: CGFloat = 3.0
-    
-    /// Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
-    fileprivate var verticalTargetOverdraw: CGFloat = 2.0 // TODO: not used??
-    
-    /// The "zero" level (in dB)
-    fileprivate var noiseFloor: CGFloat = -50.0
+    public let format: FDWaveformRenderFormat
+    public let imageSize: CGSize
+    public let sampleRange: CountableRange<Int>
     
     public override var isAsynchronous: Bool { return true }
     
@@ -451,11 +436,12 @@ final public class FDWaveformRenderOperation: Operation {
     
     private var renderedImage: UIImage?
     
-    public init(audioContext: FDAudioContext, completionHandler: @escaping (_ image: UIImage?) -> ()) {
+    public init(audioContext: FDAudioContext, imageSize: CGSize, sampleRange: CountableRange<Int>? = nil, format: FDWaveformRenderFormat = FDWaveformRenderFormat(), completionHandler: @escaping (_ image: UIImage?) -> ()) {
         self.audioContext = audioContext
+        self.format = format
+        self.imageSize = imageSize
+        self.sampleRange = sampleRange ?? 0..<audioContext.totalSamples
         self.completionHandler = completionHandler
-        
-        self.sampleRange = 0..<audioContext.totalSamples
         
         super.init()
         
@@ -502,7 +488,7 @@ final public class FDWaveformRenderOperation: Operation {
         let image: UIImage? = {
             guard
                 let (samples, sampleMax) = sliceAsset(withRange: sampleRange, andDownsampleTo: Int(imageSize.width)),
-                let image = plotLogGraph(samples, maximumValue: sampleMax, zeroValue: self.noiseFloor, imageHeight: self.imageSize.height)
+                let image = plotLogGraph(samples, maximumValue: sampleMax, zeroValue: self.format.noiseFloor, imageHeight: self.imageSize.height)
             else { return nil }
             
             return image
@@ -541,7 +527,7 @@ final public class FDWaveformRenderOperation: Operation {
             channelCount = Int(fmtDesc.pointee.mChannelsPerFrame)
         }
 
-        var sampleMax = noiseFloor
+        var sampleMax = format.noiseFloor
         // TODO: bad things happen if target samples is 0
         let samplesPerPixel = max(1, channelCount * slice.count / targetSamples)
         let filter = [Float](repeating: 1.0 / Float(samplesPerPixel), count: samplesPerPixel)
@@ -629,7 +615,7 @@ final public class FDWaveformRenderOperation: Operation {
             
             //Clip to [noiseFloor, 0]
             var ceil: Float = 0.0
-            var noiseFloorFloat = Float(noiseFloor)
+            var noiseFloorFloat = Float(format.noiseFloor)
             vDSP_vclip(processingBuffer, 1, &noiseFloorFloat, &ceil, &processingBuffer, 1, sampleCount)
             
             //Downsample and average
@@ -667,7 +653,7 @@ final public class FDWaveformRenderOperation: Operation {
         context.setShouldAntialias(false)
         context.setAlpha(1.0)
         context.setLineWidth(1.0)
-        context.setStrokeColor(wavesColor.cgColor)
+        context.setStrokeColor(format.wavesColor.cgColor)
 
         let sampleDrawingScale: CGFloat
         if max == min {
