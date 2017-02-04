@@ -24,8 +24,7 @@ open class FDWaveformView: UIView {
         didSet {
             guard let audioURL = audioURL else {
                 NSLog("FDWaveformView received nil audioURL")
-                self.audioContext = nil
-                // TODO: cancel existing rendering
+                audioContext = nil
                 return
             }
 
@@ -146,19 +145,28 @@ open class FDWaveformView: UIView {
             progressSamples = 0
             zoomStartSamples = 0
             zoomEndSamples = totalSamples
+            waveformRenderOperation = nil
             
             setNeedsDisplay()
             setNeedsLayout()
         }
     }
     
-    /// Currently running waveformRenderTask
-    private var waveformRenderTask: FDWaveformRenderTask?
+    /// Currently running renderer
+    private var waveformRenderOperation: FDWaveformRenderOperation? {
+        willSet {
+            if newValue !== waveformRenderOperation {
+                print("cancelling")
+                waveformRenderOperation?.cancel()
+            }
+        }
+    }
     
     /// Image of waveform
     private var waveformImage: UIImage? {
         get { return imageView.image }
         set {
+            // This will allow us to apply a tint color to the image
             imageView.image = newValue?.withRenderingMode(.alwaysTemplate)
             highlightedImage.image = imageView.image
         }
@@ -317,6 +325,8 @@ open class FDWaveformView: UIView {
             let audioContext = audioContext
             else { return }
 
+        print("rendering")
+        
         renderingInProgress = true
         delegate?.waveformViewWillRender?(self)
         
@@ -329,8 +339,9 @@ open class FDWaveformView: UIView {
         let widthInPixels = floor(frame.width * UIScreen.main.scale * horizontalTargetOverdraw)
         let heightInPixels = frame.height * UIScreen.main.scale * horizontalTargetOverdraw // TODO: Vertical target overdraw?
 
-        let waveformRenderTask = FDWaveformRenderTask(audioContext: audioContext) { image in
+        let waveformRenderOperation = FDWaveformRenderOperation(audioContext: audioContext) { image in
             DispatchQueue.main.async {
+                print("done")
                 self.waveformImage = image
                 self.cachedSampleRange = renderSampleRange
                 self.renderingInProgress = false
@@ -338,15 +349,14 @@ open class FDWaveformView: UIView {
                 self.delegate?.waveformViewDidRender?(self)
             }
         }
+        self.waveformRenderOperation = waveformRenderOperation
         // TODO: set other values here or require a context to be passed in
-        waveformRenderTask.sampleRange = renderSampleRange
-        waveformRenderTask.imageSize = CGSize(width: widthInPixels, height: heightInPixels)
-        waveformRenderTask.horizontalTargetOverdraw = horizontalTargetOverdraw
-        waveformRenderTask.verticalTargetOverdraw = verticalTargetOverdraw
-        waveformRenderTask.noiseFloor = noiseFloor
-
-        waveformRenderTask.start()
-        self.waveformRenderTask = waveformRenderTask
+        waveformRenderOperation.sampleRange = renderSampleRange
+        waveformRenderOperation.imageSize = CGSize(width: widthInPixels, height: heightInPixels)
+        waveformRenderOperation.horizontalTargetOverdraw = horizontalTargetOverdraw
+        waveformRenderOperation.verticalTargetOverdraw = verticalTargetOverdraw
+        waveformRenderOperation.noiseFloor = noiseFloor
+        waveformRenderOperation.start()
     }
 }
 
@@ -413,7 +423,7 @@ final public class FDAudioContext {
 //       state between render calls.
 //       What we need is some way to turn these into discrete operations or tasks that are only run once and are cancellable.
 //       How long does it take to get the duration? If it's not long it's not a big deal to load the asset every time, right?
-final public class FDWaveformRenderTask {
+final public class FDWaveformRenderOperation: Operation {
     
     // TODO: document and clean up
     public let audioContext: FDAudioContext
@@ -433,16 +443,37 @@ final public class FDWaveformRenderTask {
     /// The "zero" level (in dB)
     fileprivate var noiseFloor: CGFloat = -50.0
     
+    public override var isAsynchronous: Bool { return true }
+    
+    private var _isExecuting = false
+    public override var isExecuting: Bool { return _isExecuting }
+    
+    private var _isFinished = false
+    public override var isFinished: Bool { return _isFinished }
+    
+    private var renderedImage: UIImage?
+    
     public init(audioContext: FDAudioContext, completionHandler: @escaping (_ image: UIImage?) -> ()) {
         self.audioContext = audioContext
         self.completionHandler = completionHandler
         
         self.sampleRange = 0..<audioContext.totalSamples
+        
+        super.init()
+        
+        self.completionBlock = { [weak self] in
+            guard let `self` = self else { return }
+            self.completionHandler(self.renderedImage)
+        }
     }
     
-    public func start() {
-        // TODO: needed if we go to nsoperation?
-        // TODO: if there is an error running this, then the waveformview will try to load the image over and over
+    public override func start() {
+        guard !isExecuting && !isFinished && !isCancelled else { return }
+        
+        willChangeValue(forKey: "isExecuting")
+        _isExecuting = true
+        didChangeValue(forKey: "isExecuting")
+        
         if #available(iOS 8.0, *) {
             DispatchQueue.global(qos: .background).async { self.render() }
         } else {
@@ -451,8 +482,16 @@ final public class FDWaveformRenderTask {
     }
     
     private func finish(with image: UIImage?) {
-        // TODO: nil this out or use a finished flag to not call this mulitple times?
-        completionHandler(image)
+        guard !isFinished && !isCancelled else { return }
+        
+        renderedImage = image
+        
+        willChangeValue(forKey: "isExecuting")
+        willChangeValue(forKey: "isFinished")
+        _isExecuting = false
+        _isFinished = true
+        didChangeValue(forKey: "isExecuting")
+        didChangeValue(forKey: "isFinished")
     }
     
     private func render() {
