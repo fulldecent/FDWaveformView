@@ -328,9 +328,6 @@ open class FDWaveformView: UIView {
 
         print("rendering")
         
-        renderingInProgress = true
-        delegate?.waveformViewWillRender?(self)
-        
         let displayRange = zoomEndSamples - zoomStartSamples
         guard displayRange > 0 else { return }
 
@@ -347,17 +344,22 @@ open class FDWaveformView: UIView {
                 self.waveformImage = image
                 self.cachedSampleRange = (image != nil) ? renderSampleRange : nil
                 self.renderingInProgress = false
+                self.waveformRenderOperation = nil
                 self.setNeedsLayout()
                 self.delegate?.waveformViewDidRender?(self)
             }
         }
-        self.waveformRenderOperation = waveformRenderOperation
         // TODO: set other values here or require a context to be passed in
         waveformRenderOperation.sampleRange = renderSampleRange
         waveformRenderOperation.imageSize = CGSize(width: widthInPixels, height: heightInPixels)
         waveformRenderOperation.horizontalTargetOverdraw = horizontalTargetOverdraw
         waveformRenderOperation.verticalTargetOverdraw = verticalTargetOverdraw
         waveformRenderOperation.noiseFloor = noiseFloor
+        
+        self.waveformRenderOperation = waveformRenderOperation
+        renderingInProgress = true
+        delegate?.waveformViewWillRender?(self)
+
         waveformRenderOperation.start()
     }
 }
@@ -460,6 +462,7 @@ final public class FDWaveformRenderOperation: Operation {
         self.completionBlock = { [weak self] in
             guard let `self` = self else { return }
             self.completionHandler(self.renderedImage)
+            self.renderedImage = nil
         }
     }
     
