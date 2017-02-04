@@ -359,12 +359,19 @@ open class FDWaveformView: UIView {
     }
 }
 
+/// Holds audio information used for building waveforms
 final public class FDAudioContext {
     
+    /// The audio asset URL used to load the context
     public let audioURL: URL
     
+    /// Total number of samples in loaded asset
     fileprivate let totalSamples: Int
+    
+    /// Loaded asset
     fileprivate let asset: AVAsset
+    
+    // Loaded assetTrack
     fileprivate let assetTrack: AVAssetTrack
     
     private init(audioURL: URL, totalSamples: Int, asset: AVAsset, assetTrack: AVAssetTrack) {
@@ -407,23 +414,35 @@ final public class FDAudioContext {
     }
 }
 
+/// Format options for FDWaveformRenderOperation
 public struct FDWaveformRenderFormat {
     
     /// The color of the waveform
     public var wavesColor = UIColor.black
     
-    fileprivate var noiseFloor: CGFloat = -50.0
+    /// The "zero" level (in dB)
+    public var noiseFloor: CGFloat = -50.0
 }
 
+/// Operation used for rendering waveform images
 final public class FDWaveformRenderOperation: Operation {
     
-    // TODO: document and clean up
+    /// The audio context used to build the waveform
     public let audioContext: FDAudioContext
+    
+    ///  Handler called when the rendering has completed. nil UIImage indicates that there was an error during processing.
     private let completionHandler: (UIImage?) -> ()
 
-    public let format: FDWaveformRenderFormat
+    /// Size of waveform image to render
     public let imageSize: CGSize
+    
+    /// Range of samples within audio asset to build waveform for
     public let sampleRange: CountableRange<Int>
+    
+    /// Format of waveform image
+    public let format: FDWaveformRenderFormat
+    
+    // MARK: - NSOperation Overrides
     
     public override var isAsynchronous: Bool { return true }
     
@@ -433,13 +452,16 @@ final public class FDWaveformRenderOperation: Operation {
     private var _isFinished = false
     public override var isFinished: Bool { return _isFinished }
     
+    // MARK: - Private
+    
+    /// Final rendered image. Used to hold image for completionHandler.
     private var renderedImage: UIImage?
     
     public init(audioContext: FDAudioContext, imageSize: CGSize, sampleRange: CountableRange<Int>? = nil, format: FDWaveformRenderFormat = FDWaveformRenderFormat(), completionHandler: @escaping (_ image: UIImage?) -> ()) {
         self.audioContext = audioContext
-        self.format = format
         self.imageSize = imageSize
         self.sampleRange = sampleRange ?? 0..<audioContext.totalSamples
+        self.format = format
         self.completionHandler = completionHandler
         
         super.init()
@@ -470,6 +492,7 @@ final public class FDWaveformRenderOperation: Operation {
         
         renderedImage = image
         
+        // completionBlock called automatically by NSOperation after these values change
         willChangeValue(forKey: "isExecuting")
         willChangeValue(forKey: "isFinished")
         _isExecuting = false
