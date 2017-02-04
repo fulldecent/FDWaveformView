@@ -442,6 +442,7 @@ final public class FDWaveformRenderTask {
     
     public func start() {
         // TODO: needed if we go to nsoperation?
+        // TODO: if there is an error running this, then the waveformview will try to load the image over and over
         if #available(iOS 8.0, *) {
             DispatchQueue.global(qos: .background).async { self.render() }
         } else {
