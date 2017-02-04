@@ -32,7 +32,6 @@ open class FDWaveformView: UIView {
             delegate?.waveformViewWillLoad?(self)
             
             // TODO: weak self here?
-            // TODO: need to cancel previous loads? Can use nsoperation with block to cancel?
             FDAudioContext.load(fromAudioURL: audioURL) { audioContext in
                 DispatchQueue.main.async {
                     if audioContext == nil {
@@ -421,11 +420,6 @@ final public class FDAudioContext {
     }
 }
 
-// TODO: ++++++++++++++ Consider having a separate class to load the audio file? And that's passed in here?
-//       Or passed into the render function? Although that will still have the same issue where there is shared
-//       state between render calls.
-//       What we need is some way to turn these into discrete operations or tasks that are only run once and are cancellable.
-//       How long does it take to get the duration? If it's not long it's not a big deal to load the asset every time, right?
 final public class FDWaveformRenderOperation: Operation {
     
     // TODO: document and clean up
@@ -436,7 +430,6 @@ final public class FDWaveformRenderOperation: Operation {
     public var imageSize: CGSize = .zero
     public var wavesColor: UIColor = .black
 
-    // TODO: need to set these three below when rendering
     /// Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
     fileprivate var horizontalTargetOverdraw: CGFloat = 3.0
     
@@ -539,7 +532,6 @@ final public class FDWaveformRenderOperation: Operation {
         var channelCount = 1
         let formatDesc = audioContext.assetTrack.formatDescriptions
         for item in formatDesc {
-            // TODO: handle error here
             guard let fmtDesc = CMAudioFormatDescriptionGetStreamBasicDescription(item as! CMAudioFormatDescription) else { return nil }    // TODO: Can the forced downcast in here be safer?
             channelCount = Int(fmtDesc.pointee.mChannelsPerFrame)
         }
