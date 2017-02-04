@@ -513,6 +513,8 @@ final public class FDWaveformRenderOperation: Operation {
 
     /// Read the asset and create create a lower resolution set of samples
     func sliceAsset(withRange slice: CountableRange<Int>, andDownsampleTo targetSamples: Int) -> (samples: [CGFloat], sampleMax: CGFloat)? {
+        guard !isCancelled else { print("sampling cancelled!"); return nil }
+        
         guard
             !slice.isEmpty,
             let reader = try? AVAssetReader(asset: audioContext.asset)
@@ -549,8 +551,11 @@ final public class FDWaveformRenderOperation: Operation {
 
         // 16-bit samples
         reader.startReading()
+        defer { reader.cancelReading(); print("canceled reading") } // Cancel reading if we exit early if operation is cancelled
 
         while reader.status == .reading {
+            guard !isCancelled else { print("sampling cancelled!"); return nil }
+            
             guard let readSampleBuffer = readerOutput.copyNextSampleBuffer(),
                 let readBuffer = CMSampleBufferGetDataBuffer(readSampleBuffer) else {
                     break
@@ -581,6 +586,8 @@ final public class FDWaveformRenderOperation: Operation {
         // Process the remaining samples at the end which didn't fit into samplesPerPixel
         let samplesToProcess = sampleBuffer.count / MemoryLayout<Int16>.size
         if samplesToProcess > 0 {
+            guard !isCancelled else { print("sampling cancelled!"); return nil }
+            
             let downSampledLength = 1
             let samplesPerPixel = samplesToProcess
             let filter = [Float](repeating: 1.0 / Float(samplesPerPixel), count: samplesPerPixel)
@@ -599,7 +606,7 @@ final public class FDWaveformRenderOperation: Operation {
         if reader.status == .completed {
             return (outputSamples, sampleMax)
         } else {
-            print(reader.status)
+            print("FDWaveformRenderOperation failed to read audio: \(reader.error)")
             return nil
         }
     }
@@ -648,6 +655,8 @@ final public class FDWaveformRenderOperation: Operation {
 
     // TODO: switch to a synchronous function that paints onto a given context? (for issue #2)
     func plotLogGraph(_ samples: [CGFloat], maximumValue max: CGFloat, zeroValue min: CGFloat, imageHeight: CGFloat) -> UIImage? {
+        guard !isCancelled else { return nil }
+        
         let imageSize = CGSize(width: CGFloat(samples.count), height: imageHeight)
         UIGraphicsBeginImageContext(imageSize)
         defer { UIGraphicsEndImageContext() }
