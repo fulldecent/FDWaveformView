@@ -31,7 +31,6 @@ open class FDWaveformView: UIView {
             loadingInProgress = true
             delegate?.waveformViewWillLoad?(self)
             
-            // TODO: weak self here?
             FDAudioContext.load(fromAudioURL: audioURL) { audioContext in
                 DispatchQueue.main.async {
                     if audioContext == nil {
@@ -335,7 +334,7 @@ open class FDWaveformView: UIView {
         let renderEndSamples = minMaxX(zoomEndSamples + Int(CGFloat(displayRange) * horizontalTargetBleed), min: 0, max: totalSamples)
         let renderSampleRange = renderStartSamples..<renderEndSamples
         let widthInPixels = floor(frame.width * UIScreen.main.scale * horizontalTargetOverdraw)
-        let heightInPixels = frame.height * UIScreen.main.scale * horizontalTargetOverdraw // TODO: Vertical target overdraw?
+        let heightInPixels = frame.height * UIScreen.main.scale * horizontalTargetOverdraw
         let imageSize = CGSize(width: widthInPixels, height: heightInPixels)
         let renderFormat = FDWaveformRenderFormat(wavesColor: .black, noiseFloor: noiseFloor)
         
@@ -528,7 +527,6 @@ final public class FDWaveformRenderOperation: Operation {
         }
 
         var sampleMax = format.noiseFloor
-        // TODO: bad things happen if target samples is 0
         let samplesPerPixel = max(1, channelCount * slice.count / targetSamples)
         let filter = [Float](repeating: 1.0 / Float(samplesPerPixel), count: samplesPerPixel)
 
