@@ -289,7 +289,7 @@ open class FDWaveformView: UIView {
 
     override open func layoutSubviews() {
         super.layoutSubviews()
-        guard audioContext != nil && !renderingInProgress && zoomEndSamples > 0 else {
+        guard audioContext != nil && zoomEndSamples > 0 else {
             return
         }
 
@@ -320,10 +320,7 @@ open class FDWaveformView: UIView {
     }
 
     func renderWaveform() {
-        guard
-            !renderingInProgress,
-            let audioContext = audioContext
-            else { return }
+        guard let audioContext = audioContext else { return }
 
         print("rendering")
         
