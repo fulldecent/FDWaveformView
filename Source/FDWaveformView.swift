@@ -138,6 +138,9 @@ open class FDWaveformView: UIView {
 
     // Mark - Private vars
 
+    /// Whether rendering for the current asset failed
+    private var renderForCurrentAssetFailed = false
+    
     /// Current audio context to be used for rendering
     private var audioContext: FDAudioContext? {
         didSet {
@@ -158,6 +161,7 @@ open class FDWaveformView: UIView {
             if newValue !== waveformRenderOperation {
                 print("cancelling")
                 waveformRenderOperation?.cancel()
+                renderForCurrentAssetFailed = false
             }
         }
     }
@@ -205,7 +209,7 @@ open class FDWaveformView: UIView {
     }()
 
     /// The range of samples we rendered
-    fileprivate var cachedSampleRange = 0..<0
+    fileprivate var cachedSampleRange: CountableRange<Int>?
 
     /// Gesture recognizer
     fileprivate var pinchRecognizer = UIPinchGestureRecognizer()
@@ -255,11 +259,12 @@ open class FDWaveformView: UIView {
 
     /// If the cached image is insufficient for the current frame
     fileprivate func cacheIsDirty() -> Bool {
-        guard let image = waveformImage else { return true }
+        guard !renderForCurrentAssetFailed else { return false }
+        guard
+            let image = waveformImage,
+            let cachedSampleRange = cachedSampleRange
+            else { return true }
         
-        if cachedSampleRange.count == 0 {
-            return true
-        }
         if cachedSampleRange.lowerBound < minMaxX(zoomStartSamples - Int(CGFloat(cachedSampleRange.count) * horizontalMaximumBleed), min: 0, max: totalSamples) {
             return true
         }
@@ -306,7 +311,7 @@ open class FDWaveformView: UIView {
         var scaledX: CGFloat = 0.0
         var scaledProgressWidth: CGFloat = 0.0
         var scaledWidth: CGFloat = 1.0
-        if cachedSampleRange.count > 0 && zoomSamples.count > 0 {
+        if let cachedSampleRange = cachedSampleRange, !cachedSampleRange.isEmpty && !zoomSamples.isEmpty {
             scaledX = CGFloat(cachedSampleRange.lowerBound - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)
             scaledWidth = CGFloat(cachedSampleRange.last! - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)    // forced unwrap is safe
             scaledProgressWidth = CGFloat(progressSamples - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)
@@ -338,9 +343,10 @@ open class FDWaveformView: UIView {
 
         let waveformRenderOperation = FDWaveformRenderOperation(audioContext: audioContext) { image in
             DispatchQueue.main.async {
+                self.renderForCurrentAssetFailed = (image == nil)
                 print("done")
                 self.waveformImage = image
-                self.cachedSampleRange = renderSampleRange
+                self.cachedSampleRange = (image != nil) ? renderSampleRange : nil
                 self.renderingInProgress = false
                 self.setNeedsLayout()
                 self.delegate?.waveformViewDidRender?(self)
@@ -649,6 +655,7 @@ final public class FDWaveformRenderOperation: Operation {
     func plotLogGraph(_ samples: [CGFloat], maximumValue max: CGFloat, zeroValue min: CGFloat, imageHeight: CGFloat) -> UIImage? {
         let imageSize = CGSize(width: CGFloat(samples.count), height: imageHeight)
         UIGraphicsBeginImageContext(imageSize)
+        defer { UIGraphicsEndImageContext() }
         guard let context = UIGraphicsGetCurrentContext() else {
             NSLog("FDWaveformView failed to get graphics context")
             return nil
