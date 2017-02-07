@@ -11,7 +11,7 @@ import XCTest
 
 class FDWaveformViewTests: XCTestCase {
 
-    var fd: FDWaveformView?
+    var fd: FDWaveformView!
 
     override func setUp() {
         super.setUp()
@@ -35,19 +35,19 @@ class FDWaveformViewTests: XCTestCase {
     }
 
     func testZoomSaples() {
-        XCTAssert(fd?.zoomStartSamples == 0)
-        XCTAssert(fd?.zoomEndSamples == 0)
+        XCTAssert(fd.zoomStartSamples == 0)
+        XCTAssert(fd.zoomEndSamples == 0)
     }
 
     func testGesturesPermissions() {
-        XCTAssert(fd?.doesAllowScroll == true)
-        XCTAssert(fd?.doesAllowStretch == true)
-        XCTAssert(fd?.doesAllowScrubbing == true)
+        XCTAssert(fd.doesAllowScroll == true)
+        XCTAssert(fd.doesAllowStretch == true)
+        XCTAssert(fd.doesAllowScrubbing == true)
     }
 
     func testColors() {
-        XCTAssert(fd?.wavesColor == UIColor.black)
-        XCTAssert(fd?.progressColor == UIColor.blue)
+        XCTAssert(fd.wavesColor == UIColor.black)
+        XCTAssert(fd.progressColor == UIColor.blue)
     }
 
 }
