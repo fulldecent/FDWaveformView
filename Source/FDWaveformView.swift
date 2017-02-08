@@ -184,7 +184,7 @@ open class FDWaveformView: UIView {
     }
 
     /// View for rendered waveform
-    lazy fileprivate var imageView: UIImageView = {
+    lazy public var imageView: UIImageView = {
         let retval = UIImageView(frame: CGRect.zero)
         retval.contentMode = .scaleToFill
         retval.tintColor = self.wavesColor
@@ -275,16 +275,16 @@ open class FDWaveformView: UIView {
         if cachedSampleRange.upperBound > minMaxX(zoomEndSamples + Int(CGFloat(cachedSampleRange.count) * horizontalMaximumBleed), min: 0, max: totalSamples) {
             return true
         }
-        if image.size.width < frame.width * UIScreen.main.scale * CGFloat(horizontalMinimumOverdraw) {
+        if image.size.width < frame.width * CGFloat(horizontalMinimumOverdraw) {
             return true
         }
-        if image.size.width > frame.width * UIScreen.main.scale * CGFloat(horizontalMaximumOverdraw) {
+        if image.size.width > frame.width * CGFloat(horizontalMaximumOverdraw) {
             return true
         }
-        if image.size.height < frame.height * UIScreen.main.scale * CGFloat(verticalMinimumOverdraw) {
+        if image.size.height < frame.height * CGFloat(verticalMinimumOverdraw) {
             return true
         }
-        if image.size.height > frame.height * UIScreen.main.scale * CGFloat(verticalMaximumOverdraw) {
+        if image.size.height > frame.height * CGFloat(verticalMaximumOverdraw) {
             return true
         }
         return false
@@ -333,12 +333,12 @@ open class FDWaveformView: UIView {
         let renderStartSamples = minMaxX(zoomStartSamples - Int(CGFloat(displayRange) * horizontalTargetBleed), min: 0, max: totalSamples)
         let renderEndSamples = minMaxX(zoomEndSamples + Int(CGFloat(displayRange) * horizontalTargetBleed), min: 0, max: totalSamples)
         let renderSampleRange = renderStartSamples..<renderEndSamples
-        let widthInPixels = floor(frame.width * UIScreen.main.scale * horizontalTargetOverdraw)
-        let heightInPixels = frame.height * UIScreen.main.scale * horizontalTargetOverdraw
+        let widthInPixels = floor(frame.width * horizontalTargetOverdraw)
+        let heightInPixels = frame.height * horizontalTargetOverdraw
         let imageSize = CGSize(width: widthInPixels, height: heightInPixels)
-        let renderFormat = FDWaveformRenderFormat(wavesColor: .black, noiseFloor: noiseFloor)
+        let renderFormat = FDWaveformRenderFormat(wavesColor: .black, scale: UIScreen.main.scale, noiseFloor: noiseFloor)
         
-        let waveformRenderOperation = FDWaveformRenderOperation(audioContext: audioContext, imageSize: imageSize, sampleRange: renderSampleRange) { image in
+        let waveformRenderOperation = FDWaveformRenderOperation(audioContext: audioContext, imageSize: imageSize, sampleRange: renderSampleRange, format: renderFormat) { image in
             DispatchQueue.main.async {
                 self.renderForCurrentAssetFailed = (image == nil)
                 print("done")
@@ -419,6 +419,8 @@ public struct FDWaveformRenderFormat {
     
     /// The color of the waveform
     public var wavesColor = UIColor.black
+    
+    public var scale: CGFloat = UIScreen.main.scale
     
     /// The "zero" level (in dB)
     public var noiseFloor: CGFloat = -50.0
@@ -507,14 +509,19 @@ final public class FDWaveformRenderOperation: Operation {
             return
         }
         
+//        let imageHeight = imageSize.height * format.scale
+        let imageWidth = Int(imageSize.width * format.scale)
+        
         let image: UIImage? = {
             guard
-                let (samples, sampleMax) = sliceAsset(withRange: sampleRange, andDownsampleTo: Int(imageSize.width)),
-                let image = plotLogGraph(samples, maximumValue: sampleMax, zeroValue: self.format.noiseFloor, imageHeight: self.imageSize.height)
+                let (samples, sampleMax) = sliceAsset(withRange: sampleRange, andDownsampleTo: imageWidth),
+                let image = plotLogGraph(samples, maximumValue: sampleMax, zeroValue: self.format.noiseFloor)
             else { return nil }
             
             return image
         }()
+        
+        print("image: \(image!), scale: \(image!.scale)")
         
         finish(with: image)
     }
@@ -550,11 +557,22 @@ final public class FDWaveformRenderOperation: Operation {
         }
 
         var sampleMax = format.noiseFloor
-        let samplesPerPixel = max(1, channelCount * slice.count / targetSamples)
-        let filter = [Float](repeating: 1.0 / Float(samplesPerPixel), count: samplesPerPixel)
+        
+        let sliceTotalSamples = channelCount * slice.count
+//        let firstSamplesCount = (sliceTotalSamples / (targetSamples - 1)) * (targetSamples - 1)
+//        let samplesPerPixel = firstSamplesCount / (targetSamples - 1)
+        
+//        print("firstSamplesCount: \(firstSamplesCount), samplesPerPixel: \(samplesPerPixel)")
+        
+        let lowerSamplesPerPixel = max(1, channelCount * slice.count / targetSamples)
+        let sampleRemainder = sliceTotalSamples % targetSamples
+        let filter = [Float]()//(repeating: 1.0 / Float(samplesPerPixel), count: samplesPerPixel)
 
         var outputSamples = [CGFloat]()
         var sampleBuffer = Data()
+        
+        var totalSampleCount = 0
+        var sampleRemainderBucketCount = 0
 
         // 16-bit samples
         reader.startReading()
@@ -574,11 +592,29 @@ final public class FDWaveformRenderOperation: Operation {
             CMBlockBufferGetDataPointer(readBuffer, 0, &readBufferLength, nil, &readBufferPointer)
             sampleBuffer.append(UnsafeBufferPointer(start: readBufferPointer, count: readBufferLength))
             CMSampleBufferInvalidate(readSampleBuffer)
+            
+            totalSampleCount += readBufferLength / 2
 
+//            let samplesPerPixel: Int
+//            if sampleRemainderBucketCount > sampleRemainder {
+//                samplesPerPixel = 44
+//            }
+//            else {
+//                samplesPerPixel = 45
+//            }
+            
             let totalSamples = sampleBuffer.count / MemoryLayout<Int16>.size
-            let downSampledLength = totalSamples / samplesPerPixel
-            let samplesToProcess = downSampledLength * samplesPerPixel
+           
+//            let downSampledLength = totalSamples / samplesPerPixel
+//            let samplesToProcess = downSampledLength * samplesPerPixel
 
+            let (samplesToProcess, downSampledLength) = test(totalCurrentSamples: totalSamples,
+                                                             lowerSamplesPerPixel: lowerSamplesPerPixel,
+                                                             remainder: sampleRemainder,
+                                                             currentRemained: &sampleRemainderBucketCount)
+            let samplesPerPixel = samplesToProcess / downSampledLength
+//            sampleRemainderBucketCount += downSampledLength
+            
             guard samplesToProcess > 0 else { continue }
             
             processSamples(fromData: &sampleBuffer,
@@ -587,7 +623,7 @@ final public class FDWaveformRenderOperation: Operation {
                            samplesToProcess: samplesToProcess,
                            downSampledLength: downSampledLength,
                            samplesPerPixel: samplesPerPixel,
-                           filter: filter)
+                           filter2: filter)
         }
         
         // Process the remaining samples at the end which didn't fit into samplesPerPixel
@@ -605,12 +641,14 @@ final public class FDWaveformRenderOperation: Operation {
                            samplesToProcess: samplesToProcess,
                            downSampledLength: downSampledLength,
                            samplesPerPixel: samplesPerPixel,
-                           filter: filter)
+                           filter2: filter)
         }
         
         // if (reader.status == AVAssetReaderStatusFailed || reader.status == AVAssetReaderStatusUnknown)
         // Something went wrong. Handle it.
         if reader.status == .completed {
+            print("totalSampleCount \(totalSampleCount), expected sample count: \(channelCount * slice.count)")
+            print("outputSampleCount: \(outputSamples.count), expected target samples: \(targetSamples)")
             return (outputSamples, sampleMax)
         } else {
             print("FDWaveformRenderOperation failed to read audio: \(reader.error)")
@@ -618,7 +656,72 @@ final public class FDWaveformRenderOperation: Operation {
         }
     }
     
-    func processSamples(fromData sampleBuffer: inout Data, sampleMax: inout CGFloat, outputSamples: inout [CGFloat], samplesToProcess: Int, downSampledLength: Int, samplesPerPixel: Int, filter: [Float]) {
+    func test(totalCurrentSamples: Int, lowerSamplesPerPixel: Int, remainder: Int, currentRemained: inout Int) -> (samplesToProcess: Int, downsampleCount: Int) {
+
+        let samplesPerPixel: Int = 44
+        let totalSamplesToProcess: Int = totalCurrentSamples
+        
+        // TODO: >= here?
+//        if currentRemained >= remainder {
+//            samplesPerPixel = lowerSamplesPerPixel
+//            totalSamplesToProcess = totalCurrentSamples
+//        }
+//        else {
+//            samplesPerPixel = lowerSamplesPerPixel + 1
+//            
+//            let potentialDownsampleCount = totalCurrentSamples / lowerSamplesPerPixel
+//            
+//            // TODO: >= here?
+//            if currentRemained + potentialDownsampleCount >= remainder {
+//                totalSamplesToProcess = (remainder - currentRemained) * samplesPerPixel
+//            }
+//            else {
+//                totalSamplesToProcess = totalCurrentSamples
+//            }
+//            
+//            
+//        }
+        
+        let samplesToProcess = (totalSamplesToProcess / samplesPerPixel) * samplesPerPixel
+        let downsample = samplesToProcess / samplesPerPixel
+
+        print("downsample: \(downsample), samplesToProcess: \(samplesToProcess)")
+
+        currentRemained += downsample
+        
+        return (samplesToProcess, downsample)
+        
+//        if currentRemained >= remainder {
+//            let samplesPerPixel = lowerSamplesPerPixel
+//            let samplesToProcess = (totalCurrentSamples / samplesPerPixel) * samplesPerPixel
+//            let downsample = samplesToProcess / samplesPerPixel
+//            return (samplesToProcess, downsample)
+//        }
+//        
+//        let samplesPerPixel = lowerSamplesPerPixel + 1
+//        var samplesToProcess = (totalCurrentSamples / samplesPerPixel) * samplesPerPixel
+//        var downsample = samplesToProcess / samplesPerPixel
+//
+//        var changed: Bool = false
+//        if currentRemained + downsample > remainder {
+//            let diff = remainder - currentRemained
+//           
+//            downsample = diff
+//            samplesToProcess = downsample * samplesPerPixel
+//            
+//            changed = true
+//        }
+//        
+//        currentRemained += downsample
+//        
+//        print("downsample: \(downsample), samplesToProcess: \(samplesToProcess), changed: \(changed)")
+//        
+//        return (samplesToProcess, downsample)
+    }
+    
+    func processSamples(fromData sampleBuffer: inout Data, sampleMax: inout CGFloat, outputSamples: inout [CGFloat], samplesToProcess: Int, downSampledLength: Int, samplesPerPixel: Int, filter2: [Float]) {
+    
+        let filter = [Float](repeating: 1.0 / Float(samplesPerPixel), count: samplesPerPixel)
         sampleBuffer.withUnsafeBytes { (samples: UnsafePointer<Int16>) in
             var processingBuffer = [Float](repeating: 0.0, count: samplesToProcess)
             
@@ -653,6 +756,9 @@ final public class FDWaveformRenderOperation: Operation {
                 return element
             }
             
+            print("samplesPerPixel: \(samplesPerPixel), samples to process: \(samplesToProcess), downsample length: \(downSampledDataCG.count)")
+//            print("remainder? \(samplesToProcess % downSampledLength )")
+            
             // Remove processed samples
             sampleBuffer.removeFirst(samplesToProcess * MemoryLayout<Int16>.size)
             
@@ -661,32 +767,39 @@ final public class FDWaveformRenderOperation: Operation {
     }
 
     // TODO: switch to a synchronous function that paints onto a given context? (for issue #2)
-    func plotLogGraph(_ samples: [CGFloat], maximumValue max: CGFloat, zeroValue min: CGFloat, imageHeight: CGFloat) -> UIImage? {
+    func plotLogGraph(_ samples: [CGFloat], maximumValue max: CGFloat, zeroValue min: CGFloat) -> UIImage? {
         guard !isCancelled else { return nil }
         
-        let imageSize = CGSize(width: CGFloat(samples.count), height: imageHeight)
-        UIGraphicsBeginImageContext(imageSize)
+        print("samples \(samples)")
+        
+        UIGraphicsBeginImageContextWithOptions(imageSize, false, format.scale)
         defer { UIGraphicsEndImageContext() }
         guard let context = UIGraphicsGetCurrentContext() else {
             NSLog("FDWaveformView failed to get graphics context")
             return nil
         }
+//        context.scaleBy(x: (imageSize.width) / CGFloat(samples.count), //(((imageSize.width * format.scale) / CGFloat(samples.count)) / format.scale),
+//                        y: 1 / format.scale) // Scale context to account for scaling applied to image
+        context.scaleBy(x: 1 / format.scale, //(((imageSize.width * format.scale) / CGFloat(samples.count)) / format.scale),
+            y: 1 / format.scale) // Scale context to account for scaling applied to image
         context.setShouldAntialias(false)
         context.setAlpha(1.0)
-        context.setLineWidth(1.0)
+        context.setLineWidth(0.5)
         context.setStrokeColor(format.wavesColor.cgColor)
-
+        
+        
         let sampleDrawingScale: CGFloat
         if max == min {
             sampleDrawingScale = 0
         } else {
-            sampleDrawingScale = imageHeight / 2 / (max - min)
+            sampleDrawingScale = (imageSize.height * format.scale) / 2 / (max - min)
         }
-        let verticalMiddle = imageHeight / 2
+        let verticalMiddle = (imageSize.height * format.scale) / 2
         for (x, sample) in samples.enumerated() {
             let height = (sample - min) * sampleDrawingScale
-            context.move(to: CGPoint(x: CGFloat(x), y: verticalMiddle - height))
-            context.addLine(to: CGPoint(x: CGFloat(x), y: verticalMiddle + height))
+            context.move(to: CGPoint(x: CGFloat(x), y: (verticalMiddle - height)))
+            context.addLine(to: CGPoint(x: CGFloat(x), y: (verticalMiddle + height)))
+
             context.strokePath();
         }
         guard let image = UIGraphicsGetImageFromCurrentImageContext() else {
