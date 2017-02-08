@@ -174,6 +174,10 @@ open class FDWaveformView: UIView {
         }
     }
     
+    private var desiredImageScale: CGFloat {
+        return window?.screen.scale ?? UIScreen.main.scale
+    }
+    
     //TODO RENAME
     fileprivate func minMaxX<T: Comparable>(_ x: T, min: T, max: T) -> T {
         return x < min ? min : x > max ? max : x
@@ -275,7 +279,7 @@ open class FDWaveformView: UIView {
         if cachedSampleRange.upperBound > minMaxX(zoomEndSamples + Int(CGFloat(cachedSampleRange.count) * horizontalMaximumBleed), min: 0, max: totalSamples) {
             return true
         }
-        if image.scale != UIScreen.main.scale {
+        if image.scale != desiredImageScale {
             return true
         }
         if image.size.width < frame.width * CGFloat(horizontalMinimumOverdraw) {
@@ -339,7 +343,7 @@ open class FDWaveformView: UIView {
         let widthInPixels = floor(frame.width * horizontalTargetOverdraw)
         let heightInPixels = frame.height * horizontalTargetOverdraw
         let imageSize = CGSize(width: widthInPixels, height: heightInPixels)
-        let renderFormat = FDWaveformRenderFormat(wavesColor: .black, scale: UIScreen.main.scale, noiseFloor: noiseFloor)
+        let renderFormat = FDWaveformRenderFormat(wavesColor: .black, scale: desiredImageScale, noiseFloor: noiseFloor)
         
         let waveformRenderOperation = FDWaveformRenderOperation(audioContext: audioContext, imageSize: imageSize, sampleRange: renderSampleRange, format: renderFormat) { image in
             DispatchQueue.main.async {
