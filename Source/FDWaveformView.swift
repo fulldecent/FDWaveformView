@@ -784,7 +784,7 @@ final public class FDWaveformRenderOperation: Operation {
             y: 1 / format.scale) // Scale context to account for scaling applied to image
         context.setShouldAntialias(false)
         context.setAlpha(1.0)
-        context.setLineWidth(0.5)
+        context.setLineWidth(1.0 / format.scale)
         context.setStrokeColor(format.wavesColor.cgColor)
         
         
