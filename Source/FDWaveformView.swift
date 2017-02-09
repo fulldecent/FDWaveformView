@@ -548,6 +548,7 @@ public struct FDWaveformRenderFormat {
     /// The color of the waveform
     public var wavesColor = UIColor.black
     
+    /// The scale factor to apply to the rendered image (usually the current screen's scale)
     public var scale: CGFloat = UIScreen.main.scale
 }
 
