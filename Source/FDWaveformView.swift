@@ -375,7 +375,6 @@ open class FDWaveformView: UIView {
         case .notDirty(let cancelInProgressRenderOperation):
             if cancelInProgressRenderOperation {
                 inProgressWaveformRenderOperation = nil
-                // TODO: when cancelled, does the waveform show up again? Or is it not a problem because the audio file hasn't change? Say if we go from linear to log?
             }
         }
 
