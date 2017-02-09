@@ -87,6 +87,14 @@ class ViewController: UIViewController {
         self.waveform.audioURL = url
     }
     
+    @IBAction func doLinear() {
+        self.waveform.waveformType = .linear
+    }
+    
+    @IBAction func doLogarithmic() {
+        self.waveform.waveformType = .logarithmic
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         let thisBundle = Bundle(for: type(of: self))
