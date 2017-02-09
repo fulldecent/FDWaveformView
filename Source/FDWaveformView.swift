@@ -207,7 +207,6 @@ open class FDWaveformView: UIView {
     }
     
     /// Represents the status of the waveform renderings
-    // TODO: update names?
     private enum CacheStatus {
         case dirty
         case notDirty(cancelInProgressRenderOperation: Bool)
