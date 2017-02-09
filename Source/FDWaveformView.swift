@@ -561,7 +561,7 @@ final public class FDWaveformRenderOperation: Operation {
             return image
         }()
         
-        print("image: \(image!), scale: \(image!.scale)")
+        print("image: \(image?.description ?? "nil"), scale: \(image?.scale.description ?? "nil")")
         
         finish(with: image)
     }
