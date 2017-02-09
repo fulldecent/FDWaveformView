@@ -89,6 +89,19 @@ open class FDWaveformView: UIView {
     /// Whether to allow the scroll gesture
     @IBInspectable open var doesAllowScroll = true
 
+    /// Supported waveform types
+    public enum WaveformType {
+        case linear, logarithmic
+    }
+    
+    // Type of waveform to display
+    open var waveformType: WaveformType = .logarithmic {
+        didSet {
+            setNeedsDisplay()
+            setNeedsLayout()
+        }
+    }
+    
     /// The color of the waveform
     @IBInspectable open var wavesColor = UIColor.black {
         didSet {
@@ -181,6 +194,16 @@ open class FDWaveformView: UIView {
     /// Desired scale of image based on window's screen scale
     private var desiredImageScale: CGFloat {
         return window?.screen.scale ?? UIScreen.main.scale
+    }
+    
+    /// Waveform type for rending waveforms
+    private var waveformRenderType: FDWaveformType {
+        get {
+            switch waveformType {
+            case .linear: return .linear
+            case .logarithmic: return .logarithmic(noiseFloor: noiseFloor)
+            }
+        }
     }
     
     /// Represents the status of the waveform renderings
@@ -306,6 +329,9 @@ open class FDWaveformView: UIView {
         let imageSize = renderOperation.imageSize
         let sampleRange = renderOperation.sampleRange
 
+        if renderOperation.format.type != waveformRenderType {
+            return true
+        }
         if renderOperation.format.scale != desiredImageScale {
             return true
         }
@@ -389,7 +415,7 @@ open class FDWaveformView: UIView {
         let widthInPixels = floor(frame.width * horizontalTargetOverdraw)
         let heightInPixels = frame.height * horizontalTargetOverdraw
         let imageSize = CGSize(width: widthInPixels, height: heightInPixels)
-        let renderFormat = FDWaveformRenderFormat(type: .logarithmic(noiseFloor: noiseFloor), wavesColor: .black, scale: desiredImageScale)
+        let renderFormat = FDWaveformRenderFormat(type: waveformRenderType, wavesColor: .black, scale: desiredImageScale)
         
         let waveformRenderOperation = FDWaveformRenderOperation(audioContext: audioContext, imageSize: imageSize, sampleRange: renderSampleRange, format: renderFormat) { image in
             DispatchQueue.main.async {
@@ -467,13 +493,28 @@ final public class FDAudioContext {
     }
 }
 
-public enum FDWaveformType {
+public enum FDWaveformType: Equatable {
     /// Waveform is rendered using a linear scale
     case linear
     
     /// Waveform is rendered using a logarithmic scale
     ///   noiseFloor: The "zero" level (in dB)
     case logarithmic(noiseFloor: CGFloat)
+    
+    // See http://stackoverflow.com/questions/24339807/how-to-test-equality-of-swift-enums-with-associated-values
+    public static func ==(lhs: FDWaveformType, rhs: FDWaveformType) -> Bool {
+        switch lhs {
+        case .linear:
+            if case .linear = rhs {
+                return true
+            }
+        case .logarithmic(let lhsNoiseFloor):
+            if case .logarithmic(let rhsNoiseFloor) = rhs {
+                return lhsNoiseFloor == rhsNoiseFloor
+            }
+        }
+        return false
+    }
     
     fileprivate var floorValue: CGFloat {
         switch self {
