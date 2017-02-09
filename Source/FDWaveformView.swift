@@ -344,7 +344,7 @@ open class FDWaveformView: UIView {
         let widthInPixels = floor(frame.width * horizontalTargetOverdraw)
         let heightInPixels = frame.height * horizontalTargetOverdraw
         let imageSize = CGSize(width: widthInPixels, height: heightInPixels)
-        let renderFormat = FDWaveformRenderFormat(wavesColor: .black, scale: desiredImageScale, noiseFloor: noiseFloor)
+        let renderFormat = FDWaveformRenderFormat(type: .logarithmic(noiseFloor: noiseFloor), wavesColor: .black, scale: desiredImageScale)
         
         let waveformRenderOperation = FDWaveformRenderOperation(audioContext: audioContext, imageSize: imageSize, sampleRange: renderSampleRange, format: renderFormat) { image in
             DispatchQueue.main.async {
@@ -422,16 +422,49 @@ final public class FDAudioContext {
     }
 }
 
+public enum FDWaveformType {
+    /// Waveform is rendered using a linear scale
+    case linear
+    
+    /// Waveform is rendered using a logarithmic scale
+    ///   noiseFloor: The "zero" level (in dB)
+    case logarithmic(noiseFloor: CGFloat)
+    
+    fileprivate var floorValue: CGFloat {
+        switch self {
+        case .linear: return 0
+        case .logarithmic(let noiseFloor): return noiseFloor
+        }
+    }
+    
+    fileprivate func process(normalizedSamples: inout [Float]) {
+        switch self {
+        case .linear:
+            return
+            
+        case .logarithmic(let noiseFloor):
+            // Convert samples to a log scale
+            var zero: Float = 32768.0
+            vDSP_vdbcon(normalizedSamples, 1, &zero, &normalizedSamples, 1, vDSP_Length(normalizedSamples.count), 1)
+            
+            //Clip to [noiseFloor, 0]
+            var ceil: Float = 0.0
+            var noiseFloorFloat = Float(noiseFloor)
+            vDSP_vclip(normalizedSamples, 1, &noiseFloorFloat, &ceil, &normalizedSamples, 1, vDSP_Length(normalizedSamples.count))
+        }
+    }
+}
+
 /// Format options for FDWaveformRenderOperation
 public struct FDWaveformRenderFormat {
+
+    /// The type of waveform to render
+    public var type: FDWaveformType = .linear
     
     /// The color of the waveform
     public var wavesColor = UIColor.black
     
     public var scale: CGFloat = UIScreen.main.scale
-    
-    /// The "zero" level (in dB)
-    public var noiseFloor: CGFloat = -50.0
 }
 
 /// Operation used for rendering waveform images
@@ -522,7 +555,7 @@ final public class FDWaveformRenderOperation: Operation {
         let image: UIImage? = {
             guard
                 let (samples, sampleMax) = sliceAsset(withRange: sampleRange, andDownsampleTo: targetSamples),
-                let image = plotLogGraph(samples, maximumValue: sampleMax, zeroValue: self.format.noiseFloor)
+                let image = plotLogGraph(samples, maximumValue: sampleMax, zeroValue: format.type.floorValue)
             else { return nil }
             
             return image
@@ -563,7 +596,7 @@ final public class FDWaveformRenderOperation: Operation {
             channelCount = Int(fmtDesc.pointee.mChannelsPerFrame)
         }
 
-        var sampleMax = format.noiseFloor
+        var sampleMax = format.type.floorValue
         let samplesPerPixel = max(1, channelCount * slice.count / targetSamples)
         let filter = [Float](repeating: 1.0 / Float(samplesPerPixel), count: samplesPerPixel)
 
@@ -649,15 +682,9 @@ final public class FDWaveformRenderOperation: Operation {
             
             //Take the absolute values to get amplitude
             vDSP_vabs(processingBuffer, 1, &processingBuffer, 1, sampleCount)
-            
-            //Convert to dB
-            var zero: Float = 32768.0
-            vDSP_vdbcon(processingBuffer, 1, &zero, &processingBuffer, 1, sampleCount, 1)
-            
-            //Clip to [noiseFloor, 0]
-            var ceil: Float = 0.0
-            var noiseFloorFloat = Float(format.noiseFloor)
-            vDSP_vclip(processingBuffer, 1, &noiseFloorFloat, &ceil, &processingBuffer, 1, sampleCount)
+
+            //Let current type further process the samples
+            format.type.process(normalizedSamples: &processingBuffer)
             
             //Downsample and average
             var downSampledData = [Float](repeating: 0.0, count: downSampledLength)
