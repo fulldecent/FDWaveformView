@@ -146,7 +146,8 @@ open class FDWaveformView: UIView {
             progressSamples = 0
             zoomStartSamples = 0
             zoomEndSamples = totalSamples
-            waveformRenderOperation = nil
+            inProgressWaveformRenderOperation = nil
+            cachedWaveformRenderOperation = nil
             renderForCurrentAssetFailed = false
             
             setNeedsDisplay()
@@ -155,14 +156,17 @@ open class FDWaveformView: UIView {
     }
     
     /// Currently running renderer
-    private var waveformRenderOperation: FDWaveformRenderOperation? {
+    private var inProgressWaveformRenderOperation: FDWaveformRenderOperation? {
         willSet {
-            if newValue !== waveformRenderOperation {
+            if newValue !== inProgressWaveformRenderOperation {
                 print("cancelling")
-                waveformRenderOperation?.cancel()
+                inProgressWaveformRenderOperation?.cancel()
             }
         }
     }
+    
+    /// The render operation used to render the current waveform image
+    private var cachedWaveformRenderOperation: FDWaveformRenderOperation?
     
     /// Image of waveform
     private var waveformImage: UIImage? {
@@ -177,6 +181,13 @@ open class FDWaveformView: UIView {
     /// Desired scale of image based on window's screen scale
     private var desiredImageScale: CGFloat {
         return window?.screen.scale ?? UIScreen.main.scale
+    }
+    
+    /// Represents the status of the waveform renderings
+    // TODO: update names?
+    private enum CacheStatus {
+        case dirty
+        case notDirty(cancelInProgressRenderOperation: Bool)
     }
     
     //TODO RENAME
@@ -210,9 +221,6 @@ open class FDWaveformView: UIView {
         retval.clipsToBounds = true
         return retval
     }()
-
-    /// The range of samples we rendered
-    fileprivate var cachedSampleRange: CountableRange<Int>?
 
     /// Gesture recognizer
     fileprivate var pinchRecognizer = UIPinchGestureRecognizer()
@@ -260,39 +268,69 @@ open class FDWaveformView: UIView {
         setup()
     }
 
-    /// If the cached image is insufficient for the current frame
-    fileprivate func cacheIsDirty() -> Bool {
-        guard !renderForCurrentAssetFailed else { return false }
-        guard
-            let image = waveformImage,
-            let cachedSampleRange = cachedSampleRange
-            else { return true }
+    /// If the cached waveform or in progress waveform is insufficient for the current frame
+    fileprivate func cacheStatus() -> CacheStatus {
+        guard !renderForCurrentAssetFailed else { return .notDirty(cancelInProgressRenderOperation: true) }
+
+        let isInProgressRenderOperationDirty = isWaveformRenderOperationDirty(inProgressWaveformRenderOperation)
+        let isCachedRenderOperationDirty = isWaveformRenderOperationDirty(cachedWaveformRenderOperation)
         
-        if cachedSampleRange.lowerBound < minMaxX(zoomStartSamples - Int(CGFloat(cachedSampleRange.count) * horizontalMaximumBleed), min: 0, max: totalSamples) {
+        if let isInProgressRenderOperationDirty = isInProgressRenderOperationDirty {
+            if let isCachedRenderOperationDirty = isCachedRenderOperationDirty {
+                if isInProgressRenderOperationDirty {
+                    if isCachedRenderOperationDirty {
+                        return .dirty
+                    } else {
+                        return .notDirty(cancelInProgressRenderOperation: true)
+                    }
+                } else if !isCachedRenderOperationDirty {
+                    return .notDirty(cancelInProgressRenderOperation: true)
+                }
+            } else if isInProgressRenderOperationDirty {
+                return .dirty
+            }
+        } else if let isLastWaveformRenderOperationDirty = isCachedRenderOperationDirty {
+            if isLastWaveformRenderOperationDirty {
+                return .dirty
+            }
+        } else {
+            return .dirty
+        }
+        
+        return .notDirty(cancelInProgressRenderOperation: false)
+    }
+    
+    func isWaveformRenderOperationDirty(_ renderOperation: FDWaveformRenderOperation?) -> Bool? {
+        guard let renderOperation = renderOperation else { return nil }
+        
+        let imageSize = renderOperation.imageSize
+        let sampleRange = renderOperation.sampleRange
+
+        if renderOperation.format.scale != desiredImageScale {
             return true
         }
-        if cachedSampleRange.lowerBound > minMaxX(zoomStartSamples - Int(CGFloat(cachedSampleRange.count) * horizontalMinimumBleed), min: 0, max: totalSamples) {
+        if sampleRange.lowerBound < minMaxX(zoomStartSamples - Int(CGFloat(sampleRange.count) * horizontalMaximumBleed), min: 0, max: totalSamples) {
             return true
         }
-        if cachedSampleRange.upperBound < minMaxX(zoomEndSamples + Int(CGFloat(cachedSampleRange.count) * horizontalMinimumBleed), min: 0, max: totalSamples) {
+        if sampleRange.lowerBound > minMaxX(zoomStartSamples - Int(CGFloat(sampleRange.count) * horizontalMinimumBleed), min: 0, max: totalSamples) {
             return true
         }
-        if cachedSampleRange.upperBound > minMaxX(zoomEndSamples + Int(CGFloat(cachedSampleRange.count) * horizontalMaximumBleed), min: 0, max: totalSamples) {
+        if sampleRange.upperBound < minMaxX(zoomEndSamples + Int(CGFloat(sampleRange.count) * horizontalMinimumBleed), min: 0, max: totalSamples) {
             return true
         }
-        if image.scale != desiredImageScale {
+        if sampleRange.upperBound > minMaxX(zoomEndSamples + Int(CGFloat(sampleRange.count) * horizontalMaximumBleed), min: 0, max: totalSamples) {
             return true
         }
-        if image.size.width < frame.width * CGFloat(horizontalMinimumOverdraw) {
+        if imageSize.width < frame.width * CGFloat(horizontalMinimumOverdraw) {
             return true
         }
-        if image.size.width > frame.width * CGFloat(horizontalMaximumOverdraw) {
+        if imageSize.width > frame.width * CGFloat(horizontalMaximumOverdraw) {
             return true
         }
-        if image.size.height < frame.height * CGFloat(verticalMinimumOverdraw) {
+        if imageSize.height < frame.height * CGFloat(verticalMinimumOverdraw) {
             return true
         }
-        if image.size.height > frame.height * CGFloat(verticalMaximumOverdraw) {
+        if imageSize.height > frame.height * CGFloat(verticalMaximumOverdraw) {
             return true
         }
         return false
@@ -304,9 +342,16 @@ open class FDWaveformView: UIView {
             return
         }
 
-        guard !cacheIsDirty() else {
+        switch cacheStatus() {
+        case .dirty:
             renderWaveform()
             return
+        
+        case .notDirty(let cancelInProgressRenderOperation):
+            if cancelInProgressRenderOperation {
+                inProgressWaveformRenderOperation = nil
+                // TODO: when cancelled, does the waveform show up again? Or is it not a problem because the audio file hasn't change? Say if we go from linear to log?
+            }
         }
 
         let zoomSamples = zoomStartSamples ..< zoomEndSamples
@@ -317,7 +362,7 @@ open class FDWaveformView: UIView {
         var scaledX: CGFloat = 0.0
         var scaledProgressWidth: CGFloat = 0.0
         var scaledWidth: CGFloat = 1.0
-        if let cachedSampleRange = cachedSampleRange, !cachedSampleRange.isEmpty && !zoomSamples.isEmpty {
+        if let cachedSampleRange = cachedWaveformRenderOperation?.sampleRange, !cachedSampleRange.isEmpty && !zoomSamples.isEmpty {
             scaledX = CGFloat(cachedSampleRange.lowerBound - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)
             scaledWidth = CGFloat(cachedSampleRange.last! - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)    // forced unwrap is safe
             scaledProgressWidth = CGFloat(progressSamples - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)
@@ -351,14 +396,14 @@ open class FDWaveformView: UIView {
                 self.renderForCurrentAssetFailed = (image == nil)
                 print("done")
                 self.waveformImage = image
-                self.cachedSampleRange = (image != nil) ? renderSampleRange : nil
                 self.renderingInProgress = false
-                self.waveformRenderOperation = nil
+                self.cachedWaveformRenderOperation = self.inProgressWaveformRenderOperation
+                self.inProgressWaveformRenderOperation = nil
                 self.setNeedsLayout()
                 self.delegate?.waveformViewDidRender?(self)
             }
         }
-        self.waveformRenderOperation = waveformRenderOperation
+        self.inProgressWaveformRenderOperation = waveformRenderOperation
         
         renderingInProgress = true
         delegate?.waveformViewWillRender?(self)
