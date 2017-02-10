@@ -122,9 +122,6 @@ extension ViewController: FDWaveformViewDelegate {
         UIView.animate(withDuration: 0.25, animations: {() -> Void in
             waveformView.alpha = 1.0
         })
-        
-        let data = UIImagePNGRepresentation(waveformView.imageView.image!)!
-        try! data.write(to: URL(fileURLWithPath: "/Users/kip/Desktop/real_output.png"))
     }
     
     func waveformViewWillLoad(_ waveformView: FDWaveformView) {

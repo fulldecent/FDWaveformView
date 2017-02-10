@@ -223,7 +223,7 @@ open class FDWaveformView: UIView {
     }
 
     /// View for rendered waveform
-    lazy public var imageView: UIImageView = {
+    lazy fileprivate var imageView: UIImageView = {
         let retval = UIImageView(frame: CGRect.zero)
         retval.contentMode = .scaleToFill
         retval.tintColor = self.wavesColor
