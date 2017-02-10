@@ -95,6 +95,15 @@ class ViewController: UIViewController {
         self.waveform.waveformType = .logarithmic
     }
     
+    @IBAction func doChangeColors() {
+        let randomColor: () -> (UIColor) = {
+            return UIColor(red: CGFloat(drand48()), green: CGFloat(drand48()), blue: CGFloat(drand48()), alpha: 1)
+        }
+        
+        self.waveform.wavesColor = randomColor()
+        self.waveform.progressColor = randomColor()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         let thisBundle = Bundle(for: type(of: self))
