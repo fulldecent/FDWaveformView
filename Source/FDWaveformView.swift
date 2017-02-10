@@ -541,13 +541,13 @@ public enum FDWaveformType: Equatable {
 public struct FDWaveformRenderFormat {
 
     /// The type of waveform to render
-    public var type: FDWaveformType = .linear
+    public var type: FDWaveformType
     
     /// The color of the waveform
-    public var wavesColor = UIColor.black
+    public var wavesColor: UIColor
     
     /// The scale factor to apply to the rendered image (usually the current screen's scale)
-    public var scale: CGFloat = UIScreen.main.scale
+    public var scale: CGFloat
     
     /// Whether the resulting image size should be as close as possible to imageSize (approximate)
     /// or whether it should match it exactly. Right now there is no support for matching exactly.
@@ -555,6 +555,20 @@ public struct FDWaveformRenderFormat {
     //       Right now the imageSize passed in to the render operation might not match the
     //       resulting image's size. This flag is hard coded here to convey that.
     public let constrainImageSizeToExactlyMatch = false
+    
+    // To make these public, you must implement them
+    // See http://stackoverflow.com/questions/26224693/how-can-i-make-public-by-default-the-member-wise-initialiser-for-structs-in-swif
+    public init() {
+        self.init(type: .linear,
+                  wavesColor: .black,
+                  scale: UIScreen.main.scale)
+    }
+    
+    public init(type: FDWaveformType, wavesColor: UIColor, scale: CGFloat) {
+        self.type = type
+        self.wavesColor = wavesColor
+        self.scale = scale
+    }
 }
 
 /// Operation used for rendering waveform images
