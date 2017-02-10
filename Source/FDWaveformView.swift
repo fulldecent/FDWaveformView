@@ -174,7 +174,6 @@ open class FDWaveformView: UIView {
     private var inProgressWaveformRenderOperation: FDWaveformRenderOperation? {
         willSet {
             if newValue !== inProgressWaveformRenderOperation {
-                print("cancelling")
                 inProgressWaveformRenderOperation?.cancel()
             }
         }
@@ -404,8 +403,6 @@ open class FDWaveformView: UIView {
     func renderWaveform() {
         guard let audioContext = audioContext else { return }
 
-        print("rendering")
-        
         let displayRange = zoomEndSamples - zoomStartSamples
         guard displayRange > 0 else { return }
 
@@ -420,7 +417,6 @@ open class FDWaveformView: UIView {
         let waveformRenderOperation = FDWaveformRenderOperation(audioContext: audioContext, imageSize: imageSize, sampleRange: renderSampleRange, format: renderFormat) { image in
             DispatchQueue.main.async {
                 self.renderForCurrentAssetFailed = (image == nil)
-                print("done")
                 self.waveformImage = image
                 self.renderingInProgress = false
                 self.cachedWaveformRenderOperation = self.inProgressWaveformRenderOperation
@@ -658,14 +654,12 @@ final public class FDWaveformRenderOperation: Operation {
             return image
         }()
         
-        print("image: \(image?.description ?? "nil"), scale: \(image?.scale.description ?? "nil")")
-        
         finish(with: image)
     }
 
     /// Read the asset and create create a lower resolution set of samples
     func sliceAsset(withRange slice: CountableRange<Int>, andDownsampleTo targetSamples: Int) -> (samples: [CGFloat], sampleMax: CGFloat)? {
-        guard !isCancelled else { print("sampling cancelled!"); return nil }
+        guard !isCancelled else { return nil }
         
         guard
             !slice.isEmpty,
@@ -705,10 +699,10 @@ final public class FDWaveformRenderOperation: Operation {
 
         // 16-bit samples
         reader.startReading()
-        defer { reader.cancelReading(); print("canceled reading") } // Cancel reading if we exit early if operation is cancelled
+        defer { reader.cancelReading() } // Cancel reading if we exit early if operation is cancelled
 
         while reader.status == .reading {
-            guard !isCancelled else { print("sampling cancelled!"); return nil }
+            guard !isCancelled else { return nil }
             
             guard let readSampleBuffer = readerOutput.copyNextSampleBuffer(),
                 let readBuffer = CMSampleBufferGetDataBuffer(readSampleBuffer) else {
@@ -742,7 +736,7 @@ final public class FDWaveformRenderOperation: Operation {
         // Process the remaining samples at the end which didn't fit into samplesPerPixel
         let samplesToProcess = sampleBuffer.count / MemoryLayout<Int16>.size
         if samplesToProcess > 0 {
-            guard !isCancelled else { print("sampling cancelled!"); return nil }
+            guard !isCancelled else { return nil }
             
             let downSampledLength = 1
             let samplesPerPixel = samplesToProcess
@@ -760,8 +754,6 @@ final public class FDWaveformRenderOperation: Operation {
         // if (reader.status == AVAssetReaderStatusFailed || reader.status == AVAssetReaderStatusUnknown)
         // Something went wrong. Handle it.
         if reader.status == .completed {
-            print("totalSampleCount \(totalSampleCount), expected sample count: \(channelCount * slice.count)")
-            print("outputSampleCount: \(outputSamples.count), expected target samples: \(targetSamples)")
             return (outputSamples, sampleMax)
         } else {
             print("FDWaveformRenderOperation failed to read audio: \(reader.error)")
@@ -798,8 +790,6 @@ final public class FDWaveformRenderOperation: Operation {
                 return element
             }
             
-            print("samplesPerPixel: \(samplesPerPixel), samples to process: \(samplesToProcess), downsample length: \(downSampledDataCG.count)")
-            
             // Remove processed samples
             sampleBuffer.removeFirst(samplesToProcess * MemoryLayout<Int16>.size)
             
@@ -810,8 +800,6 @@ final public class FDWaveformRenderOperation: Operation {
     // TODO: switch to a synchronous function that paints onto a given context? (for issue #2)
     func plotLogGraph(_ samples: [CGFloat], maximumValue max: CGFloat, zeroValue min: CGFloat) -> UIImage? {
         guard !isCancelled else { return nil }
-        
-        print("samples \(samples)")
         
         let imageSize = CGSize(width: CGFloat(samples.count) / format.scale,
                                height: self.imageSize.height)
