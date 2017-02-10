@@ -34,7 +34,7 @@ open class FDWaveformView: UIView {
             FDAudioContext.load(fromAudioURL: audioURL) { audioContext in
                 DispatchQueue.main.async {
                     if audioContext == nil {
-                        NSLog("FDWaveformView failed to load URL")
+                        NSLog("FDWaveformView failed to load URL: \(audioURL)")
                     }
                     
                     self.audioContext = audioContext // This will reset the view and kick off a layout
