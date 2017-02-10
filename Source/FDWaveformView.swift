@@ -648,7 +648,7 @@ final public class FDWaveformRenderOperation: Operation {
         let image: UIImage? = {
             guard
                 let (samples, sampleMax) = sliceAsset(withRange: sampleRange, andDownsampleTo: targetSamples),
-                let image = plotLogGraph(samples, maximumValue: sampleMax, zeroValue: format.type.floorValue)
+                let image = plotWaveformGraph(samples, maximumValue: sampleMax, zeroValue: format.type.floorValue)
                 else { return nil }
             
             return image
@@ -798,7 +798,7 @@ final public class FDWaveformRenderOperation: Operation {
     }
 
     // TODO: switch to a synchronous function that paints onto a given context? (for issue #2)
-    func plotLogGraph(_ samples: [CGFloat], maximumValue max: CGFloat, zeroValue min: CGFloat) -> UIImage? {
+    func plotWaveformGraph(_ samples: [CGFloat], maximumValue max: CGFloat, zeroValue min: CGFloat) -> UIImage? {
         guard !isCancelled else { return nil }
         
         let imageSize = CGSize(width: CGFloat(samples.count) / format.scale,
