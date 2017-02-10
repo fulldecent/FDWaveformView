@@ -637,10 +637,13 @@ final public class FDWaveformRenderOperation: Operation {
     }
     
     private func render() {
-        guard !sampleRange.isEmpty else {
-            finish(with: nil)
-            return
-        }
+        guard
+            !sampleRange.isEmpty,
+            imageSize.width > 0, imageSize.height > 0
+            else {
+                finish(with: nil)
+                return
+            }
         
         let targetSamples = Int(imageSize.width * format.scale)
         
