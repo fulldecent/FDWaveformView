@@ -565,9 +565,6 @@ final public class FDWaveformRenderOperation: Operation {
     /// The audio context used to build the waveform
     public let audioContext: FDAudioContext
     
-    ///  Handler called when the rendering has completed. nil UIImage indicates that there was an error during processing.
-    private let completionHandler: (UIImage?) -> ()
-
     /// Size of waveform image to render
     public let imageSize: CGSize
     
@@ -588,6 +585,9 @@ final public class FDWaveformRenderOperation: Operation {
     public override var isFinished: Bool { return _isFinished }
     
     // MARK: - Private
+    
+    ///  Handler called when the rendering has completed. nil UIImage indicates that there was an error during processing.
+    private let completionHandler: (UIImage?) -> ()
     
     /// Final rendered image. Used to hold image for completionHandler.
     private var renderedImage: UIImage?
