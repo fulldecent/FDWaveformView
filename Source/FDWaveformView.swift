@@ -664,6 +664,7 @@ final public class FDWaveformRenderOperation: Operation {
         
         guard
             !slice.isEmpty,
+            targetSamples > 0,
             let reader = try? AVAssetReader(asset: audioContext.asset)
             else { return nil }
         
