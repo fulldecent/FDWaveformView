@@ -33,6 +33,8 @@ open class FDWaveformView: UIView {
             
             FDAudioContext.load(fromAudioURL: audioURL) { audioContext in
                 DispatchQueue.main.async {
+                    guard self.audioURL == audioContext?.audioURL else { return }
+                    
                     if audioContext == nil {
                         NSLog("FDWaveformView failed to load URL: \(audioURL)")
                     }
