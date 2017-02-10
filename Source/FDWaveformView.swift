@@ -550,6 +550,13 @@ public struct FDWaveformRenderFormat {
     
     /// The scale factor to apply to the rendered image (usually the current screen's scale)
     public var scale: CGFloat = UIScreen.main.scale
+    
+    /// Whether the resulting image size should be as close as possible to imageSize (approximate)
+    /// or whether it should match it exactly. Right now there is no support for matching exactly.
+    // TODO: Support rendering operations that always match the desired imageSize passed in.
+    //       Right now the imageSize passed in to the render operation might not match the
+    //       resulting image's size. This flag is hard coded here to convey that.
+    public let constrainImageSizeToExactlyMatch = false
 }
 
 /// Operation used for rendering waveform images
