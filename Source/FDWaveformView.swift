@@ -651,7 +651,7 @@ final public class FDWaveformRenderOperation: Operation {
             guard
                 let (samples, sampleMax) = sliceAsset(withRange: sampleRange, andDownsampleTo: targetSamples),
                 let image = plotLogGraph(samples, maximumValue: sampleMax, zeroValue: format.type.floorValue)
-            else { return nil }
+                else { return nil }
             
             return image
         }()
