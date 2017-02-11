@@ -13,6 +13,8 @@ import FDWaveformView
 class ViewController: UIViewController {
     @IBOutlet weak var waveform: FDWaveformView!
     @IBOutlet var playButton: UIView!
+    @IBOutlet weak var logarithmicButton: UIButton!
+    @IBOutlet weak var linearButton: UIButton!
     
     fileprivate var startRendering = Date()
     fileprivate var endRendering = Date()
@@ -89,10 +91,12 @@ class ViewController: UIViewController {
     
     @IBAction func doLinear() {
         self.waveform.waveformType = .linear
+        updateWaveformTypeButtons()
     }
     
     @IBAction func doLogarithmic() {
         self.waveform.waveformType = .logarithmic
+        updateWaveformTypeButtons()
     }
     
     @IBAction func doChangeColors() {
@@ -116,6 +120,19 @@ class ViewController: UIViewController {
         self.waveform.doesAllowScrubbing = true
         self.waveform.doesAllowStretch = true
         self.waveform.doesAllowScroll = true
+        updateWaveformTypeButtons()
+    }
+    
+    func updateWaveformTypeButtons() {
+        let (selectedButton, nonSelectedButton): (UIButton, UIButton) = {
+            switch self.waveform.waveformType {
+            case .linear: return (self.linearButton, self.logarithmicButton)
+            case .logarithmic: return (self.logarithmicButton, self.linearButton)
+            }
+        }()
+        selectedButton.layer.borderColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor
+        selectedButton.layer.borderWidth = 2
+        nonSelectedButton.layer.borderWidth = 0
     }
 }
 

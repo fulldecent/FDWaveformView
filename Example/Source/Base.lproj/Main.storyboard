@@ -106,23 +106,23 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AIo-Bv-jmO" userLabel="Linear">
                                 <rect key="frame" x="0.0" y="134" width="203" height="30"/>
                                 <color key="backgroundColor" red="0.9165864587" green="0.89184486870000002" blue="0.27463445069999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <state key="normal" title="Linear">
-                                    <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </state>
-                                <connections>
-                                    <action selector="doLinear" destination="GzX-4u-840" eventType="touchUpInside" id="Dfw-LG-KKA"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="t25-dP-LU3" userLabel="Logarithmic">
-                                <rect key="frame" x="211" y="134" width="203" height="30"/>
-                                <color key="backgroundColor" red="0.9165864587" green="0.89184486870000002" blue="0.27463445069999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <state key="normal" title="Logarithmic">
                                     <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                     <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 </state>
                                 <connections>
-                                    <action selector="doLogarithmic" destination="GzX-4u-840" eventType="touchUpInside" id="8C2-de-x46"/>
+                                    <action selector="doLogarithmic" destination="GzX-4u-840" eventType="touchUpInside" id="2Ev-Xe-X0A"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="t25-dP-LU3" userLabel="Logarithmic">
+                                <rect key="frame" x="211" y="134" width="203" height="30"/>
+                                <color key="backgroundColor" red="0.9165864587" green="0.89184486870000002" blue="0.27463445069999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <state key="normal" title="Linear">
+                                    <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="doLinear" destination="GzX-4u-840" eventType="touchUpInside" id="t8d-KS-hFP"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="C2Y-UB-xTc">
@@ -186,6 +186,8 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="linearButton" destination="t25-dP-LU3" id="A6s-ss-HvR"/>
+                        <outlet property="logarithmicButton" destination="AIo-Bv-jmO" id="suU-1L-G4Z"/>
                         <outlet property="playButton" destination="oh1-vd-YBA" id="b9j-po-y99"/>
                         <outlet property="waveform" destination="pHr-84-A7W" id="Cbo-cG-3Zd"/>
                     </connections>
