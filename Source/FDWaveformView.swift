@@ -708,8 +708,6 @@ final public class FDWaveformRenderOperation: Operation {
 
         var outputSamples = [CGFloat]()
         var sampleBuffer = Data()
-        
-        var totalSampleCount = 0
 
         // 16-bit samples
         reader.startReading()
@@ -729,8 +727,6 @@ final public class FDWaveformRenderOperation: Operation {
             CMBlockBufferGetDataPointer(readBuffer, 0, &readBufferLength, nil, &readBufferPointer)
             sampleBuffer.append(UnsafeBufferPointer(start: readBufferPointer, count: readBufferLength))
             CMSampleBufferInvalidate(readSampleBuffer)
-            
-            totalSampleCount += readBufferLength / 2
 
             let totalSamples = sampleBuffer.count / MemoryLayout<Int16>.size
             let downSampledLength = totalSamples / samplesPerPixel
