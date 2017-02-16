@@ -4,7 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Master](https://github.com/fulldecent/FDWaveformView/compare/2.0.0...master)
+## [Master](https://github.com/fulldecent/FDWaveformView/compare/2.0.1...master)
+
+---
+
+## [2.0.1](https://github.com/fulldecent/FDWaveformView/releases/tag/2.0.1)
+Released on 2017-02-16.
+
 #### Added
 - Allow scrubbing independantly of scrolling
   - Added by [Doug Earnshaw](https://github.com/haydenholligan)
