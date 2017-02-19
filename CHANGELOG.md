@@ -6,6 +6,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Master](https://github.com/fulldecent/FDWaveformView/compare/2.0.1...master)
 
+#### Fixed
+- Improved accuracy of waveform rendering
+  - Added by [Kip Nicol](https://github.com/ospr)
+- Fixed waveform rendering for large audio files
+  - Added by [Kip Nicol](https://github.com/ospr)
+
 ---
 
 ## [2.0.1](https://github.com/fulldecent/FDWaveformView/releases/tag/2.0.1)
