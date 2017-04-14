@@ -17,6 +17,9 @@ All notable changes to this project will be documented in this file.
   - Added by [Kip Nicol](https://github.com/ospr)
 - Fixed waveform rendering for large audio files
   - Added by [Kip Nicol](https://github.com/ospr)
+- Fixed crash with quick load time
+  - Added by [William Entriken](https://github.com/fulldecent) in Regards to Issue
+  [#76](https://github.com/fulldecent/FDWaveformView/issues/76).
 
 ---
 

@@ -27,15 +27,25 @@ open class FDWaveformView: UIView {
                 return
             }
 
-            let asset = AVURLAsset(url: audioURL, options: [AVURLAssetPreferPreciseDurationAndTimingKey: NSNumber(value: true as Bool)])
-            self.asset = asset
-
-            guard let assetTrack = asset.tracks(withMediaType: AVMediaTypeAudio).first else {
-                NSLog("FDWaveformView failed to load AVAssetTrack")
+            asset = AVURLAsset(url: audioURL, options: [AVURLAssetPreferPreciseDurationAndTimingKey: NSNumber(value: true as Bool)])
+            guard let asset = asset else {
+                // I shouldn't even have to do this
+                NSLog("FDWaveformView failed to load AVURLAsset")
                 return
             }
 
-            self.assetTrack = assetTrack
+            assetTrack = asset.tracks(withMediaType: AVMediaTypeAudio).first
+            guard let assetTrack = assetTrack else {
+                NSLog("FDWaveformView failed to load AVAssetTrack")
+                return
+            }
+            
+            assetReader = try? AVAssetReader(asset: asset)
+            guard assetReader != nil else {
+                NSLog("FDWaveformView failed to load AVAssetReader")
+                return
+            }
+
             loadingInProgress = true
             delegate?.waveformViewWillLoad?(self)
             asset.loadValuesAsynchronously(forKeys: ["duration"]) {
@@ -187,6 +197,9 @@ open class FDWaveformView: UIView {
     /// The track (part of the asset) we will render
     fileprivate var assetTrack: AVAssetTrack?
 
+    /// The way to get samples from the track
+    fileprivate var assetReader: AVAssetReader?
+    
     /// The range of samples we rendered
     fileprivate var cachedSampleRange = 0..<0
 
@@ -341,9 +354,9 @@ open class FDWaveformView: UIView {
         guard slice.count > 0 else { return }
         guard let asset = asset else { return }
         guard let assetTrack = assetTrack else { return }
-        guard let reader = try? AVAssetReader(asset: asset) else { return }
+        guard let assetReader = assetReader else { return }
 
-        reader.timeRange = CMTimeRange(start: CMTime(value: Int64(slice.lowerBound), timescale: asset.duration.timescale), duration: CMTime(value: Int64(slice.count), timescale: asset.duration.timescale))
+        assetReader.timeRange = CMTimeRange(start: CMTime(value: Int64(slice.lowerBound), timescale: asset.duration.timescale), duration: CMTime(value: Int64(slice.count), timescale: asset.duration.timescale))
         let outputSettingsDict: [String : Any] = [
             AVFormatIDKey: Int(kAudioFormatLinearPCM),
             AVLinearPCMBitDepthKey: 16,
@@ -354,7 +367,7 @@ open class FDWaveformView: UIView {
 
         let readerOutput = AVAssetReaderTrackOutput(track: assetTrack, outputSettings: outputSettingsDict)
         readerOutput.alwaysCopiesSampleData = false
-        reader.add(readerOutput)
+        assetReader.add(readerOutput)
 
         var channelCount = 1
         let formatDesc = assetTrack.formatDescriptions
@@ -371,9 +384,9 @@ open class FDWaveformView: UIView {
         var sampleBuffer = Data()
 
         // 16-bit samples
-        reader.startReading()
+        assetReader.startReading()
 
-        while reader.status == .reading {
+        while assetReader.status == .reading {
             guard let readSampleBuffer = readerOutput.copyNextSampleBuffer(),
                 let readBuffer = CMSampleBufferGetDataBuffer(readSampleBuffer) else {
                     break
@@ -419,10 +432,10 @@ open class FDWaveformView: UIView {
         
         // if (reader.status == AVAssetReaderStatusFailed || reader.status == AVAssetReaderStatusUnknown)
         // Something went wrong. Handle it.
-        if reader.status == .completed {
+        if assetReader.status == .completed {
             done(outputSamples, sampleMax)
         } else {
-            print(reader.status)
+            print(assetReader.status)
         }
     }
     
