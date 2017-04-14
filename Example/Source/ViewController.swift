@@ -127,8 +127,8 @@ extension ViewController: FDWaveformViewDelegate {
     
     func waveformViewDidRender(_ waveformView: FDWaveformView) {
         self.endRendering = Date()
-        NSLog("FDWaveformView rendering done, took %f seconds", self.endRendering.timeIntervalSince(self.startRendering))
-        self.profileResult.append(" render \(self.endRendering.timeIntervalSince(self.startRendering))")
+        NSLog("FDWaveformView rendering done, took %0.3f seconds", self.endRendering.timeIntervalSince(self.startRendering))
+        self.profileResult.append(String(format: " render %0.3f ", self.endRendering.timeIntervalSince(self.startRendering)))
         UIView.animate(withDuration: 0.25, animations: {() -> Void in
             waveformView.alpha = 1.0
         })
