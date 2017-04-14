@@ -14,13 +14,13 @@ import Accelerate
 // see http://stackoverflow.com/questions/3514066/how-to-tint-a-transparent-png-image-in-iphone
 
 /// A view for rendering audio waveforms
-// @IBDesignable
+/*@IBDesignable*/ // IBDesignable support in XCode is so broken it's sad
 open class FDWaveformView: UIView {
     /// A delegate to accept progress reporting
-    @IBInspectable open weak var delegate: FDWaveformViewDelegate?
+    /*@IBInspectable*/ open weak var delegate: FDWaveformViewDelegate?
 
     /// The audio file to render
-    @IBInspectable open var audioURL: URL? {
+    /*@IBInspectable*/ open var audioURL: URL? {
         didSet {
             guard let audioURL = self.audioURL else {
                 NSLog("FDWaveformView failed to load URL")
@@ -59,6 +59,7 @@ open class FDWaveformView: UIView {
                                 self.setNeedsLayout()
                             }
                         }
+                        print("FDWaveformView could not load samples")
                     }
                 case .failed, .cancelled, .loading, .unknown:
                     print("FDWaveformView could not load asset: " + String(describing:error?.localizedDescription))
@@ -71,7 +72,7 @@ open class FDWaveformView: UIView {
     open fileprivate(set) var totalSamples = 0
 
     /// A portion of the waveform rendering to be highlighted
-    @IBInspectable open var progressSamples = 0 {
+    /*@IBInspectable*/ open var progressSamples = 0 {
         didSet {
             if totalSamples > 0 {
                 let progress = CGFloat(progressSamples) / CGFloat(totalSamples)
@@ -82,9 +83,11 @@ open class FDWaveformView: UIView {
     }
 
     //TODO:  MAKE THIS A RANGE, CAN IT BE ANIMATABLE??!
-
+//TODO: use clampRange for safety!
+//TODO: disallow start=end
+//TODO: allow nil
     /// The first sample to render
-    @IBInspectable open var zoomStartSamples = 0 {
+    /*@IBInspectable*/ open var zoomStartSamples = 0 {
         didSet {
             setNeedsDisplay()
             setNeedsLayout()
@@ -92,21 +95,22 @@ open class FDWaveformView: UIView {
     }
 
     /// One plus the last sample to render
-    @IBInspectable open var zoomEndSamples = 0 {
+    /*@IBInspectable*/ open var zoomEndSamples = 0 {
         didSet {
             setNeedsDisplay()
             setNeedsLayout()
         }
     }
 
-    /// Whether to all the scrub gesture
-    @IBInspectable open var doesAllowScrubbing = true
+    /// Whether to allow tap and pan gestures to change highlighted range
+    /// Pan gives priority to `doesAllowScroll` if this and that are both `true`
+    /*@IBInspectable*/ open var doesAllowScrubbing = true
 
-    /// Whether to allow the stretch gesture
-    @IBInspectable open var doesAllowStretch = true
+    /// Whether to allow pinch gesture to change zoom
+    /*@IBInspectable*/ open var doesAllowStretch = true
 
-    /// Whether to allow the scroll gesture
-    @IBInspectable open var doesAllowScroll = true
+    /// Whether to allow pan gesture to change zoom
+    /*@IBInspectable*/ open var doesAllowScroll = true
 
     /// The color of the waveform
     @IBInspectable open var wavesColor = UIColor.black
@@ -206,12 +210,11 @@ open class FDWaveformView: UIView {
         clipping.addSubview(highlightedImage)
         addSubview(clipping)
         clipsToBounds = true
-
         setupGestureRecognizers()
     }
 
     fileprivate func setupGestureRecognizers() {
-        //TODO: try to do this in the lazy initializer above
+        //TODO: try to do this in the lazy initializers above
         pinchRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(handlePinchGesture))
         pinchRecognizer.delegate = self
         addGestureRecognizer(pinchRecognizer)
@@ -219,6 +222,7 @@ open class FDWaveformView: UIView {
         panRecognizer.delegate = self
         addGestureRecognizer(panRecognizer)
         tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTapGesture))
+//        tapRecognizer.delegate = self
         addGestureRecognizer(tapRecognizer)
     }
 
@@ -464,7 +468,7 @@ open class FDWaveformView: UIView {
         }
     }
 
-    // TODO: switch to a synchronous function that paints onto a given context? (for issue #2)
+    // TODO: switch to a synchronous function that paints onto a given context? (see issue #2)
     func plotLogGraph(_ samples: [CGFloat], maximumValue max: CGFloat, zeroValue min: CGFloat, imageHeight: CGFloat, done: (_ image: UIImage, _ selectedImage: UIImage)->Void) {
         let imageSize = CGSize(width: CGFloat(samples.count), height: imageHeight)
         UIGraphicsBeginImageContext(imageSize)
@@ -519,22 +523,24 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
         if recognizer.scale == 1 {
             return
         }
-        let middleSamples = CGFloat((zoomStartSamples + zoomEndSamples) / 2)
-        let rangeSamples = CGFloat(zoomEndSamples - zoomStartSamples)
-        if middleSamples - 1.0 / recognizer.scale * CGFloat(rangeSamples) >= 0 {
-            zoomStartSamples = Int(CGFloat(middleSamples) - 1.0 / recognizer.scale * CGFloat(rangeSamples) / 2)
-        }
-        else {
+        
+        let zoomRangeSamples = CGFloat(zoomEndSamples - zoomStartSamples)
+        let pinchCenterSample = zoomStartSamples + Int(zoomRangeSamples * recognizer.location(in: self).x / bounds.width)
+        let newZoomRangeSamples = Int(zoomRangeSamples * 1.0 / recognizer.scale)
+        let newZoomStart = pinchCenterSample - Int(CGFloat(pinchCenterSample - zoomStartSamples) * 1.0 / recognizer.scale)
+        let newZoomEnd = newZoomStart + newZoomRangeSamples
+        
+        //TODO: This should be done in the setter
+        if newZoomStart < 0 {
             zoomStartSamples = 0
+        } else {
+            zoomStartSamples = newZoomStart
         }
-        if middleSamples + 1 / recognizer.scale * CGFloat(rangeSamples) / 2 <= CGFloat(totalSamples) {
-            zoomEndSamples = Int(middleSamples + 1.0 / recognizer.scale * rangeSamples / 2)
-        }
-        else {
+        if newZoomEnd > totalSamples {
             zoomEndSamples = totalSamples
+        } else {
+            zoomEndSamples = newZoomEnd
         }
-        setNeedsDisplay()
-        setNeedsLayout()
         recognizer.scale = 1
     }
 
@@ -542,7 +548,7 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
         let point = recognizer.translation(in: self)
         if doesAllowScroll {
             if recognizer.state == .began {
-                delegate?.waveformDidEndPanning?(self)
+                delegate?.waveformDidBeginPanning?(self)
             }
             var translationSamples = Int(CGFloat(zoomEndSamples - zoomStartSamples) * point.x / bounds.width)
             recognizer.setTranslation(CGPoint.zero, in: self)
@@ -556,8 +562,6 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
             zoomEndSamples -= translationSamples
             if recognizer.state == .ended {
                 delegate?.waveformDidEndPanning?(self)
-                setNeedsDisplay()
-                setNeedsLayout()
             }
         }
         else if doesAllowScrubbing {

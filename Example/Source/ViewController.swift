@@ -12,13 +12,11 @@ import FDWaveformView
 
 class ViewController: UIViewController {
     @IBOutlet weak var waveform: FDWaveformView!
-    @IBOutlet var playButton: UIView!
     
     fileprivate var startRendering = Date()
     fileprivate var endRendering = Date()
     fileprivate var startLoading = Date()
     fileprivate var endLoading = Date()
-    fileprivate var profilingAlert: UIAlertView? = nil
     fileprivate var profileResult = ""
     
     @IBAction func doAnimation() {
@@ -29,20 +27,22 @@ class ViewController: UIViewController {
     }
     
     @IBAction func doZoomIn() {
-        self.waveform.zoomStartSamples = 0
-        self.waveform.zoomEndSamples = self.waveform.totalSamples / 4
+        waveform.zoomStartSamples = 0
+        waveform.zoomEndSamples = waveform.totalSamples / 4
     }
     
     @IBAction func doZoomOut() {
-        self.waveform.zoomStartSamples = 0
-        self.waveform.zoomEndSamples = self.waveform.totalSamples
+        waveform.zoomStartSamples = 0
+        waveform.zoomEndSamples = waveform.totalSamples
     }
     
     @IBAction func doRunPerformanceProfile() {
         NSLog("RUNNING PERFORMANCE PROFILE")
-        let alert = UIAlertView(title: "PROFILING BEGIN", message: "Profiling will begin, please don't touch anything. This will take less than 30 seconds", delegate: nil, cancelButtonTitle: nil, otherButtonTitles: "")
-        alert.show()
-        self.profilingAlert = alert
+        
+        let alert = UIAlertController(title: "Start Profiling", message:"Profiling will begin, please don't touch anything. This will take less than 30 seconds.", preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK", style: .default)
+        alert.addAction(action)
+        present(alert, animated: true)
         
         self.profileResult = ""
         // Delay execution of my block for 1 seconds.
@@ -62,29 +62,41 @@ class ViewController: UIViewController {
         })
         // Delay execution of my block for 14 seconds.
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(14) * Int64(NSEC_PER_SEC)) / Double(NSEC_PER_SEC), execute: {
-            self.profilingAlert?.dismiss(withClickedButtonIndex: -1, animated: false)
-            let alert = UIAlertView(title: "PLEASE POST TO github.com/fulldecent/FDWaveformView/wiki", message: self.profileResult, delegate: nil, cancelButtonTitle: "Done", otherButtonTitles: "")
-            alert.show()
-            self.profilingAlert = alert
+            let alert = UIAlertController(title: "PLEASE POST TO github.com/fulldecent/FDWaveformView/wiki", message: self.profileResult, preferredStyle: .alert)
+            let action = UIAlertAction(title: "OK", style: .default)
+            alert.addAction(action)
+            self.present(alert, animated: true)
         })
     }
     
     @IBAction func doLoadAAC() {
         let thisBundle = Bundle(for: type(of: self))
         let url = thisBundle.url(forResource: "TchaikovskyExample2", withExtension: "m4a")
-        self.waveform.audioURL = url
+        waveform.audioURL = url
     }
     
     @IBAction func doLoadMP3() {
         let thisBundle = Bundle(for: type(of: self))
         let url = thisBundle.url(forResource: "TchaikovskyExample2", withExtension: "mp3")
-        self.waveform.audioURL = url
+        waveform.audioURL = url
     }
     
     @IBAction func doLoadOGG() {
         let thisBundle = Bundle(for: type(of: self))
         let url = thisBundle.url(forResource: "TchaikovskyExample2", withExtension: "ogg")
-        self.waveform.audioURL = url
+        waveform.audioURL = url
+    }
+    
+    @IBAction func toggleScrub(_ sender: UISwitch) {
+        waveform.doesAllowScrubbing = sender.isOn
+    }
+    
+    @IBAction func toggleStretch(_ sender: UISwitch) {
+        waveform.doesAllowStretch = sender.isOn
+    }
+    
+    @IBAction func toggleScroll(_ sender: UISwitch) {
+        waveform.doesAllowScroll = sender.isOn
     }
     
     override func viewDidLoad() {
@@ -92,13 +104,13 @@ class ViewController: UIViewController {
         let thisBundle = Bundle(for: type(of: self))
         let url = thisBundle.url(forResource: "Submarine", withExtension: "aiff")
         // Animate the waveforme view in when it is rendered
-        self.waveform.delegate = self
-        self.waveform.alpha = 0.0
-        self.waveform.audioURL = url
-        self.waveform.progressSamples = 10000
-        self.waveform.doesAllowScrubbing = true
-        self.waveform.doesAllowStretch = true
-        self.waveform.doesAllowScroll = true
+        waveform.delegate = self
+        waveform.alpha = 0.0
+        waveform.audioURL = url
+        waveform.progressSamples = 10000
+        waveform.doesAllowScrubbing = true
+        waveform.doesAllowStretch = true
+        waveform.doesAllowScroll = true
     }
 }
 

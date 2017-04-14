@@ -1,138 +1,175 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11201" systemVersion="16A320" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="GzX-4u-840">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12118" systemVersion="16E195" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="upN-2p-DeK">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11161"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12086"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
-        <scene sceneID="jLQ-mk-NKA">
+        <scene sceneID="lZG-W1-WAO">
             <objects>
-                <viewController id="GzX-4u-840" customClass="ViewController" customModule="iOS_Example" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="upN-2p-DeK" customClass="ViewController" customModule="iOS_Example" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="C8T-P3-aco"/>
-                        <viewControllerLayoutGuide type="bottom" id="01F-59-2xz"/>
+                        <viewControllerLayoutGuide type="top" id="5Mt-V7-gnm"/>
+                        <viewControllerLayoutGuide type="bottom" id="ncR-8H-cID"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="oh1-vd-YBA">
+                    <view key="view" contentMode="scaleToFill" id="ghI-45-3fA">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pHr-84-A7W" customClass="FDWaveformView" customModule="FDWaveformView">
-                                <color key="backgroundColor" red="0.99811935424804688" green="0.92034381628036499" blue="0.90713727474212646" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="wavesColor">
-                                        <color key="value" red="0.17254901959999999" green="0.50980392159999999" blue="0.78823529410000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                            </view>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ip2-HE-aX1">
-                                <color key="backgroundColor" red="0.98823529409999999" green="0.37647058820000001" blue="0.25882352939999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <state key="normal" title="Load AAC">
-                                    <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </state>
-                                <connections>
-                                    <action selector="doLoadAAC" destination="GzX-4u-840" eventType="touchUpInside" id="92l-zv-E96"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="V6O-ov-C15">
-                                <color key="backgroundColor" red="0.98823529409999999" green="0.37647058820000001" blue="0.25882352939999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <state key="normal" title="Load MP3">
-                                    <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </state>
-                                <connections>
-                                    <action selector="doLoadMP3" destination="GzX-4u-840" eventType="touchUpInside" id="i44-Ny-Czm"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QiA-5t-Tep">
-                                <color key="backgroundColor" red="0.98823529409999999" green="0.37647058820000001" blue="0.25882352939999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <state key="normal" title="Load OGG">
-                                    <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </state>
-                                <connections>
-                                    <action selector="doLoadOGG" destination="GzX-4u-840" eventType="touchUpInside" id="rhB-PI-RJC"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Eo2-dg-ThD">
-                                <color key="backgroundColor" red="0.91658645868301392" green="0.89184486865997314" blue="0.27463445067405701" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <state key="normal" title="Zoom in">
-                                    <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </state>
-                                <connections>
-                                    <action selector="doZoomIn" destination="GzX-4u-840" eventType="touchUpInside" id="9jC-Su-4m8"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XOT-uC-eqi">
-                                <color key="backgroundColor" red="0.91658645868301392" green="0.89184486865997314" blue="0.27463445067405701" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <state key="normal" title="Zoom out">
-                                    <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </state>
-                                <connections>
-                                    <action selector="doZoomOut" destination="GzX-4u-840" eventType="touchUpInside" id="AYs-Ev-ApW"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WLG-lH-cUv">
-                                <color key="backgroundColor" red="0.91658645868301392" green="0.89184486865997314" blue="0.27463445067405701" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <state key="normal" title="Randomly set play progress">
-                                    <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </state>
-                                <connections>
-                                    <action selector="doAnimation" destination="GzX-4u-840" eventType="touchUpInside" id="fb7-NT-Wds"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="C2Y-UB-xTc">
-                                <color key="backgroundColor" red="0.91658645868301392" green="0.89184486865997314" blue="0.27463445067405701" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <state key="normal" title="Run performance profiling">
-                                    <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </state>
-                                <connections>
-                                    <action selector="doRunPerformanceProfile" destination="GzX-4u-840" eventType="touchUpInside" id="qKf-b0-xNq"/>
-                                </connections>
-                            </button>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="tfN-a4-TrR">
+                                <rect key="frame" x="16" y="20" width="343" height="647"/>
+                                <subviews>
+                                    <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="alq-jP-5MO">
+                                        <rect key="frame" x="0.0" y="0.0" width="343" height="30"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pEF-zu-tpZ">
+                                                <rect key="frame" x="0.0" y="0.0" width="109" height="30"/>
+                                                <color key="backgroundColor" red="0.1803921568627451" green="0.80000000000000004" blue="0.44313725490196076" alpha="1" colorSpace="calibratedRGB"/>
+                                                <state key="normal" title="Load AAC">
+                                                    <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="doLoadAAC" destination="upN-2p-DeK" eventType="touchUpInside" id="Tp4-1N-rWv"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cMD-ob-cpb">
+                                                <rect key="frame" x="117" y="0.0" width="109" height="30"/>
+                                                <color key="backgroundColor" red="0.1803921568627451" green="0.80000000000000004" blue="0.44313725490196076" alpha="1" colorSpace="calibratedRGB"/>
+                                                <state key="normal" title="Load MP3">
+                                                    <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="doLoadMP3" destination="upN-2p-DeK" eventType="touchUpInside" id="5qy-BC-ZSA"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hTi-Cr-9Fv">
+                                                <rect key="frame" x="234" y="0.0" width="109" height="30"/>
+                                                <color key="backgroundColor" red="0.1803921568627451" green="0.80000000000000004" blue="0.44313725490196076" alpha="1" colorSpace="calibratedRGB"/>
+                                                <state key="normal" title="Load OGG">
+                                                    <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="doLoadOGG" destination="upN-2p-DeK" eventType="touchUpInside" id="hjb-ag-6Je"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                    </stackView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j1y-7e-BVW">
+                                        <rect key="frame" x="0.0" y="38" width="343" height="12"/>
+                                        <color key="backgroundColor" red="0.94509803921568625" green="0.76862745098039209" blue="0.058823529411764705" alpha="1" colorSpace="calibratedRGB"/>
+                                        <state key="normal" title="Randomly Set Play Progress">
+                                            <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="doAnimation" destination="upN-2p-DeK" eventType="touchUpInside" id="8is-yA-PRF"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SVK-SI-w8z">
+                                        <rect key="frame" x="0.0" y="58" width="343" height="30"/>
+                                        <color key="backgroundColor" red="0.94509803921568625" green="0.76862745098039209" blue="0.058823529411764705" alpha="1" colorSpace="calibratedRGB"/>
+                                        <state key="normal" title="Zoom In">
+                                            <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="doZoomIn" destination="upN-2p-DeK" eventType="touchUpInside" id="S0y-Hu-Y5X"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="E4r-xb-1qj">
+                                        <rect key="frame" x="0.0" y="96" width="343" height="30"/>
+                                        <color key="backgroundColor" red="0.94509803921568625" green="0.76862745098039209" blue="0.058823529411764705" alpha="1" colorSpace="calibratedRGB"/>
+                                        <state key="normal" title="Zoom Out">
+                                            <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="doZoomOut" destination="upN-2p-DeK" eventType="touchUpInside" id="6Q6-GO-3mm"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3PV-7N-GXl">
+                                        <rect key="frame" x="0.0" y="134" width="343" height="30"/>
+                                        <color key="backgroundColor" red="0.94509803921568625" green="0.76862745098039209" blue="0.058823529411764705" alpha="1" colorSpace="calibratedRGB"/>
+                                        <state key="normal" title="Run Performance Profiling">
+                                            <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="doRunPerformanceProfile" destination="upN-2p-DeK" eventType="touchUpInside" id="4GS-M8-KTw"/>
+                                        </connections>
+                                    </button>
+                                    <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" translatesAutoresizingMaskIntoConstraints="NO" id="GEb-3P-FO0">
+                                        <rect key="frame" x="0.0" y="172" width="343" height="31"/>
+                                        <subviews>
+                                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3Zb-ye-cdK">
+                                                <rect key="frame" x="0.0" y="0.0" width="51" height="31"/>
+                                                <connections>
+                                                    <action selector="toggleScrub:" destination="upN-2p-DeK" eventType="valueChanged" id="vFK-AP-HP8"/>
+                                                </connections>
+                                            </switch>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Scrub" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="r3D-l1-N75">
+                                                <rect key="frame" x="59.5" y="0.0" width="45.5" height="31"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fsW-Pt-df4">
+                                                <rect key="frame" x="115" y="0.0" width="51" height="31"/>
+                                                <connections>
+                                                    <action selector="toggleStretch:" destination="upN-2p-DeK" eventType="valueChanged" id="6w9-zo-AEN"/>
+                                                </connections>
+                                            </switch>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Stretch" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yOA-vT-AiT">
+                                                <rect key="frame" x="174.5" y="0.0" width="56" height="31"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZFF-qv-sd0">
+                                                <rect key="frame" x="240.5" y="0.0" width="51" height="31"/>
+                                                <connections>
+                                                    <action selector="toggleScroll:" destination="upN-2p-DeK" eventType="valueChanged" id="N5m-30-QgF"/>
+                                                </connections>
+                                            </switch>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Scroll" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Vc1-yS-LoO">
+                                                <rect key="frame" x="300" y="0.0" width="43" height="31"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                        </subviews>
+                                    </stackView>
+                                    <view contentMode="scaleToFill" verticalHuggingPriority="249" translatesAutoresizingMaskIntoConstraints="NO" id="IUq-Ru-f0Z" customClass="FDWaveformView" customModule="FDWaveformView">
+                                        <rect key="frame" x="0.0" y="211" width="343" height="436"/>
+                                        <color key="backgroundColor" red="0.74117647058823533" green="0.76470588235294112" blue="0.7803921568627451" alpha="1" colorSpace="calibratedRGB"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="wavesColor">
+                                                <color key="value" red="0.20392156862745098" green="0.59607843137254901" blue="0.85882352941176465" alpha="1" colorSpace="calibratedRGB"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="progressColor">
+                                                <color key="value" red="0.55686274509803924" green="0.26666666666666666" blue="0.67843137254901964" alpha="1" colorSpace="calibratedRGB"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </view>
+                                </subviews>
+                            </stackView>
                         </subviews>
-                        <color key="backgroundColor" red="0.93609845638275146" green="0.93607044219970703" blue="0.93608629703521729" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.92549019607843142" green="0.94117647058823528" blue="0.94509803921568625" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="Eo2-dg-ThD" secondAttribute="trailing" id="0h3-Y1-yc0"/>
-                            <constraint firstItem="WLG-lH-cUv" firstAttribute="top" secondItem="Ip2-HE-aX1" secondAttribute="bottom" constant="8" id="4ZM-7Q-VFH"/>
-                            <constraint firstAttribute="trailing" secondItem="QiA-5t-Tep" secondAttribute="trailing" id="5mM-3f-3p7"/>
-                            <constraint firstAttribute="trailing" secondItem="pHr-84-A7W" secondAttribute="trailing" id="8LR-eU-l1V"/>
-                            <constraint firstItem="QiA-5t-Tep" firstAttribute="top" secondItem="Ip2-HE-aX1" secondAttribute="top" id="EP2-Bz-Vr6"/>
-                            <constraint firstAttribute="trailing" secondItem="WLG-lH-cUv" secondAttribute="trailing" id="HHp-cp-GGI"/>
-                            <constraint firstItem="C2Y-UB-xTc" firstAttribute="leading" secondItem="oh1-vd-YBA" secondAttribute="leading" id="HpT-w6-iSA"/>
-                            <constraint firstItem="XOT-uC-eqi" firstAttribute="leading" secondItem="oh1-vd-YBA" secondAttribute="leading" id="KdZ-Dj-KcD"/>
-                            <constraint firstItem="Eo2-dg-ThD" firstAttribute="leading" secondItem="oh1-vd-YBA" secondAttribute="leading" id="Kke-ES-oXY"/>
-                            <constraint firstItem="QiA-5t-Tep" firstAttribute="width" secondItem="Ip2-HE-aX1" secondAttribute="width" id="LWw-hq-qY8"/>
-                            <constraint firstItem="pHr-84-A7W" firstAttribute="top" secondItem="C2Y-UB-xTc" secondAttribute="bottom" constant="8" id="Npi-VG-9Hy"/>
-                            <constraint firstItem="V6O-ov-C15" firstAttribute="leading" secondItem="Ip2-HE-aX1" secondAttribute="trailing" constant="8" id="OPB-Vh-njT"/>
-                            <constraint firstItem="Eo2-dg-ThD" firstAttribute="top" secondItem="WLG-lH-cUv" secondAttribute="bottom" constant="8" id="SQN-bP-TFX"/>
-                            <constraint firstItem="01F-59-2xz" firstAttribute="top" secondItem="pHr-84-A7W" secondAttribute="bottom" id="VQx-0k-2h0"/>
-                            <constraint firstItem="pHr-84-A7W" firstAttribute="leading" secondItem="oh1-vd-YBA" secondAttribute="leading" id="ZNn-L4-LJb"/>
-                            <constraint firstItem="WLG-lH-cUv" firstAttribute="leading" secondItem="oh1-vd-YBA" secondAttribute="leading" id="g3y-aI-M8l"/>
-                            <constraint firstItem="QiA-5t-Tep" firstAttribute="leading" secondItem="V6O-ov-C15" secondAttribute="trailing" constant="8" id="hUB-FB-37u"/>
-                            <constraint firstAttribute="trailing" secondItem="XOT-uC-eqi" secondAttribute="trailing" id="hba-mb-hKR"/>
-                            <constraint firstItem="Ip2-HE-aX1" firstAttribute="top" secondItem="C8T-P3-aco" secondAttribute="bottom" id="jvf-Da-oMt"/>
-                            <constraint firstItem="QiA-5t-Tep" firstAttribute="top" secondItem="V6O-ov-C15" secondAttribute="top" id="kbm-7d-0tI"/>
-                            <constraint firstAttribute="trailing" secondItem="C2Y-UB-xTc" secondAttribute="trailing" id="kmU-rv-w1H"/>
-                            <constraint firstItem="QiA-5t-Tep" firstAttribute="width" secondItem="V6O-ov-C15" secondAttribute="width" id="lII-fH-R24"/>
-                            <constraint firstItem="Ip2-HE-aX1" firstAttribute="leading" secondItem="oh1-vd-YBA" secondAttribute="leading" id="oQN-9n-qZO"/>
-                            <constraint firstItem="XOT-uC-eqi" firstAttribute="top" secondItem="Eo2-dg-ThD" secondAttribute="bottom" constant="8" id="tBI-Dm-XLR"/>
-                            <constraint firstItem="C2Y-UB-xTc" firstAttribute="top" secondItem="XOT-uC-eqi" secondAttribute="bottom" constant="8" id="yaM-Qf-2VN"/>
+                            <constraint firstItem="tfN-a4-TrR" firstAttribute="leading" secondItem="ghI-45-3fA" secondAttribute="leadingMargin" id="1Tc-bI-Dk3"/>
+                            <constraint firstItem="tfN-a4-TrR" firstAttribute="top" secondItem="5Mt-V7-gnm" secondAttribute="bottom" id="EV8-EC-L9f"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="tfN-a4-TrR" secondAttribute="trailing" id="Jch-45-od3"/>
+                            <constraint firstItem="ncR-8H-cID" firstAttribute="top" secondItem="tfN-a4-TrR" secondAttribute="bottom" id="aSs-zc-qNe"/>
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="playButton" destination="oh1-vd-YBA" id="b9j-po-y99"/>
-                        <outlet property="waveform" destination="pHr-84-A7W" id="Cbo-cG-3Zd"/>
+                        <outlet property="waveform" destination="IUq-Ru-f0Z" id="ey9-47-UlE"/>
                     </connections>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="5tX-dp-6bC" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="jXu-WP-4U7" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="834" y="38"/>
         </scene>
     </scenes>
 </document>
