@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Master](https://github.com/fulldecent/FDWaveformView/compare/2.0.1...master)
 
+#### Added
+- Improved example app to include more options
+  - Added by [William Entriken](https://github.com/fulldecent)
+
 #### Fixed
 - Improved accuracy of waveform rendering
   - Added by [Kip Nicol](https://github.com/ospr)
