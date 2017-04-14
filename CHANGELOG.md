@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file.
 #### Added
 - Improved example app to include more options
   - Added by [William Entriken](https://github.com/fulldecent)
+- Allow animation for changes to zoom
+  - Added by [William Entriken](https://github.com/fulldecent)
 
 #### Fixed
 - Improved accuracy of waveform rendering

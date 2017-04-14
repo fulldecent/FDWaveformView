@@ -27,13 +27,19 @@ class ViewController: UIViewController {
     }
     
     @IBAction func doZoomIn() {
-        waveform.zoomStartSamples = 0
-        waveform.zoomEndSamples = waveform.totalSamples / 4
+        UIView.animate(withDuration: 0.3, animations: {
+            self.waveform.zoomStartSamples = 0
+            self.waveform.zoomEndSamples = self.waveform.totalSamples / 4
+            self.waveform.layoutIfNeeded() // hack https://stackoverflow.com/a/12285936/300224
+        })
     }
     
     @IBAction func doZoomOut() {
-        waveform.zoomStartSamples = 0
-        waveform.zoomEndSamples = waveform.totalSamples
+        UIView.animate(withDuration: 0.3, animations: {
+            self.waveform.zoomStartSamples = 0
+            self.waveform.zoomEndSamples = self.waveform.totalSamples
+            self.waveform.layoutIfNeeded() // hack https://stackoverflow.com/a/12285936/300224
+        })
     }
     
     @IBAction func doRunPerformanceProfile() {
