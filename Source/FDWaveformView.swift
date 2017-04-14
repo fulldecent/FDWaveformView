@@ -61,7 +61,7 @@ open class FDWaveformView: UIView {
                         }
                     }
                 case .failed, .cancelled, .loading, .unknown:
-                    print("FDWaveformView could not load asset: \(error?.localizedDescription)")
+                    print("FDWaveformView could not load asset: " + String(describing:error?.localizedDescription))
                 }
             }
         }
