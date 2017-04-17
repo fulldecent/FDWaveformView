@@ -78,6 +78,7 @@ open class FDWaveformView: UIView {
         }
     }
 
+    var error: FDWareFormError!
     /// The total number of audio samples in the file
     open fileprivate(set) var totalSamples = 0
 
@@ -333,8 +334,7 @@ open class FDWaveformView: UIView {
         let widthInPixels = Int(frame.width * UIScreen.main.scale * horizontalTargetOverdraw)
         let heightInPixels = frame.height * UIScreen.main.scale * horizontalTargetOverdraw
 
-        sliceAsset(withRange: renderStartSamples..<renderEndSamples, andDownsampleTo: widthInPixels) {
-            (samples, sampleMax) in
+        sliceAsset(withRange: renderStartSamples..<renderEndSamples, andDownsampleTo: widthInPixels, done: { (samples, sampleMax) in
             self.plotLogGraph(samples, maximumValue: sampleMax, zeroValue: self.noiseFloor, imageHeight: heightInPixels) {
                 (image, selectedImage) in
                 DispatchQueue.main.async {
@@ -346,11 +346,14 @@ open class FDWaveformView: UIView {
                     self.delegate?.waveformViewDidRender?(self)
                 }
             }
+        }) { (completedSamples, completedSampleMax, status) in
+            self.error = FDWareFormError.assetReadingError
+            self.delegate?.waveformDidEndWithError?(self, error: self.error)
         }
     }
 
     /// Read the asset and create create a lower resolution set of samples
-    func sliceAsset(withRange slice: Range<Int>, andDownsampleTo targetSamples: Int, done: (_ samples: [CGFloat], _ sampleMax: CGFloat) -> Void) {
+    func sliceAsset(withRange slice: Range<Int>, andDownsampleTo targetSamples: Int, done: (_ samples: [CGFloat], _ sampleMax: CGFloat) -> Void , failure: (_ completedSamples: [CGFloat], _ completedSampleMax: CGFloat, _ status: AVAssetReaderStatus) -> Void) {
         guard slice.count > 0 else { return }
         guard let asset = asset else { return }
         guard let assetTrack = assetTrack else { return }
@@ -430,12 +433,10 @@ open class FDWaveformView: UIView {
                            filter: filter)
         }
         
-        // if (reader.status == AVAssetReaderStatusFailed || reader.status == AVAssetReaderStatusUnknown)
-        // Something went wrong. Handle it.
         if assetReader.status == .completed {
             done(outputSamples, sampleMax)
         } else {
-            print(assetReader.status)
+            failure(outputSamples, sampleMax, assetReader.status)
         }
     }
     
@@ -591,6 +592,12 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
     }
 }
 
+enum FDWareFormError: Error {
+    case unknownError
+    case loadingError
+    case assetReadingError
+}
+
 /// To receive progress updates from FDWaveformView
 @objc public protocol FDWaveformViewDelegate: NSObjectProtocol {
     /// Rendering will begin
@@ -610,4 +617,8 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
 
     /// The panning gesture did end
     @objc optional func waveformDidEndPanning(_ waveformView: FDWaveformView)
+    
+    // if Fail loading
+    @objc optional func waveformDidEndWithError(_ waveformView: FDWaveformView, error: Error)
+
 }
