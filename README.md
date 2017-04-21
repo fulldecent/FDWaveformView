@@ -86,3 +86,7 @@ Installation
 1. Add `pod 'FDWaveformView'` to your <a href="https://github.com/AFNetworking/AFNetworking/wiki/Getting-Started-with-AFNetworking">Podfile</a>
 2. The the API documentation under "Class Reference" at http://cocoadocs.org/docsets/FDWaveformView/
 3. Please add your project to "I USE THIS" at https://www.cocoacontrols.com/controls/fdwaveformview
+
+## Contributing
+
+This project's layout is based on https://github.com/fulldecent/swift3-module-template If you would like to change the layout, please change that project FIRST. Also you may appreciate that project has "recipes" -- you don't just change code you explain why you are doing things. As a maintainer this makes my job MUCH simpler. In a similar respect, if you are introducing non-minor changes, it will be VERY helpful if you could please reference to another project (like AlamoFire) that has seen and discussed the types of design challenges you are touching.) Thanks again and we all really do appreciate your contributions.
