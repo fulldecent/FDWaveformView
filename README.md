@@ -1,6 +1,5 @@
 # FDWaveformView
-
-[![CI Status](http://img.shields.io/travis/fulldecent/FDWaveformView.svg?style=flat)](https://travis-ci.org/fulldecent/FDWaveformView)
+[![Build Status](https://travis-ci.org/fulldecent/FDWaveformView.svg?branch=master)](https://travis-ci.org/fulldecent/FDWaveformView)
 [![Version](https://img.shields.io/cocoapods/v/FDWaveformView.svg?style=flat)](http://cocoadocs.org/docsets/FDWaveformView)
 [![License](https://img.shields.io/cocoapods/l/FDWaveformView.svg?style=flat)](http://cocoadocs.org/docsets/FDWaveformView)
 [![Platform](https://img.shields.io/cocoapods/p/FDWaveformView.svg?style=flat)](http://cocoadocs.org/docsets/FDWaveformView)
