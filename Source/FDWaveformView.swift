@@ -587,6 +587,8 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
         if doesAllowScrubbing {
             let rangeSamples = CGFloat(zoomEndSamples - zoomStartSamples)
             progressSamples = Int(CGFloat(zoomStartSamples) + rangeSamples * recognizer.location(in: self).x / bounds.width)
+            let progress = CGFloat(progressSamples) / CGFloat(totalSamples)
+            delegate?.waveformViewWasTapped?(self, progress: progress)
         }
     }
 }
@@ -610,4 +612,7 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
 
     /// The panning gesture did end
     @objc optional func waveformDidEndPanning(_ waveformView: FDWaveformView)
+    
+    /// The panning gesture did end
+    @objc optional func waveformViewWasTapped(_ waveformView: FDWaveformView, progress: CGFloat)
 }
