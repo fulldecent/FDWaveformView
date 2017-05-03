@@ -8,6 +8,11 @@ All notable changes to this project will be documented in this file.
 
 #### Added
 
+#### Changed
+- Now using ranges in the API where appropriate
+  - Added by [William Entriken](https://github.com/fulldecent) in Regards to Issue
+  [#76](https://github.com/fulldecent/FDWaveformView/issues/86).
+
 ---
 
 ## [2.2.0](https://github.com/fulldecent/FDWaveformView/releases/tag/2.2.0)
