@@ -12,6 +12,8 @@ import FDWaveformView
 
 class ViewController: UIViewController {
     @IBOutlet weak var waveform: FDWaveformView!
+    @IBOutlet weak var logarithmicButton: UIButton!
+    @IBOutlet weak var linearButton: UIButton!
     
     fileprivate var startRendering = Date()
     fileprivate var endRendering = Date()
@@ -105,6 +107,30 @@ class ViewController: UIViewController {
         waveform.doesAllowScroll = sender.isOn
     }
     
+    @IBAction func doLinear() {
+        /* TODO: Make this public and then use it here
+        waveform.waveformType = .linear
+        updateWaveformTypeButtons()
+         */
+    }
+    
+    @IBAction func doLogarithmic() {
+        /* TODO: Make this public and then use it here
+        waveform.waveformType = .logarithmic
+        updateWaveformTypeButtons()
+        */
+    }
+    
+    @IBAction func doChangeColors() {
+        let randomColor: () -> (UIColor) = {
+            return UIColor(red: CGFloat(drand48()), green: CGFloat(drand48()), blue: CGFloat(drand48()), alpha: 1)
+        }
+        
+        UIView.animate(withDuration: 0.3, animations: {
+            self.waveform.wavesColor = randomColor()
+            self.waveform.progressColor = randomColor()
+        })
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         let thisBundle = Bundle(for: type(of: self))
@@ -117,30 +143,45 @@ class ViewController: UIViewController {
         waveform.doesAllowScrubbing = true
         waveform.doesAllowStretch = true
         waveform.doesAllowScroll = true
+        updateWaveformTypeButtons()
+    }
+    
+    func updateWaveformTypeButtons() {
+        /* TODO: Make this public and then use it here
+        let (selectedButton, nonSelectedButton): (UIButton, UIButton) = {
+            switch waveform.waveformType {
+            case .linear: return (linearButton, logarithmicButton)
+            case .logarithmic: return (logarithmicButton, linearButton)
+            }
+        }()
+        selectedButton.layer.borderColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor
+        selectedButton.layer.borderWidth = 2
+        nonSelectedButton.layer.borderWidth = 0
+        */
     }
 }
 
 extension ViewController: FDWaveformViewDelegate {
     func waveformViewWillRender(_ waveformView: FDWaveformView) {
-        self.startRendering = Date()
+        startRendering = Date()
     }
     
     func waveformViewDidRender(_ waveformView: FDWaveformView) {
-        self.endRendering = Date()
-        NSLog("FDWaveformView rendering done, took %0.3f seconds", self.endRendering.timeIntervalSince(self.startRendering))
-        self.profileResult.append(String(format: " render %0.3f ", self.endRendering.timeIntervalSince(self.startRendering)))
+        endRendering = Date()
+        NSLog("FDWaveformView rendering done, took %0.3f seconds", endRendering.timeIntervalSince(startRendering))
+        profileResult.append(String(format: " render %0.3f ", endRendering.timeIntervalSince(startRendering)))
         UIView.animate(withDuration: 0.25, animations: {() -> Void in
             waveformView.alpha = 1.0
         })
     }
     
     func waveformViewWillLoad(_ waveformView: FDWaveformView) {
-        self.startLoading = Date()
+        startLoading = Date()
     }
     
     func waveformViewDidLoad(_ waveformView: FDWaveformView) {
-        self.endLoading = Date()
-        NSLog("FDWaveformView loading done, took %f seconds", self.endLoading.timeIntervalSince(self.startLoading))
-        self.profileResult.append(" load \(self.endLoading.timeIntervalSince(self.startLoading))")
+        endLoading = Date()
+        NSLog("FDWaveformView loading done, took %0.3f seconds", endLoading.timeIntervalSince(startLoading))
+        profileResult.append(String(format: " load %0.3f ", endLoading.timeIntervalSince(startLoading)))
     }
 }

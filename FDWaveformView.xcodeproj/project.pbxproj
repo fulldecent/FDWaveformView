@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		D94BE1CF1CCEBFD80042282A /* FDWaveformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D94BE1CE1CCEBFD80042282A /* FDWaveformView.swift */; };
+		D993BD581EBA3D110022A881 /* FDAudioContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = D993BD571EBA3D110022A881 /* FDAudioContext.swift */; };
+		D993BD5A1EBA3F570022A881 /* FDWaveformRenderOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D993BD591EBA3F570022A881 /* FDWaveformRenderOperation.swift */; };
 		D9FEF4BF1CCEBC0F0013FBDD /* FDWaveformView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9FEF4B41CCEBC0D0013FBDD /* FDWaveformView.framework */; };
 		D9FEF4C41CCEBC100013FBDD /* FDWaveformViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9FEF4C31CCEBC100013FBDD /* FDWaveformViewTests.swift */; };
 /* End PBXBuildFile section */
@@ -24,6 +26,8 @@
 
 /* Begin PBXFileReference section */
 		D94BE1CE1CCEBFD80042282A /* FDWaveformView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FDWaveformView.swift; sourceTree = "<group>"; };
+		D993BD571EBA3D110022A881 /* FDAudioContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FDAudioContext.swift; sourceTree = "<group>"; };
+		D993BD591EBA3F570022A881 /* FDWaveformRenderOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FDWaveformRenderOperation.swift; sourceTree = "<group>"; };
 		D9FEF4B41CCEBC0D0013FBDD /* FDWaveformView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FDWaveformView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D9FEF4B91CCEBC0D0013FBDD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = Source/Info.plist; sourceTree = "<group>"; };
 		D9FEF4BE1CCEBC0F0013FBDD /* FDWaveformViewTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FDWaveformViewTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -81,6 +85,8 @@
 			isa = PBXGroup;
 			children = (
 				D94BE1CE1CCEBFD80042282A /* FDWaveformView.swift */,
+				D993BD571EBA3D110022A881 /* FDAudioContext.swift */,
+				D993BD591EBA3F570022A881 /* FDWaveformRenderOperation.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -203,6 +209,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D993BD581EBA3D110022A881 /* FDAudioContext.swift in Sources */,
+				D993BD5A1EBA3F570022A881 /* FDWaveformRenderOperation.swift in Sources */,
 				D94BE1CF1CCEBFD80042282A /* FDWaveformView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
