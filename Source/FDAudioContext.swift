@@ -41,8 +41,9 @@ final class FDAudioContext {
             switch status {
             case .loaded:
                 guard
-                    let audioFormatDesc = assetTrack.formatDescriptions.first,
-                    let asbd = CMAudioFormatDescriptionGetStreamBasicDescription(audioFormatDesc as! CMAudioFormatDescription) // TODO: Can this be safer?
+                    let formatDescriptions = assetTrack.formatDescriptions as? [CMAudioFormatDescription],
+                    let audioFormatDesc = formatDescriptions.first,
+                    let asbd = CMAudioFormatDescriptionGetStreamBasicDescription(audioFormatDesc)
                     else { break }
                 
                 let totalSamples = Int((asbd.pointee.mSampleRate) * Float64(asset.duration.value) / Float64(asset.duration.timescale))

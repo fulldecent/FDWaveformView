@@ -166,9 +166,9 @@ final public class FDWaveformRenderOperation: Operation {
         reader.add(readerOutput)
         
         var channelCount = 1
-        let formatDesc = audioContext.assetTrack.formatDescriptions
-        for item in formatDesc {
-            guard let fmtDesc = CMAudioFormatDescriptionGetStreamBasicDescription(item as! CMAudioFormatDescription) else { return nil }    // TODO: Can the forced downcast in here be safer?
+        let formatDescriptions = audioContext.assetTrack.formatDescriptions as! [CMAudioFormatDescription]
+        for item in formatDescriptions {
+            guard let fmtDesc = CMAudioFormatDescriptionGetStreamBasicDescription(item) else { return nil }
             channelCount = Int(fmtDesc.pointee.mChannelsPerFrame)
         }
         
@@ -241,6 +241,7 @@ final public class FDWaveformRenderOperation: Operation {
         }
     }
     
+    // TODO: report progress? (for issue #2)
     func processSamples(fromData sampleBuffer: inout Data, sampleMax: inout CGFloat, outputSamples: inout [CGFloat], samplesToProcess: Int, downSampledLength: Int, samplesPerPixel: Int, filter: [Float]) {
         sampleBuffer.withUnsafeBytes { (samples: UnsafePointer<Int16>) in
             var processingBuffer = [Float](repeating: 0.0, count: samplesToProcess)
@@ -277,7 +278,7 @@ final public class FDWaveformRenderOperation: Operation {
         }
     }
     
-    // TODO: switch to a synchronous function that paints onto a given context? (for issue #2)
+    // TODO: report progress? (for issue #2)
     func plotWaveformGraph(_ samples: [CGFloat], maximumValue max: CGFloat, zeroValue min: CGFloat) -> UIImage? {
         guard !isCancelled else { return nil }
         

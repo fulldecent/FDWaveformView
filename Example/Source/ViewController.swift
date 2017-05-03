@@ -23,23 +23,21 @@ class ViewController: UIViewController {
     
     @IBAction func doAnimation() {
         UIView.animate(withDuration: 0.3, animations: {
-            let randomNumber = Int(arc4random()) % self.waveform.totalSamples
-            self.waveform.progressSamples = randomNumber
+            let random = Int(arc4random()) % self.waveform.totalSamples
+            self.waveform.highlightedSamples = 0 ..< random
         })
     }
     
     @IBAction func doZoomIn() {
         UIView.animate(withDuration: 0.3, animations: {
-            self.waveform.zoomStartSamples = 0
-            self.waveform.zoomEndSamples = self.waveform.totalSamples / 4
+            self.waveform.zoomSamples = 0 ..< self.waveform.totalSamples / 4
             self.waveform.layoutIfNeeded() // hack https://stackoverflow.com/a/12285936/300224
         })
     }
     
     @IBAction func doZoomOut() {
         UIView.animate(withDuration: 0.3, animations: {
-            self.waveform.zoomStartSamples = 0
-            self.waveform.zoomEndSamples = self.waveform.totalSamples
+            self.waveform.zoomSamples = 0 ..< self.waveform.totalSamples
             self.waveform.layoutIfNeeded() // hack https://stackoverflow.com/a/12285936/300224
         })
     }
@@ -135,11 +133,11 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         let thisBundle = Bundle(for: type(of: self))
         let url = thisBundle.url(forResource: "Submarine", withExtension: "aiff")
-        // Animate the waveforme view in when it is rendered
+        // Animate the waveform view in when it is rendered
         waveform.delegate = self
         waveform.alpha = 0.0
         waveform.audioURL = url
-        waveform.progressSamples = 10000
+        waveform.zoomSamples = 0 ..< waveform.totalSamples / 3
         waveform.doesAllowScrubbing = true
         waveform.doesAllowStretch = true
         waveform.doesAllowScroll = true
