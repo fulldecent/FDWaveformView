@@ -2,12 +2,16 @@
 // Copyright 2013 - 2017, William Entriken and the FDWaveformView contributors.
 //
 import UIKit
+import AVFoundation
+import Accelerate
 
 /// Format options for FDWaveformRenderOperation
-public struct FDWaveformRenderFormat {
+//MAYBE: Make this public
+struct FDWaveformRenderFormat {
     
     /// The type of waveform to render
-    public var type: FDWaveformType
+    //TODO: make this public after reconciling FDWaveformView.WaveformType and FDWaveformType
+    var type: FDWaveformType
     
     /// The color of the waveform
     public var wavesColor: UIColor
@@ -30,7 +34,7 @@ public struct FDWaveformRenderFormat {
                   scale: UIScreen.main.scale)
     }
     
-    public init(type: FDWaveformType, wavesColor: UIColor, scale: CGFloat) {
+    init(type: FDWaveformType, wavesColor: UIColor, scale: CGFloat) {
         self.type = type
         self.wavesColor = wavesColor
         self.scale = scale
@@ -50,7 +54,7 @@ final public class FDWaveformRenderOperation: Operation {
     public let sampleRange: CountableRange<Int>
     
     /// Format of waveform image
-    public let format: FDWaveformRenderFormat
+    let format: FDWaveformRenderFormat
     
     // MARK: - NSOperation Overrides
     

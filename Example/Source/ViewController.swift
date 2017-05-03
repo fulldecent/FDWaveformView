@@ -108,13 +108,17 @@ class ViewController: UIViewController {
     }
     
     @IBAction func doLinear() {
+        /* TODO: Make this public and then use it here
         waveform.waveformType = .linear
         updateWaveformTypeButtons()
+         */
     }
     
     @IBAction func doLogarithmic() {
+        /* TODO: Make this public and then use it here
         waveform.waveformType = .logarithmic
         updateWaveformTypeButtons()
+        */
     }
     
     @IBAction func doChangeColors() {
@@ -142,6 +146,7 @@ class ViewController: UIViewController {
     }
     
     func updateWaveformTypeButtons() {
+        /* TODO: Make this public and then use it here
         let (selectedButton, nonSelectedButton): (UIButton, UIButton) = {
             switch waveform.waveformType {
             case .linear: return (linearButton, logarithmicButton)
@@ -151,6 +156,7 @@ class ViewController: UIViewController {
         selectedButton.layer.borderColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor
         selectedButton.layer.borderWidth = 2
         nonSelectedButton.layer.borderWidth = 0
+        */
     }
 }
 

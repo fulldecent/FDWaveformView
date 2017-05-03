@@ -92,12 +92,13 @@ open class FDWaveformView: UIView {
     /*@IBInspectable*/ open var doesAllowScroll = true
 
     /// Supported waveform types
-    public enum WaveformType {
+    //TODO: make this public after reconciling FDWaveformView.WaveformType and FDWaveformType
+    enum WaveformType {
         case linear, logarithmic
     }
     
     // Type of waveform to display
-    open var waveformType: WaveformType = .logarithmic {
+    var waveformType: WaveformType = .logarithmic {
         didSet {
             setNeedsDisplay()
             setNeedsLayout()
@@ -198,7 +199,8 @@ open class FDWaveformView: UIView {
     }
     
     /// Waveform type for rending waveforms
-    public var waveformRenderType: FDWaveformType {
+    //TODO: make this public after reconciling FDWaveformView.WaveformType and FDWaveformType
+    var waveformRenderType: FDWaveformType {
         get {
             switch waveformType {
             case .linear: return .linear
@@ -434,7 +436,8 @@ open class FDWaveformView: UIView {
     }
 }
 
-public enum FDWaveformType: Equatable {
+//TODO: make this public after reconciling FDWaveformView.WaveformType and FDWaveformType
+enum FDWaveformType: Equatable {
     /// Waveform is rendered using a linear scale
     case linear
     
@@ -457,14 +460,14 @@ public enum FDWaveformType: Equatable {
         return false
     }
     
-    fileprivate var floorValue: CGFloat {
+    public var floorValue: CGFloat {
         switch self {
         case .linear: return 0
         case .logarithmic(let noiseFloor): return noiseFloor
         }
     }
     
-    fileprivate func process(normalizedSamples: inout [Float]) {
+    func process(normalizedSamples: inout [Float]) {
         switch self {
         case .linear:
             return
