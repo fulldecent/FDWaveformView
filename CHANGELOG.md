@@ -4,7 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Master](https://github.com/fulldecent/FDWaveformView/compare/2.1.0...master)
+## [Master](https://github.com/fulldecent/FDWaveformView/compare/2.2.0...master)
+
+#### Added
+
+---
+
+## [2.2.0](https://github.com/fulldecent/FDWaveformView/releases/tag/2.2.0)
+Released on 2017-05-03.
 
 #### Added
 - Improved accuracy of waveform rendering
