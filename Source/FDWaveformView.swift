@@ -183,7 +183,7 @@ open class FDWaveformView: UIView {
     private var audioContext: FDAudioContext? {
         didSet {
             waveformImage = nil
-            zoomSamples = 0 ..< 0
+            zoomSamples = 0 ..< self.totalSamples
             highlightedSamples = nil
             inProgressWaveformRenderOperation = nil
             cachedWaveformRenderOperation = nil
