@@ -14,7 +14,7 @@ struct FDWaveformRenderFormat {
     var type: FDWaveformType
     
     /// The color of the waveform
-    public var wavesColor: UIColor
+    internal var wavesColor: UIColor
     
     /// The scale factor to apply to the rendered image (usually the current screen's scale)
     public var scale: CGFloat

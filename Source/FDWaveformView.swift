@@ -51,7 +51,7 @@ open class FDWaveformView: UIView {
     }
     
     /// The samples to be highlighted in a different color
-    /*@IBInspectable*/ open var highlightedSamples: CountableRange<Int>? = 0 ..< 0 {
+    /*@IBInspectable*/ open var highlightedSamples: CountableRange<Int>? = nil {
         didSet {
             guard totalSamples > 0 else {
                 return
@@ -68,10 +68,10 @@ open class FDWaveformView: UIView {
     @available(*, deprecated, message: "Use `zoomSamples` to set range")
     open var progressSamples: Int {
         get {
-            return highlightedSamples?.last ?? 0
+            return highlightedSamples?.upperBound ?? 0
         }
-        set(newSamples) {
-            highlightedSamples = 0 ..< newSamples
+        set {
+            highlightedSamples = 0 ..< newValue
         }
     }
 
@@ -144,31 +144,29 @@ open class FDWaveformView: UIView {
     }
 
 
-    //TODO MAKE PUBLIC
+    //TODO: MAKE PUBLIC
 
-    // Drawing a larger image than needed to have it available for scrolling
-    fileprivate var horizontalMinimumBleed: CGFloat = 0.1
-    fileprivate var horizontalMaximumBleed: CGFloat = 3.0
-    fileprivate var horizontalTargetBleed: CGFloat = 0.5
+    /// The portion of extra pixels to render left and right of the viewable region
+    private var horizontalBleedTarget = 0.5
+    
+    /// The required portion of extra pixels to render left and right of the viewable region
+    /// If this portion is not available then a re-render will be performed
+    private var horizontalBleedAllowed = 0.1 ... 3.0
 
-    /// Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
-    fileprivate var horizontalMinimumOverdraw: CGFloat = 2.0
-
-    /// Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
-    fileprivate var horizontalMaximumOverdraw: CGFloat = 5.0
-
-    /// Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
-    fileprivate var horizontalTargetOverdraw: CGFloat = 3.0
-
-    /// Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
-    fileprivate var verticalMinimumOverdraw: CGFloat = 1.0
-
-    /// Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
-    fileprivate var verticalMaximumOverdraw: CGFloat = 3.0
-
-    /// Drawing more pixels than shown to get antialiasing, 1.0 = no overdraw, 2.0 = twice as many pixels
-    fileprivate var verticalTargetOverdraw: CGFloat = 2.0
-
+    /// The number of horizontal pixels to render per visible pixel on the screen (for antialiasing)
+    private var horizontalOverdrawTarget = 3.0
+    
+    /// The required number of horizontal pixels to render per visible pixel on the screen (for antialiasing)
+    /// If this number is not available then a re-render will be performed
+    private var horizontalOverdrawAllowed = 1.5 ... 5.0
+    
+    /// The number of vertical pixels to render per visible pixel on the screen (for antialiasing)
+    private var verticalOverdrawTarget = 2.0
+    
+    /// The required number of vertical pixels to render per visible pixel on the screen (for antialiasing)
+    /// If this number is not available then a re-render will be performed
+    private var verticalOverdrawAllowed = 1.0 ... 3.0
+    
     /// The "zero" level (in dB)
     fileprivate let noiseFloor: CGFloat = -50.0
 
@@ -341,9 +339,6 @@ open class FDWaveformView: UIView {
     
     func isWaveformRenderOperationDirty(_ renderOperation: FDWaveformRenderOperation?) -> Bool? {
         guard let renderOperation = renderOperation else { return nil }
-        
-        let imageSize = renderOperation.imageSize
-        let sampleRange = renderOperation.sampleRange
 
         if renderOperation.format.type != waveformRenderType {
             return true
@@ -351,26 +346,23 @@ open class FDWaveformView: UIView {
         if renderOperation.format.scale != desiredImageScale {
             return true
         }
-        if sampleRange.lowerBound < (zoomSamples.startIndex - Int(CGFloat(sampleRange.count) * horizontalMaximumBleed)).clamped(from: 0, to: totalSamples) {
-            return true
-        }
-        if sampleRange.lowerBound > (zoomSamples.startIndex - Int(CGFloat(sampleRange.count) * horizontalMinimumBleed)).clamped(from: 0, to: totalSamples) {
-            return true
-        }
-        if sampleRange.upperBound < (zoomSamples.endIndex + Int(CGFloat(sampleRange.count) * horizontalMinimumBleed)).clamped(from: 0, to: totalSamples) {
-            return true
-        }
-        if sampleRange.upperBound > (zoomSamples.endIndex + Int(CGFloat(sampleRange.count) * horizontalMaximumBleed)).clamped(from: 0, to: totalSamples) {
-            return true
-        }
         
-        let allowableWidths = frame.width * CGFloat(horizontalMinimumOverdraw) ... frame.width * CGFloat(horizontalMaximumOverdraw)
-        if !allowableWidths.contains(imageSize.width) {
+        let requiredSamples = zoomSamples.extended(byFactor: horizontalBleedAllowed.lowerBound).clamped(to: 0 ..< totalSamples)
+        if requiredSamples.clamped(to: renderOperation.sampleRange) != requiredSamples {
             return true
         }
 
-        let allowableHeights = frame.height * CGFloat(verticalMinimumOverdraw) ... frame.height * CGFloat(verticalMaximumOverdraw)
-        if !allowableHeights.contains(imageSize.height) {
+        let allowedSamples = zoomSamples.extended(byFactor: horizontalBleedAllowed.upperBound).clamped(to: 0 ..< totalSamples)
+        if renderOperation.sampleRange.clamped(to: allowedSamples) != renderOperation.sampleRange {
+            return true
+        }
+        
+        let verticalOverdrawRequested = Double(renderOperation.imageSize.height / frame.height)
+        if !verticalOverdrawAllowed.contains(verticalOverdrawRequested) {
+            return true
+        }
+        let horizontalOverdrawRequested = Double(renderOperation.imageSize.height / frame.height)
+        if !horizontalOverdrawAllowed.contains(horizontalOverdrawRequested) {
             return true
         }
         
@@ -418,15 +410,13 @@ open class FDWaveformView: UIView {
         guard let audioContext = audioContext else { return }
         guard !zoomSamples.isEmpty else { return }
 
-        let renderStartSamples = (zoomSamples.startIndex - Int(CGFloat(zoomSamples.count) * horizontalTargetBleed)).clamped(from: 0, to: totalSamples)
-        let renderEndSamples = (zoomSamples.endIndex + Int(CGFloat(zoomSamples.count) * horizontalTargetBleed)).clamped(from: 0, to: totalSamples)
-        let renderSampleRange = renderStartSamples ..< renderEndSamples
-        let widthInPixels = floor(frame.width * horizontalTargetOverdraw)
-        let heightInPixels = frame.height * horizontalTargetOverdraw
+        let renderSamples = zoomSamples.extended(byFactor: horizontalBleedTarget).clamped(to: 0 ..< totalSamples)
+        let widthInPixels = floor(frame.width * CGFloat(horizontalOverdrawTarget))
+        let heightInPixels = frame.height * CGFloat(horizontalOverdrawTarget)
         let imageSize = CGSize(width: widthInPixels, height: heightInPixels)
         let renderFormat = FDWaveformRenderFormat(type: waveformRenderType, wavesColor: .black, scale: desiredImageScale)
         
-        let waveformRenderOperation = FDWaveformRenderOperation(audioContext: audioContext, imageSize: imageSize, sampleRange: renderSampleRange, format: renderFormat) { image in
+        let waveformRenderOperation = FDWaveformRenderOperation(audioContext: audioContext, imageSize: imageSize, sampleRange: renderSamples, format: renderFormat) { image in
             DispatchQueue.main.async {
                 self.renderForCurrentAssetFailed = (image == nil)
                 self.waveformImage = image
@@ -544,13 +534,15 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
             }
         }
         else if doesAllowScrubbing {
-            highlightedSamples = 0 ..< zoomSamples.startIndex + Int(CGFloat(zoomSamples.startIndex) * recognizer.location(in: self).x / bounds.width)
+            let rangeSamples = CGFloat(zoomSamples.count)
+            highlightedSamples = 0 ..< Int((CGFloat(zoomSamples.startIndex) + rangeSamples * recognizer.location(in: self).x / bounds.width))
         }
     }
 
     func handleTapGesture(_ recognizer: UITapGestureRecognizer) {
         if doesAllowScrubbing {
-            highlightedSamples = 0 ..< zoomSamples.startIndex + Int(CGFloat(zoomSamples.startIndex) * recognizer.location(in: self).x / bounds.width)
+            let rangeSamples = CGFloat(zoomSamples.count)
+            highlightedSamples = 0 ..< Int((CGFloat(zoomSamples.startIndex) + rangeSamples * recognizer.location(in: self).x / bounds.width))
         }
     }
 }
@@ -578,8 +570,8 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
 
 //MARK -
 
-extension Comparable
-{
+extension Comparable {
+    
     func clamped(from lowerBound: Self, to upperBound: Self) -> Self {
         return min(max(self, lowerBound), upperBound)
     }
@@ -593,5 +585,15 @@ extension Strideable where Self.Stride: SignedInteger
 {
     func clamped(to range: CountableClosedRange<Self>) -> Self {
         return min(max(self, range.lowerBound), range.upperBound)
+    }
+}
+
+extension CountableRange where Bound: Strideable {
+    
+    // Extend each bound away from midpoint by `factor`, a portion of the distance from begin to end
+    func extended(byFactor factor: Double) -> CountableRange<Bound> {
+        let theCount: Int = numericCast(count)
+        let amountToMove: Bound.Stride = numericCast(Int(Double(theCount) * factor))
+        return lowerBound - amountToMove ..< upperBound + amountToMove
     }
 }
