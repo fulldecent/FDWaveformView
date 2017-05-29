@@ -13,6 +13,10 @@ All notable changes to this project will be documented in this file.
   - Added by [William Entriken](https://github.com/fulldecent) in Regards to Issue
   [#76](https://github.com/fulldecent/FDWaveformView/issues/86).
 
+#### Fixed
+- Fixed a retain cycle in completion handler of waveform render operation
+  - Added by [Philippe Jayet](https://github.com/pjay)
+
 ---
 
 ## [2.2.0](https://github.com/fulldecent/FDWaveformView/releases/tag/2.2.0)

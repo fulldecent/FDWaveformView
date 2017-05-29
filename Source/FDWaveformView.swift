@@ -416,15 +416,17 @@ open class FDWaveformView: UIView {
         let imageSize = CGSize(width: widthInPixels, height: heightInPixels)
         let renderFormat = FDWaveformRenderFormat(type: waveformRenderType, wavesColor: .black, scale: desiredImageScale)
         
-        let waveformRenderOperation = FDWaveformRenderOperation(audioContext: audioContext, imageSize: imageSize, sampleRange: renderSamples, format: renderFormat) { image in
+        let waveformRenderOperation = FDWaveformRenderOperation(audioContext: audioContext, imageSize: imageSize, sampleRange: renderSamples, format: renderFormat) { [weak self] image in
             DispatchQueue.main.async {
-                self.renderForCurrentAssetFailed = (image == nil)
-                self.waveformImage = image
-                self.renderingInProgress = false
-                self.cachedWaveformRenderOperation = self.inProgressWaveformRenderOperation
-                self.inProgressWaveformRenderOperation = nil
-                self.setNeedsLayout()
-                self.delegate?.waveformViewDidRender?(self)
+                guard let strongSelf = self else { return }
+                
+                strongSelf.renderForCurrentAssetFailed = (image == nil)
+                strongSelf.waveformImage = image
+                strongSelf.renderingInProgress = false
+                strongSelf.cachedWaveformRenderOperation = self?.inProgressWaveformRenderOperation
+                strongSelf.inProgressWaveformRenderOperation = nil
+                strongSelf.setNeedsLayout()
+                strongSelf.delegate?.waveformViewDidRender?(strongSelf)
             }
         }
         self.inProgressWaveformRenderOperation = waveformRenderOperation
