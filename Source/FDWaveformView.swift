@@ -304,6 +304,10 @@ open class FDWaveformView: UIView {
         super.init(frame: rect)
         setup()
     }
+    
+    deinit {
+        inProgressWaveformRenderOperation?.cancel()
+    }
 
     /// If the cached waveform or in progress waveform is insufficient for the current frame
     fileprivate func cacheStatus() -> CacheStatus {
