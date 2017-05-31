@@ -16,6 +16,8 @@ All notable changes to this project will be documented in this file.
 #### Fixed
 - Fixed a retain cycle in completion handler of waveform render operation
   - Added by [Philippe Jayet](https://github.com/pjay)
+- Cancel waveform render operation when view is released
+  - Added by [Philippe Jayet](https://github.com/pjay)
 
 ---
 
