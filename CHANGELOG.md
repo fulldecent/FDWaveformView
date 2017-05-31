@@ -4,9 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Master](https://github.com/fulldecent/FDWaveformView/compare/2.2.0...master)
+## [Master](https://github.com/fulldecent/FDWaveformView/compare/2.2.1...master)
 
-#### Added
+---
+
+## [2.2.1](https://github.com/fulldecent/FDWaveformView/releases/tag/2.2.1)
+Released on 2017-05-31.
 
 #### Changed
 - Now using ranges in the API where appropriate
