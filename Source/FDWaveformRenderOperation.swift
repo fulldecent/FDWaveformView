@@ -142,17 +142,17 @@ final public class FDWaveformRenderOperation: Operation {
     }
     
     /// Read the asset and create create a lower resolution set of samples
-    func sliceAsset(withRange slice: CountableRange<Int>, andDownsampleTo targetSamples: Int) -> (samples: [CGFloat], sampleMax: CGFloat)? {
+    func sliceAsset(withRange sourceRange: CountableRange<Int>, andDownsampleTo targetSampleCount: Int) -> (samples: [CGFloat], sampleMax: CGFloat)? {
         guard !isCancelled else { return nil }
         
         guard
-            !slice.isEmpty,
-            targetSamples > 0,
-            let reader = try? AVAssetReader(asset: audioContext.asset)
+            !sourceRange.isEmpty,
+            targetSampleCount > 0,
+            let assetReader = try? AVAssetReader(asset: audioContext.asset)
             else { return nil }
         
-        reader.timeRange = CMTimeRange(start: CMTime(value: Int64(slice.lowerBound), timescale: audioContext.asset.duration.timescale),
-                                       duration: CMTime(value: Int64(slice.count), timescale: audioContext.asset.duration.timescale))
+        assetReader.timeRange = CMTimeRange(start: CMTime(value: Int64(sourceRange.lowerBound), timescale: audioContext.asset.duration.timescale),
+                                            duration: CMTime(value: Int64(sourceRange.count), timescale: audioContext.asset.duration.timescale))
         let outputSettingsDict: [String : Any] = [
             AVFormatIDKey: Int(kAudioFormatLinearPCM),
             AVLinearPCMBitDepthKey: 16,
@@ -163,7 +163,7 @@ final public class FDWaveformRenderOperation: Operation {
         
         let readerOutput = AVAssetReaderTrackOutput(track: audioContext.assetTrack, outputSettings: outputSettingsDict)
         readerOutput.alwaysCopiesSampleData = false
-        reader.add(readerOutput)
+        assetReader.add(readerOutput)
         
         var channelCount = 1
         let formatDescriptions = audioContext.assetTrack.formatDescriptions as! [CMAudioFormatDescription]
@@ -173,17 +173,17 @@ final public class FDWaveformRenderOperation: Operation {
         }
         
         var sampleMax = format.type.floorValue
-        let samplesPerPixel = max(1, channelCount * slice.count / targetSamples)
+        let samplesPerPixel = max(1, channelCount * sourceRange.count / targetSampleCount)
         let filter = [Float](repeating: 1.0 / Float(samplesPerPixel), count: samplesPerPixel)
         
         var outputSamples = [CGFloat]()
         var sampleBuffer = Data()
         
         // 16-bit samples
-        reader.startReading()
-        defer { reader.cancelReading() } // Cancel reading if we exit early if operation is cancelled
+        assetReader.startReading()
+        defer { assetReader.cancelReading() } // Cancel reading if we exit early if operation is cancelled
         
-        while reader.status == .reading {
+        while assetReader.status == .reading {
             guard !isCancelled else { return nil }
             
             guard let readSampleBuffer = readerOutput.copyNextSampleBuffer(),
@@ -233,10 +233,10 @@ final public class FDWaveformRenderOperation: Operation {
         
         // if (reader.status == AVAssetReaderStatusFailed || reader.status == AVAssetReaderStatusUnknown)
         // Something went wrong. Handle it.
-        if reader.status == .completed {
+        if assetReader.status == .completed {
             return (outputSamples, sampleMax)
         } else {
-            print("FDWaveformRenderOperation failed to read audio: \(String(describing: reader.error))")
+            print("FDWaveformRenderOperation failed to read audio: \(String(describing: assetReader.error))")
             return nil
         }
     }
