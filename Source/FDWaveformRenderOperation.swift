@@ -151,8 +151,10 @@ final public class FDWaveformRenderOperation: Operation {
             let assetReader = try? AVAssetReader(asset: audioContext.asset)
             else { return nil }
         
-        assetReader.timeRange = CMTimeRange(start: CMTime(value: Int64(sourceRange.lowerBound), timescale: audioContext.asset.duration.timescale),
-                                            duration: CMTime(value: Int64(sourceRange.count), timescale: audioContext.asset.duration.timescale))
+        let timeScale = audioContext.asset.duration.timescale
+        let timeRange = CMTimeRange(start: CMTime(value: Int64(sourceRange.lowerBound), timescale: timeScale),
+                                    duration: CMTime(value: Int64(sourceRange.count), timescale: timeScale))
+        
         let outputSettingsDict: [String : Any] = [
             AVFormatIDKey: Int(kAudioFormatLinearPCM),
             AVLinearPCMBitDepthKey: 16,
@@ -160,6 +162,8 @@ final public class FDWaveformRenderOperation: Operation {
             AVLinearPCMIsFloatKey: false,
             AVLinearPCMIsNonInterleaved: false
         ]
+        
+        assetReader.timeRange = timeRange
         
         let readerOutput = AVAssetReaderTrackOutput(track: audioContext.assetTrack, outputSettings: outputSettingsDict)
         readerOutput.alwaysCopiesSampleData = false
