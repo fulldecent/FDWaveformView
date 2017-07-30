@@ -155,6 +155,7 @@ final public class FDWaveformRenderOperation: Operation {
         let timeRange = CMTimeRange(start: CMTime(value: Int64(sourceRange.lowerBound), timescale: timeScale),
                                     duration: CMTime(value: Int64(sourceRange.count), timescale: timeScale))
         
+        // 16-bit samples
         let outputSettingsDict: [String : Any] = [
             AVFormatIDKey: Int(kAudioFormatLinearPCM),
             AVLinearPCMBitDepthKey: 16,
@@ -183,7 +184,6 @@ final public class FDWaveformRenderOperation: Operation {
         var outputSamples = [CGFloat]()
         var sampleBuffer = Data()
         
-        // 16-bit samples
         assetReader.startReading()
         defer { assetReader.cancelReading() } // Cancel reading if we exit early if operation is cancelled
         
