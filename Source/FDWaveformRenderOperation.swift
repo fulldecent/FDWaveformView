@@ -155,12 +155,12 @@ final public class FDWaveformRenderOperation: Operation {
         let timeRange = CMTimeRange(start: CMTime(value: Int64(sourceRange.lowerBound), timescale: timeScale),
                                     duration: CMTime(value: Int64(sourceRange.count), timescale: timeScale))
         
-        // 16-bit samples
+		// 32-bit float samples.
         let outputSettingsDict: [String : Any] = [
             AVFormatIDKey: Int(kAudioFormatLinearPCM),
-            AVLinearPCMBitDepthKey: 16,
+            AVLinearPCMBitDepthKey: 32,
             AVLinearPCMIsBigEndianKey: false,
-            AVLinearPCMIsFloatKey: false,
+            AVLinearPCMIsFloatKey: true,
             AVLinearPCMIsNonInterleaved: false
         ]
         
@@ -202,7 +202,7 @@ final public class FDWaveformRenderOperation: Operation {
             sampleBuffer.append(UnsafeBufferPointer(start: readBufferPointer, count: readBufferLength))
             CMSampleBufferInvalidate(readSampleBuffer)
             
-            let totalSamples = sampleBuffer.count / MemoryLayout<Int16>.size
+			let totalSamples = sampleBuffer.count / MemoryLayout<Float>.size
             let downSampledLength = totalSamples / samplesPerPixel
             let samplesToProcess = downSampledLength * samplesPerPixel
             
@@ -218,7 +218,7 @@ final public class FDWaveformRenderOperation: Operation {
         }
         
         // Process the remaining samples at the end which didn't fit into samplesPerPixel
-        let samplesToProcess = sampleBuffer.count / MemoryLayout<Int16>.size
+		let samplesToProcess = sampleBuffer.count / MemoryLayout<Float>.size
         if samplesToProcess > 0 {
             guard !isCancelled else { return nil }
             
@@ -247,13 +247,12 @@ final public class FDWaveformRenderOperation: Operation {
     
     // TODO: report progress? (for issue #2)
     func processSamples(fromData sampleBuffer: inout Data, sampleMax: inout CGFloat, outputSamples: inout [CGFloat], samplesToProcess: Int, downSampledLength: Int, samplesPerPixel: Int, filter: [Float]) {
-        sampleBuffer.withUnsafeBytes { (samples: UnsafePointer<Int16>) in
-            var processingBuffer = [Float](repeating: 0.0, count: samplesToProcess)
+        sampleBuffer.withUnsafeBytes { (samples: UnsafePointer<Float>) in
             
             let sampleCount = vDSP_Length(samplesToProcess)
             
-            //Convert 16bit int samples to floats
-            vDSP_vflt16(samples, 1, &processingBuffer, 1, sampleCount)
+			let buffer = UnsafeBufferPointer(start: samples, count: samplesToProcess);
+			var processingBuffer = Array(buffer)
             
             //Take the absolute values to get amplitude
             vDSP_vabs(processingBuffer, 1, &processingBuffer, 1, sampleCount)
@@ -286,7 +285,7 @@ final public class FDWaveformRenderOperation: Operation {
 			}
 			
             // Remove processed samples
-            sampleBuffer.removeFirst(samplesToProcess * MemoryLayout<Int16>.size)
+			sampleBuffer.removeFirst(samplesToProcess * MemoryLayout<Float>.size)
             
             outputSamples += downSampledDataCG
         }

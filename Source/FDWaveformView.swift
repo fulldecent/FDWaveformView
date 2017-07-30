@@ -480,7 +480,7 @@ enum FDWaveformType: Equatable {
             
         case .logarithmic(let noiseFloor):
             // Convert samples to a log scale
-            var zero: Float = 32768.0
+            var zero: Float = 1.0
             vDSP_vdbcon(normalizedSamples, 1, &zero, &normalizedSamples, 1, vDSP_Length(normalizedSamples.count), 1)
             
             //Clip to [noiseFloor, 0]
