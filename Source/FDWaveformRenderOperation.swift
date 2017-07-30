@@ -172,8 +172,8 @@ final public class FDWaveformRenderOperation: Operation {
         var channelCount = 1
         let formatDescriptions = audioContext.assetTrack.formatDescriptions as! [CMAudioFormatDescription]
         for item in formatDescriptions {
-            guard let fmtDesc = CMAudioFormatDescriptionGetStreamBasicDescription(item) else { return nil }
-            channelCount = Int(fmtDesc.pointee.mChannelsPerFrame)
+            guard let formatDescription = CMAudioFormatDescriptionGetStreamBasicDescription(item) else { return nil }
+            channelCount = Int(formatDescription.pointee.mChannelsPerFrame)
         }
         
         var sampleMax = format.type.floorValue
