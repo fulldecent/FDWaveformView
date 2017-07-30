@@ -261,7 +261,7 @@ final public class FDWaveformRenderOperation: Operation {
             //Let current type further process the samples
             format.type.process(normalizedSamples: &processingBuffer)
             
-            //Downsample and average
+            //Downsample and find maximum value
             var downSampledData = [Float](repeating: 0.0, count: downSampledLength)
             vDSP_desamp(processingBuffer,
                         vDSP_Stride(samplesPerPixel),
@@ -269,12 +269,22 @@ final public class FDWaveformRenderOperation: Operation {
                         vDSP_Length(downSampledLength),
                         vDSP_Length(samplesPerPixel))
             
-            let downSampledDataCG = downSampledData.map { (value: Float) -> CGFloat in
-                let element = CGFloat(value)
-                if element > sampleMax { sampleMax = element }
-                return element
-            }
-            
+			var maximum = -Float.infinity;
+			vDSP_maxv(downSampledData,
+			          1,
+			          &maximum,
+			          vDSP_Length(downSampledData.count))
+			
+			sampleMax = max(sampleMax, CGFloat(maximum))
+
+			// TODO: This is not necessary for 32-bit builds and `vDSP_vspdp()` should be faster on 64-bit.
+			// I failed to rewrite this, because I couldn’t convince the the Swift compiler that
+			// `Double` and `CGFloat` are the same thing on 64-bit with regard to arrays.
+			let downSampledDataCG = downSampledData.map { (value: Float) -> CGFloat in
+				let element = CGFloat(value)
+				return element
+			}
+			
             // Remove processed samples
             sampleBuffer.removeFirst(samplesToProcess * MemoryLayout<Int16>.size)
             
