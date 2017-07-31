@@ -45,8 +45,10 @@ final class FDAudioContext {
                     let audioFormatDesc = formatDescriptions.first,
                     let asbd = CMAudioFormatDescriptionGetStreamBasicDescription(audioFormatDesc)
                     else { break }
-                
-                let totalSamples = Int((asbd.pointee.mSampleRate) * Float64(asset.duration.value) / Float64(asset.duration.timescale))
+				
+				let sampleRate = asbd.pointee.mSampleRate
+				let assetDuration = asset.duration
+                let totalSamples = Int(sampleRate * Float64(CMTimeGetSeconds(assetDuration)))
                 let audioContext = FDAudioContext(audioURL: audioURL, totalSamples: totalSamples, asset: asset, assetTrack: assetTrack)
                 completionHandler(audioContext)
                 return
