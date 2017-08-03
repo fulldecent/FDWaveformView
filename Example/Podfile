@@ -1,5 +1,7 @@
 use_frameworks!
 
+project 'iOS Example.xcodeproj'
+
 target 'iOS Example' do
   pod 'FDWaveformView', :path => '../'
 
