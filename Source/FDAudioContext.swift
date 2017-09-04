@@ -29,7 +29,7 @@ final class FDAudioContext {
     public static func load(fromAudioURL audioURL: URL, completionHandler: @escaping (_ audioContext: FDAudioContext?) -> ()) {
         let asset = AVURLAsset(url: audioURL, options: [AVURLAssetPreferPreciseDurationAndTimingKey: NSNumber(value: true as Bool)])
         
-        guard let assetTrack = asset.tracks(withMediaType: AVMediaTypeAudio).first else {
+        guard let assetTrack = asset.tracks(withMediaType: AVMediaType.audio).first else {
             NSLog("FDWaveformView failed to load AVAssetTrack")
             completionHandler(nil)
             return
@@ -45,10 +45,8 @@ final class FDAudioContext {
                     let audioFormatDesc = formatDescriptions.first,
                     let asbd = CMAudioFormatDescriptionGetStreamBasicDescription(audioFormatDesc)
                     else { break }
-				
-				let sampleRate = asbd.pointee.mSampleRate
-				let assetDuration = asset.duration
-                let totalSamples = Int(sampleRate * Float64(CMTimeGetSeconds(assetDuration)))
+                
+                let totalSamples = Int((asbd.pointee.mSampleRate) * Float64(asset.duration.value) / Float64(asset.duration.timescale))
                 let audioContext = FDAudioContext(audioURL: audioURL, totalSamples: totalSamples, asset: asset, assetTrack: assetTrack)
                 completionHandler(audioContext)
                 return
@@ -61,3 +59,4 @@ final class FDAudioContext {
         }
     }
 }
+
