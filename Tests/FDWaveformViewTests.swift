@@ -11,43 +11,33 @@ import XCTest
 
 class FDWaveformViewTests: XCTestCase {
 
-    var fd: FDWaveformView?
+    var waveformView: FDWaveformView!
 
     override func setUp() {
         super.setUp()
-        fd = FDWaveformView()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+        waveformView = FDWaveformView()
     }
 
     override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
     }
 
-    func testExample() {
-        XCTAssert(true)
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
-
-    func testFD() {
-        XCTAssert(fd != nil)
-    }
-
+    // MARK: - Tests
+    
     func testZoomSaples() {
-        XCTAssert(fd?.zoomStartSamples == 0)
-        XCTAssert(fd?.zoomEndSamples == 0)
+        XCTAssert(waveformView.zoomStartSamples == 0)
+        XCTAssert(waveformView.zoomEndSamples == 0)
     }
 
     func testGesturesPermissions() {
-        XCTAssert(fd?.doesAllowScroll == true)
-        XCTAssert(fd?.doesAllowStretch == true)
-        XCTAssert(fd?.doesAllowScrubbing == true)
+        XCTAssert(waveformView.doesAllowScroll == true)
+        XCTAssert(waveformView.doesAllowStretch == true)
+        XCTAssert(waveformView.doesAllowScrubbing == true)
     }
 
     func testColors() {
-        XCTAssert(fd?.wavesColor == UIColor.black)
-        XCTAssert(fd?.progressColor == UIColor.blue)
+        XCTAssert(waveformView.wavesColor == UIColor.black)
+        XCTAssert(waveformView.progressColor == UIColor.blue)
     }
 
 }

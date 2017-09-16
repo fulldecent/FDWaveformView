@@ -4,7 +4,78 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Master](https://github.com/fulldecent/FDWaveformView/compare/2.0.0...master)
+## [Master](https://github.com/fulldecent/FDWaveformView/compare/2.2.1...master)
+
+---
+
+## [2.2.1](https://github.com/fulldecent/FDWaveformView/releases/tag/2.2.1)
+Released on 2017-05-31.
+
+#### Changed
+- Now using ranges in the API where appropriate
+  - Added by [William Entriken](https://github.com/fulldecent) in Regards to Issue
+  [#76](https://github.com/fulldecent/FDWaveformView/issues/86).
+
+#### Fixed
+- Fixed a retain cycle in completion handler of waveform render operation
+  - Added by [Philippe Jayet](https://github.com/pjay)
+- Cancel waveform render operation when view is released
+  - Added by [Philippe Jayet](https://github.com/pjay)
+
+---
+
+## [2.2.0](https://github.com/fulldecent/FDWaveformView/releases/tag/2.2.0)
+Released on 2017-05-03.
+
+#### Added
+- Improved accuracy of waveform rendering
+  - Added by [Kip Nicol](https://github.com/ospr)
+- Added support for rendering waveform images outside of a view (See `FDWaveformRenderOperation`)
+  - Added by [Kip Nicol](https://github.com/ospr)
+- Added support for rendering linear waveforms
+  - Added by [Kip Nicol](https://github.com/ospr)
+- Added support for changing `wavesColor` and `progressColor` after waveform was rendered
+  - Added by [Kip Nicol](https://github.com/ospr)
+- Added support for updating waveform type and color to iOS Example app.
+  - Added by [Kip Nicol](https://github.com/ospr)
+
+#### Fixed
+- Fixed waveform rendering for large audio files
+  - Added by [Kip Nicol](https://github.com/ospr)
+- Fixed bug which could prevent waveform from fitting new view size if rendering was in progress during a view resize
+  - Added by [Kip Nicol](https://github.com/ospr)
+- Fixed bug which caused `waveformViewDidLoad()` to not be called after the audio file was loaded
+  - Added by [Kip Nicol](https://github.com/ospr)
+- Fixed bug which caused subsequent waveform renderings for new audioURLs to never complete if there was an error with a previous render
+  - Added by [Kip Nicol](https://github.com/ospr)
+- Fixed bug which could cause a crash (divide by zero error) if the view's width was 0
+  - Added by [Kip Nicol](https://github.com/ospr)
+
+---
+
+## [2.1.0](https://github.com/fulldecent/FDWaveformView/releases/tag/2.1.0)
+Released on 2017-04-15.
+
+#### Added
+- Improved example app to include more options
+  - Added by [William Entriken](https://github.com/fulldecent)
+- Allow animation for changes to zoom
+  - Added by [William Entriken](https://github.com/fulldecent)
+
+#### Fixed
+- Improved accuracy of waveform rendering
+  - Added by [Kip Nicol](https://github.com/ospr)
+- Fixed waveform rendering for large audio files
+  - Added by [Kip Nicol](https://github.com/ospr)
+- Fixed crash with quick load time
+  - Added by [William Entriken](https://github.com/fulldecent) in Regards to Issue
+  [#76](https://github.com/fulldecent/FDWaveformView/issues/76).
+
+---
+
+## [2.0.1](https://github.com/fulldecent/FDWaveformView/releases/tag/2.0.1)
+Released on 2017-02-16.
+
 #### Added
 - Allow scrubbing independantly of scrolling
   - Added by [Doug Earnshaw](https://github.com/haydenholligan)

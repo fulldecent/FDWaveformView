@@ -246,7 +246,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0730;
-				LastUpgradeCheck = 0800;
+				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = "William Entriken";
 				TargetAttributes = {
 					D904BBBF1CDD3F170083BD78 = {
@@ -256,6 +256,7 @@
 					};
 					D94BE1B81CCEBF2C0042282A = {
 						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = 8Q693ZG5RN;
 						LastSwiftMigration = 0800;
 					};
 				};
@@ -584,9 +585,10 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 8Q693ZG5RN;
 				FRAMEWORK_SEARCH_PATHS = "";
 				INFOPLIST_FILE = Source/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "net.phor.FDWaveformView.FDWaveformView-iOS";
 				PRODUCT_NAME = "iOS Example";
@@ -600,9 +602,10 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 8Q693ZG5RN;
 				FRAMEWORK_SEARCH_PATHS = "";
 				INFOPLIST_FILE = Source/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "net.phor.FDWaveformView.FDWaveformView-iOS";
 				PRODUCT_NAME = "iOS Example";
