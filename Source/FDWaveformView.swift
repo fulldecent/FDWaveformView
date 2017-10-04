@@ -544,7 +544,9 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
         }
         else if doesAllowScrubbing {
             let rangeSamples = CGFloat(zoomSamples.count)
-            highlightedSamples = 0 ..< Int((CGFloat(zoomSamples.startIndex) + rangeSamples * recognizer.location(in: self).x / bounds.width))
+            let scrubLocation = min(max(recognizer.location(in: self).x, 0), frame.width)    // clamp location within the frame
+            highlightedSamples = 0 ..< Int((CGFloat(zoomSamples.startIndex) + rangeSamples * scrubLocation / bounds.width))
+            delegate?.waveformDidEndScrubbing?(self)
         }
     }
     
@@ -552,6 +554,7 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
         if doesAllowScrubbing {
             let rangeSamples = CGFloat(zoomSamples.count)
             highlightedSamples = 0 ..< Int((CGFloat(zoomSamples.startIndex) + rangeSamples * recognizer.location(in: self).x / bounds.width))
+            delegate?.waveformDidEndScrubbing?(self)
         }
     }
 }
@@ -575,6 +578,9 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
     
     /// The panning gesture did end
     @objc optional func waveformDidEndPanning(_ waveformView: FDWaveformView)
+    
+    /// The scrubbing gesture did end
+    @objc optional func waveformDidEndScrubbing(_ waveformView: FDWaveformView)
 }
 
 //MARK -
