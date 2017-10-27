@@ -1,15 +1,28 @@
 #!/bin/ruby
+
+#
+# CheckCocoaPodsQualityIndexes.rb
+# by William Entriken, version 1.0.1
+# Part of https://github.com/fulldecent/swift3-module-template
 #
 # The validates that all controllable quality metrics receive maximum score
+# from CocoaPods's scoring quality algorithm
 #
-# Metrics are at: https://guides.cocoapods.org/making/quality-indexes.html
-# Your modifiers are at: https://cocoadocs-api-cocoapods-org.herokuapp.com/pods/FDWaveformView/stats
-# Your raw data is at: http://metrics.cocoapods.org/api/v1/pods/FDWaveformView
+# Usage: ruby CheckCocoaPodsQualityIndexes.rb PODNAME
 #
 
 require "json"
 require "uri"
 require "net/http"
+
+pod_name = ARGV.shift
+
+puts "Reviewing CocoaPods's quality metrics for #{pod_name}"
+puts "Metrics documentation: https://guides.cocoapods.org/making/quality-indexes.html"
+puts "Modifiers from: https://cocoadocs-api-cocoapods-org.herokuapp.com/pods/#{pod_name}/stats"
+puts "Raw data from: http://metrics.cocoapods.org/api/v1/pods/#{pod_name}"
+puts "NOTE: You must pust a new version to CocoaPods to get new metrics!"
+puts ""
 
 uri = URI.parse('https://cocoadocs-api-cocoapods-org.herokuapp.com/pods/FDWaveformView/stats')
 http = Net::HTTP.new(uri.host, uri.port)
