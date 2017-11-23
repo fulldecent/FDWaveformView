@@ -42,6 +42,7 @@ class ViewController: UIViewController {
         })
     }
     
+    ///TODO: figure out how to run these back-to-back
     @IBAction func doRunPerformanceProfile() {
         NSLog("RUNNING PERFORMANCE PROFILE")
         
@@ -61,13 +62,15 @@ class ViewController: UIViewController {
             self.profileResult.append(" MP3:")
             self.doLoadMP3()
         })
+        /*
         // Delay execution of my block for 9 seconds.
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(9) * Int64(NSEC_PER_SEC)) / Double(NSEC_PER_SEC), execute: {
             self.profileResult.append(" OGG:")
             self.doLoadOGG()
         })
-        // Delay execution of my block for 14 seconds.
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(14) * Int64(NSEC_PER_SEC)) / Double(NSEC_PER_SEC), execute: {
+        */
+        // Delay execution of my block for 9 seconds.
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(9) * Int64(NSEC_PER_SEC)) / Double(NSEC_PER_SEC), execute: {
             let alert = UIAlertController(title: "PLEASE POST TO github.com/fulldecent/FDWaveformView/wiki", message: self.profileResult, preferredStyle: .alert)
             let action = UIAlertAction(title: "OK", style: .default)
             alert.addAction(action)
