@@ -8,6 +8,8 @@
 
 FDWaveformView is an easy way to display an audio waveform in your app. It is a nice visualization to show a playing audio file or to select a position in a file.
 
+**:hatching_chick: Virtual tip jar: https://amazon.com/hz/wishlist/ls/EE78A23EEGQB**
+
 Usage
 -----
 
