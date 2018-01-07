@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 ## [Master](https://github.com/fulldecent/FDWaveformView/compare/3.0.0...master)
 
 #### Fixed
-- Fixed Highlight Samples not aligned to base waveform
+- Fixed Highlight Samples not aligned to base waveform [#101](https://github.com/fulldecent/FDWaveformView/issues/101).
   - Added by [Jon Andersen](https://github.com/jonandersen)
 
 ---
