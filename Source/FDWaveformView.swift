@@ -370,14 +370,14 @@ open class FDWaveformView: UIView {
             scaledX = CGFloat(cachedSampleRange.lowerBound - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)
             scaledWidth = CGFloat(cachedSampleRange.last! - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)    // forced unwrap is safe
             scaledHighlightedX = CGFloat((highlightedSamples?.lowerBound ?? 0) - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)
-            scaledHighlightedWidth = CGFloat((highlightedSamples?.last ?? 0) - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)
+            let highlightLastPortion = CGFloat((highlightedSamples?.last ?? 0) - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)
+            scaledHighlightedWidth = highlightLastPortion - scaledHighlightedX
         }
         let childFrame = CGRect(x: frame.width * scaledX, y: 0, width: frame.width * scaledWidth, height: frame.height)
         imageView.frame = childFrame
-        highlightedImage.frame = childFrame
+        highlightedImage.frame = CGRect(x: frame.width * scaledX - frame.width * scaledHighlightedX, y: 0, width: frame.width * scaledWidth, height: frame.height)
         clipping.frame = CGRect(x: frame.width * scaledHighlightedX, y: 0, width: frame.width * scaledHighlightedWidth, height: frame.height)
         clipping.isHidden = !(highlightedSamples?.overlaps(zoomSamples) ?? false)
-        print("layed-out frames: \(frame) -- \(imageView.frame)")
     }
 
     func renderWaveform() {
