@@ -4,7 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Master](https://github.com/fulldecent/FDWaveformView/compare/3.0.0...master)
+## [Master](https://github.com/fulldecent/FDWaveformView/compare/3.0.1...master)
+
+---
+
+## [3.0.1](https://github.com/fulldecent/FDWaveformView/releases/tag/3.0.1)
+Released on 2017-10-27.
 
 #### Fixed
 - Fixed Highlight Samples not aligned to base waveform [#101](https://github.com/fulldecent/FDWaveformView/issues/101).

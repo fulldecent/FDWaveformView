@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'FDWaveformView'
-  s.version = '3.0.0'
+  s.version = '3.0.1'
   s.license = { :type => 'MIT', :file => 'LICENSE' }
   s.summary = 'Reads an audio file and displays the waveform'
   s.description      = <<-DESC
@@ -12,5 +12,6 @@ DESC
   s.source           = { :git => 'https://github.com/fulldecent/FDWaveformView.git', :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/fulldecent'
   s.ios.deployment_target = '8.0'
+  s.swift_version = '4.0'
   s.source_files = 'Source/*.swift'
 end
