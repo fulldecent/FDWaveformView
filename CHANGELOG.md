@@ -95,9 +95,9 @@ Released on 2017-02-16.
 
 #### Added
 - Allow scrubbing independantly of scrolling
-  - Added by [Doug Earnshaw](https://github.com/haydenholligan)
+  - Added by [Doug Earnshaw](https://github.com/pixlwave)
 - Tidy up Swift 3.0 conversion, remove some forced unwraps & generally make more Swifty
-  - Added by [Doug Earnshaw](https://github.com/haydenholligan)
+  - Added by [Doug Earnshaw](https://github.com/pixlwave)
 
 ---
 
