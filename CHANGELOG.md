@@ -4,7 +4,24 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Master](https://github.com/fulldecent/FDWaveformView/compare/2.2.1...master)
+## [Master](https://github.com/fulldecent/FDWaveformView/compare/3.0.1...master)
+
+---
+
+## [3.0.1](https://github.com/fulldecent/FDWaveformView/releases/tag/3.0.1)
+Released on 2017-10-27.
+
+#### Fixed
+- Fixed Highlight Samples not aligned to base waveform [#101](https://github.com/fulldecent/FDWaveformView/issues/101).
+  - Added by [Jon Andersen](https://github.com/jonandersen)
+
+---
+
+## [3.0.0](https://github.com/fulldecent/FDWaveformView/releases/tag/3.0.0)
+Released on 2017-10-27.
+
+#### Changed
+- Now supporting Swift 4.0
 
 ---
 
