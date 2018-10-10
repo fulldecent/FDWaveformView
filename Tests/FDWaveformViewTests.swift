@@ -25,8 +25,8 @@ class FDWaveformViewTests: XCTestCase {
     // MARK: - Tests
     
     func testZoomSaples() {
-        XCTAssert(waveformView.zoomStartSamples == 0)
-        XCTAssert(waveformView.zoomEndSamples == 0)
+        XCTAssert(waveformView.zoomSamples.startIndex == 0)
+        XCTAssert(waveformView.zoomSamples.endIndex == 0)
     }
 
     func testGesturesPermissions() {

@@ -193,7 +193,7 @@ final public class FDWaveformRenderOperation: Operation {
             // Append audio sample buffer into our current sample buffer
             var readBufferLength = 0
             var readBufferPointer: UnsafeMutablePointer<Int8>?
-            CMBlockBufferGetDataPointer(readBuffer, 0, &readBufferLength, nil, &readBufferPointer)
+            CMBlockBufferGetDataPointer(readBuffer, atOffset: 0, lengthAtOffsetOut: &readBufferLength, totalLengthOut: nil, dataPointerOut: &readBufferPointer)
             sampleBuffer.append(UnsafeBufferPointer(start: readBufferPointer, count: readBufferLength))
             CMSampleBufferInvalidate(readSampleBuffer)
             
@@ -320,7 +320,7 @@ final public class FDWaveformRenderOperation: Operation {
     }
 }
 
-extension AVAssetReaderStatus : CustomStringConvertible{
+extension AVAssetReader.Status : CustomStringConvertible{
     public var description: String{
         switch self{
         case .reading: return "reading"

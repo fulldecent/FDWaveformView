@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Master](https://github.com/fulldecent/FDWaveformView/compare/3.0.1...master)
 
+#### Changed
+- Converted to Swift 4.2 and Xcode 10
+  - Added by [Doug Earnshaw](https://github.com/pixlwave)
+
 ---
 
 ## [3.0.1](https://github.com/fulldecent/FDWaveformView/releases/tag/3.0.1)
