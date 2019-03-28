@@ -12,6 +12,6 @@ DESC
   s.source           = { :git => 'https://github.com/fulldecent/FDWaveformView.git', :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/fulldecent'
   s.ios.deployment_target = '8.0'
-  s.swift_version = '4.0'
+  s.swift_version = '4.2'
   s.source_files = 'Source/*.swift'
 end
