@@ -373,22 +373,40 @@ open class FDWaveformView: UIView {
         // We need to place the images which have samples in `cachedSampleRange`
         // inside our frame which represents `startSamples..<endSamples`
         // all figures are a portion of our frame width
-        var scaledX: CGFloat = 0.0
-        var scaledWidth: CGFloat = 1.0
-        var scaledHighlightedX: CGFloat = 0.0
-        var scaledHighlightedWidth: CGFloat = 0.0
-        if let cachedSampleRange = cachedWaveformRenderOperation?.sampleRange, !cachedSampleRange.isEmpty && !zoomSamples.isEmpty {
-            scaledX = CGFloat(cachedSampleRange.lowerBound - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)
-            scaledWidth = CGFloat(cachedSampleRange.last! - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)    // forced unwrap is safe
-            scaledHighlightedX = CGFloat((highlightedSamples?.lowerBound ?? 0) - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)
-            let highlightLastPortion = CGFloat((highlightedSamples?.last ?? 0) - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)
-            scaledHighlightedWidth = highlightLastPortion - scaledHighlightedX
+
+        var scaleX: CGFloat = 0.0
+        var scaleW: CGFloat = 1.0
+        var highlightScaleX: CGFloat = 0.0
+        var highlightClipScaleL: CGFloat = 0.0
+        var highlightClipScaleR: CGFloat = 1.0
+        if let cachedSampleRange = cachedWaveformRenderOperation?.sampleRange, !cachedSampleRange.isEmpty {
+            scaleX = CGFloat(zoomSamples.lowerBound - cachedSampleRange.lowerBound) / CGFloat(cachedSampleRange.count)
+            scaleW = CGFloat(cachedSampleRange.count) / CGFloat(zoomSamples.count)
+            if let highlightedSamples = highlightedSamples {
+                highlightScaleX = CGFloat(highlightedSamples.lowerBound - zoomSamples.lowerBound) / CGFloat(cachedSampleRange.count)
+                highlightClipScaleL = max(0.0, CGFloat((highlightedSamples.lowerBound - cachedSampleRange.lowerBound) - (zoomSamples.lowerBound - cachedSampleRange.lowerBound)) / CGFloat(zoomSamples.count))
+                highlightClipScaleR = min(1.0, 1.0 - CGFloat((zoomSamples.upperBound - highlightedSamples.upperBound)) / CGFloat(zoomSamples.count))
+            }
         }
-        let childFrame = CGRect(x: frame.width * scaledX, y: 0, width: frame.width * scaledWidth, height: frame.height)
+        let childFrame = CGRect(x: frame.width * scaleW * -scaleX,
+                                y: 0,
+                                width: frame.width * scaleW,
+                                height: frame.height)
         imageView.frame = childFrame
-        highlightedImage.frame = CGRect(x: frame.width * scaledX - frame.width * scaledHighlightedX, y: 0, width: frame.width * scaledWidth, height: frame.height)
-        clipping.frame = CGRect(x: frame.width * scaledHighlightedX, y: 0, width: frame.width * scaledHighlightedWidth, height: frame.height)
-        clipping.isHidden = !(highlightedSamples?.overlaps(zoomSamples) ?? false)
+        if let highlightedSamples = highlightedSamples, highlightedSamples.overlaps(zoomSamples) {
+            clipping.frame = CGRect(x: frame.width * highlightClipScaleL,
+                                    y: 0,
+                                    width: frame.width * (highlightClipScaleR - highlightClipScaleL),
+                                    height: frame.height)
+            if 0 < clipping.frame.minX {
+                highlightedImage.frame = childFrame.offsetBy(dx: frame.width * scaleW * -highlightScaleX, dy: 0)
+            } else {
+                highlightedImage.frame = childFrame
+            }
+            clipping.isHidden = false
+        } else {
+            clipping.isHidden = true
+        }
     }
 
     func renderWaveform() {
