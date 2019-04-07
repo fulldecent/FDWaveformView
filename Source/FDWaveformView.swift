@@ -489,7 +489,6 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
             return
         }
 
-        let point = recognizer.translation(in: self)
         if doesAllowScroll {
             if zoomSamples.count == totalSamples {
                 // No need to handle panning
@@ -499,6 +498,8 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
             if recognizer.state == .began {
                 delegate?.waveformDidBeginPanning?(self)
             }
+
+            let point = recognizer.translation(in: self)
             recognizer.setTranslation(CGPoint.zero, in: self)
 
             let samplesPerPixel = CGFloat(zoomSamples.count) / bounds.width
