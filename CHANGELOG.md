@@ -9,6 +9,10 @@ All notable changes to this project will be documented in this file.
 #### Changed
 - Converted to Swift 4.2 and Xcode 10
   - Added by [Doug Earnshaw](https://github.com/pixlwave)
+- Prevent to handle panning gesture while pinching
+  - Added by [HANAI, Tohru](https://github.com/reedom)
+- Improve rendering of zooming and scrolling with highlight
+  - Added by [HANAI, Tohru](https://github.com/reedom)
 
 ---
 
