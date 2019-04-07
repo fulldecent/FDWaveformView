@@ -233,6 +233,17 @@ open class FDWaveformView: UIView {
         return retval
     }()
 
+    enum PressType {
+        case none
+        case pinch
+        case pan
+    }
+
+    /// Indicates the gesture begun lastly.
+    /// This helps to determine which of continuous interaction should be active, pinching or panning.
+    /// pinchRecognizer
+    fileprivate var firstGesture = PressType.none
+
     /// Gesture recognizer
     fileprivate var pinchRecognizer = UIPinchGestureRecognizer()
 
@@ -467,11 +478,22 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
     }
 
     @objc func handlePinchGesture(_ recognizer: UIPinchGestureRecognizer) {
-        if !doesAllowStretch {
-            return
-        }
-        if recognizer.scale == 1 {
-            return
+        guard doesAllowStretch, recognizer.scale != 1 else { return }
+
+        switch recognizer.state {
+        case .began:
+            if firstGesture == .none {
+                // Set firstGesture to .pinch only if panning gesture is not active.
+                // This enables the user to repetitive pan and zoom action.
+                // If we set firstGesture to .pinch in any state then the user became unable
+                // to panning until they release all of fingers from the view.
+                firstGesture = .pinch
+            }
+        case .ended, .cancelled:
+            // This happens only if panning had not started.
+            firstGesture = .none
+        default:
+            break
         }
 
         let zoomRangeSamples = CGFloat(zoomSamples.count)
@@ -485,8 +507,20 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
     }
 
     @objc func handlePanGesture(_ recognizer: UIPanGestureRecognizer) {
-        guard !zoomSamples.isEmpty else {
-            return
+        guard !zoomSamples.isEmpty else { return }
+
+        // This method is called even the user began with pinching.
+
+        switch recognizer.state {
+        case .began:
+            guard firstGesture != .pinch else { return }
+            firstGesture = .pan
+        case .ended, .cancelled:
+            let isPan = firstGesture == .pan
+            firstGesture = .none
+            guard isPan else { return }
+        default:
+            guard firstGesture == .pan, recognizer.numberOfTouches == 1 else { return }
         }
 
         if doesAllowScroll {
