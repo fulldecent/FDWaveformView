@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Master](https://github.com/fulldecent/FDWaveformView/compare/4.0.0...master)
 
+#### Changed
+- Switch to new standard library clamp functions
+  - Added by [William Entriken](https://github.com/fulldecent)
+
 ---
 
 ## [4.0.0](https://github.com/fulldecent/FDWaveformView/releases/tag/4.0.0)

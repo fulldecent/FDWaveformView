@@ -608,24 +608,6 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
 
 //MARK -
 
-extension Comparable {
-
-    func clamped(from lowerBound: Self, to upperBound: Self) -> Self {
-        return min(max(self, lowerBound), upperBound)
-    }
-
-    func clamped(to range: ClosedRange<Self>) -> Self {
-        return min(max(self, range.lowerBound), range.upperBound)
-    }
-}
-
-extension Strideable where Self.Stride: SignedInteger
-{
-    func clamped(to range: CountableClosedRange<Self>) -> Self {
-        return min(max(self, range.lowerBound), range.upperBound)
-    }
-}
-
 extension CountableRange where Bound: Strideable {
 
     // Extend each bound away from midpoint by `factor`, a portion of the distance from begin to end
