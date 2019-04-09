@@ -233,6 +233,17 @@ open class FDWaveformView: UIView {
         return retval
     }()
 
+    enum PressType {
+        case none
+        case pinch
+        case pan
+    }
+
+    /// Indicates the gesture begun lastly.
+    /// This helps to determine which of continuous interaction should be active, pinching or panning.
+    /// pinchRecognizer
+    fileprivate var firstGesture = PressType.none
+
     /// Gesture recognizer
     fileprivate var pinchRecognizer = UIPinchGestureRecognizer()
 
@@ -362,22 +373,40 @@ open class FDWaveformView: UIView {
         // We need to place the images which have samples in `cachedSampleRange`
         // inside our frame which represents `startSamples..<endSamples`
         // all figures are a portion of our frame width
-        var scaledX: CGFloat = 0.0
-        var scaledWidth: CGFloat = 1.0
-        var scaledHighlightedX: CGFloat = 0.0
-        var scaledHighlightedWidth: CGFloat = 0.0
-        if let cachedSampleRange = cachedWaveformRenderOperation?.sampleRange, !cachedSampleRange.isEmpty && !zoomSamples.isEmpty {
-            scaledX = CGFloat(cachedSampleRange.lowerBound - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)
-            scaledWidth = CGFloat(cachedSampleRange.last! - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)    // forced unwrap is safe
-            scaledHighlightedX = CGFloat((highlightedSamples?.lowerBound ?? 0) - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)
-            let highlightLastPortion = CGFloat((highlightedSamples?.last ?? 0) - zoomSamples.lowerBound) / CGFloat(zoomSamples.count)
-            scaledHighlightedWidth = highlightLastPortion - scaledHighlightedX
+
+        var scaleX: CGFloat = 0.0
+        var scaleW: CGFloat = 1.0
+        var highlightScaleX: CGFloat = 0.0
+        var highlightClipScaleL: CGFloat = 0.0
+        var highlightClipScaleR: CGFloat = 1.0
+        if let cachedSampleRange = cachedWaveformRenderOperation?.sampleRange, !cachedSampleRange.isEmpty {
+            scaleX = CGFloat(zoomSamples.lowerBound - cachedSampleRange.lowerBound) / CGFloat(cachedSampleRange.count)
+            scaleW = CGFloat(cachedSampleRange.count) / CGFloat(zoomSamples.count)
+            if let highlightedSamples = highlightedSamples {
+                highlightScaleX = CGFloat(highlightedSamples.lowerBound - zoomSamples.lowerBound) / CGFloat(cachedSampleRange.count)
+                highlightClipScaleL = max(0.0, CGFloat((highlightedSamples.lowerBound - cachedSampleRange.lowerBound) - (zoomSamples.lowerBound - cachedSampleRange.lowerBound)) / CGFloat(zoomSamples.count))
+                highlightClipScaleR = min(1.0, 1.0 - CGFloat((zoomSamples.upperBound - highlightedSamples.upperBound)) / CGFloat(zoomSamples.count))
+            }
         }
-        let childFrame = CGRect(x: frame.width * scaledX, y: 0, width: frame.width * scaledWidth, height: frame.height)
+        let childFrame = CGRect(x: frame.width * scaleW * -scaleX,
+                                y: 0,
+                                width: frame.width * scaleW,
+                                height: frame.height)
         imageView.frame = childFrame
-        highlightedImage.frame = CGRect(x: frame.width * scaledX - frame.width * scaledHighlightedX, y: 0, width: frame.width * scaledWidth, height: frame.height)
-        clipping.frame = CGRect(x: frame.width * scaledHighlightedX, y: 0, width: frame.width * scaledHighlightedWidth, height: frame.height)
-        clipping.isHidden = !(highlightedSamples?.overlaps(zoomSamples) ?? false)
+        if let highlightedSamples = highlightedSamples, highlightedSamples.overlaps(zoomSamples) {
+            clipping.frame = CGRect(x: frame.width * highlightClipScaleL,
+                                    y: 0,
+                                    width: frame.width * (highlightClipScaleR - highlightClipScaleL),
+                                    height: frame.height)
+            if 0 < clipping.frame.minX {
+                highlightedImage.frame = childFrame.offsetBy(dx: frame.width * scaleW * -highlightScaleX, dy: 0)
+            } else {
+                highlightedImage.frame = childFrame
+            }
+            clipping.isHidden = false
+        } else {
+            clipping.isHidden = true
+        }
     }
 
     func renderWaveform() {
@@ -467,11 +496,22 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
     }
 
     @objc func handlePinchGesture(_ recognizer: UIPinchGestureRecognizer) {
-        if !doesAllowStretch {
-            return
-        }
-        if recognizer.scale == 1 {
-            return
+        guard doesAllowStretch, recognizer.scale != 1 else { return }
+
+        switch recognizer.state {
+        case .began:
+            if firstGesture == .none {
+                // Set firstGesture to .pinch only if panning gesture is not active.
+                // This enables the user to repetitive pan and zoom action.
+                // If we set firstGesture to .pinch in any state then the user became unable
+                // to panning until they release all of fingers from the view.
+                firstGesture = .pinch
+            }
+        case .ended, .cancelled:
+            // This happens only if panning had not started.
+            firstGesture = .none
+        default:
+            break
         }
 
         let zoomRangeSamples = CGFloat(zoomSamples.count)
@@ -485,25 +525,41 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
     }
 
     @objc func handlePanGesture(_ recognizer: UIPanGestureRecognizer) {
-        guard !zoomSamples.isEmpty else {
-            return
+        guard !zoomSamples.isEmpty else { return }
+
+        // This method is called even the user began with pinching.
+
+        switch recognizer.state {
+        case .began:
+            guard firstGesture != .pinch else { return }
+            firstGesture = .pan
+        case .ended, .cancelled:
+            let isPan = firstGesture == .pan
+            firstGesture = .none
+            guard isPan else { return }
+        default:
+            guard firstGesture == .pan, recognizer.numberOfTouches == 1 else { return }
         }
 
-        let point = recognizer.translation(in: self)
         if doesAllowScroll {
+            if zoomSamples.count == totalSamples {
+                // No need to handle panning
+                return
+            }
+
             if recognizer.state == .began {
                 delegate?.waveformDidBeginPanning?(self)
             }
-            let translationSamples = Int(CGFloat(zoomSamples.count) * point.x / bounds.width)
+
+            let point = recognizer.translation(in: self)
             recognizer.setTranslation(CGPoint.zero, in: self)
 
-            switch translationSamples {
-            case let x where x > zoomSamples.startIndex:
-                zoomSamples = 0 ..< zoomSamples.count
-            case let x where zoomSamples.endIndex - x > totalSamples:
-                zoomSamples = totalSamples - zoomSamples.count ..< totalSamples
-            default:
-                zoomSamples = zoomSamples.startIndex - translationSamples ..< zoomSamples.endIndex - translationSamples
+            let samplesPerPixel = CGFloat(zoomSamples.count) / bounds.width
+            let deltaPixels = point.x < 0
+                ? min(-point.x * samplesPerPixel, CGFloat(totalSamples - zoomSamples.endIndex))
+                : min(point.x * samplesPerPixel, CGFloat(zoomSamples.startIndex)) * -1
+            if deltaPixels != 0 {
+                zoomSamples = zoomSamples.startIndex + Int(deltaPixels) ..< zoomSamples.endIndex + Int(deltaPixels)
             }
             if recognizer.state == .ended {
                 delegate?.waveformDidEndPanning?(self)
