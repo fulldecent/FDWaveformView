@@ -53,6 +53,8 @@ final class FDAudioContext {
                 
             case .failed, .cancelled, .loading, .unknown:
                 print("FDWaveformView could not load asset: \(error?.localizedDescription ?? "Unknown error")")
+            @unknown default:
+                print("FDWaveformView could not load asset: \(error?.localizedDescription ?? "Unknown error")")
             }
             
             completionHandler(nil)

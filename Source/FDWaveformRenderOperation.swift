@@ -328,6 +328,8 @@ extension AVAssetReader.Status : CustomStringConvertible{
         case .completed: return "completed"
         case .failed: return "failed"
         case .cancelled: return "cancelled"
+        @unknown default:
+            fatalError()
         }
     }
 }
