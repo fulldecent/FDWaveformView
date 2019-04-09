@@ -4,7 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Master](https://github.com/fulldecent/FDWaveformView/compare/3.0.1...master)
+## [Master](https://github.com/fulldecent/FDWaveformView/compare/4.0.0...master)
+
+---
+
+## [4.0.0](https://github.com/fulldecent/FDWaveformView/releases/tag/4.0.0)
+Released on 2019-04-08.
 
 #### Changed
 - Converted to Swift 4.2 and Xcode 10
@@ -13,6 +18,7 @@ All notable changes to this project will be documented in this file.
   - Added by [HANAI, Tohru](https://github.com/reedom)
 - Improve rendering of zooming and scrolling with highlight
   - Added by [HANAI, Tohru](https://github.com/reedom)
+- Updated to Swift 5
 
 ---
 
