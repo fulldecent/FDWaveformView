@@ -589,12 +589,17 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
     
     /// Updates highlightedSamples with the sample passed in, taking into account the value of boundToScrub
     func scrub(to sample: Int) {
-        if boundToScrub == .upper, let lowerBound = highlightedSamples?.lowerBound, sample > lowerBound {
-            highlightedSamples = lowerBound ..< sample
-            delegate?.waveformDidEndScrubbing?(self)
-        } else if let upperBound = highlightedSamples?.upperBound, sample < upperBound {
-            highlightedSamples = sample ..< upperBound
-            delegate?.waveformDidEndScrubbing?(self)
+        switch boundToScrub {
+        case .upper:
+            if let lowerBound = highlightedSamples?.lowerBound, sample > lowerBound {
+                highlightedSamples = lowerBound ..< sample
+                delegate?.waveformDidEndScrubbing?(self)
+            }
+        case .lower:
+            if let upperBound = highlightedSamples?.upperBound, sample < upperBound {
+                highlightedSamples = sample ..< upperBound
+                delegate?.waveformDidEndScrubbing?(self)
+            }
         }
     }
 }
