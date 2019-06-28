@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## [Master](https://github.com/fulldecent/FDWaveformView/compare/4.0.0...master)
+#### Added
+- Scrubbing can now update both the start and end of the highlighted samples range.
+  - Added by [Doug Earnshaw](https://github.com/pixlwave)
 
 #### Changed
 - Switch to new standard library clamp functions

@@ -78,6 +78,14 @@ open class FDWaveformView: UIView {
     /// Whether to allow tap and pan gestures to change highlighted range
     /// Pan gives priority to `doesAllowScroll` if this and that are both `true`
     /*@IBInspectable*/ open var doesAllowScrubbing = true
+    
+    /// Supported bounds for scrubbing
+    public enum ScrubbingBound {
+        case lower, upper
+    }
+    
+    /// Whether scrubbing affects the start or end of highlighted samples
+    open var boundToScrub = ScrubbingBound.upper
 
     /// Whether to allow pinch gesture to change zoom
     /*@IBInspectable*/ open var doesAllowStretch = true
@@ -91,7 +99,7 @@ open class FDWaveformView: UIView {
         case linear, logarithmic
     }
 
-    // Type of waveform to display
+    /// Type of waveform to display
     var waveformType: WaveformType = .logarithmic {
         didSet {
             setNeedsDisplay()
@@ -568,15 +576,23 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
         else if doesAllowScrubbing {
             let rangeSamples = CGFloat(zoomSamples.count)
             let scrubLocation = min(max(recognizer.location(in: self).x, 0), frame.width)    // clamp location within the frame
-            highlightedSamples = 0 ..< Int((CGFloat(zoomSamples.startIndex) + rangeSamples * scrubLocation / bounds.width))
-            delegate?.waveformDidEndScrubbing?(self)
+            scrub(to: Int((CGFloat(zoomSamples.startIndex) + rangeSamples * scrubLocation / bounds.width)))
         }
     }
 
     @objc func handleTapGesture(_ recognizer: UITapGestureRecognizer) {
         if doesAllowScrubbing {
             let rangeSamples = CGFloat(zoomSamples.count)
-            highlightedSamples = 0 ..< Int((CGFloat(zoomSamples.startIndex) + rangeSamples * recognizer.location(in: self).x / bounds.width))
+            scrub(to: Int((CGFloat(zoomSamples.startIndex) + rangeSamples * recognizer.location(in: self).x / bounds.width)))
+        }
+    }
+    
+    func scrub(to sample: Int) {
+        if boundToScrub == .upper, let lowerBound = highlightedSamples?.lowerBound, sample > lowerBound {
+            highlightedSamples = lowerBound ..< sample
+            delegate?.waveformDidEndScrubbing?(self)
+        } else if let upperBound = highlightedSamples?.upperBound, sample < upperBound {
+            highlightedSamples = sample ..< upperBound
             delegate?.waveformDidEndScrubbing?(self)
         }
     }
