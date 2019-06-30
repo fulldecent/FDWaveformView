@@ -79,13 +79,13 @@ open class FDWaveformView: UIView {
     /// Pan gives priority to `doesAllowScroll` if this and that are both `true`
     /*@IBInspectable*/ open var doesAllowScrubbing = true
     
-    /// Supported bounds for scrubbing
-    public enum ScrubbingBound {
-        case lower, upper
+    /// Supported scrub types
+    public enum ScrubType {
+        case highlightStart, highlightEnd
     }
     
     /// Whether scrubbing affects the start or end of highlighted samples
-    open var boundToScrub = ScrubbingBound.upper
+    open var scrubbing = ScrubType.highlightEnd
 
     /// Whether to allow pinch gesture to change zoom
     /*@IBInspectable*/ open var doesAllowStretch = true
@@ -587,17 +587,17 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
         }
     }
     
-    /// Updates highlightedSamples with the sample passed in, taking into account the value of boundToScrub
+    /// Updates highlightedSamples with the sample passed in, taking into account the current scrub type
     func scrub(to sample: Int) {
-        switch boundToScrub {
-        case .upper:
-            if let lowerBound = highlightedSamples?.lowerBound, sample > lowerBound {
-                highlightedSamples = lowerBound ..< sample
+        switch scrubbing {
+        case .highlightEnd:
+            if let startSample = highlightedSamples?.lowerBound, sample > startSample {
+                highlightedSamples = startSample ..< sample
                 delegate?.waveformDidEndScrubbing?(self)
             }
-        case .lower:
-            if let upperBound = highlightedSamples?.upperBound, sample < upperBound {
-                highlightedSamples = sample ..< upperBound
+        case .highlightStart:
+            if let endSample = highlightedSamples?.upperBound, sample < endSample {
+                highlightedSamples = sample ..< endSample
                 delegate?.waveformDidEndScrubbing?(self)
             }
         }
