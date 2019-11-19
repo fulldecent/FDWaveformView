@@ -3,33 +3,21 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D904BBC31CDD3F170083BD78 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D904BBC21CDD3F170083BD78 /* Tests.swift */; };
+		C4D2819B2383FB4F009DD34E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C4D281962383FB4F009DD34E /* Assets.xcassets */; };
+		C4D281B02383FD0A009DD34E /* Submarine.aiff in Resources */ = {isa = PBXBuildFile; fileRef = C4D281AC2383FD0A009DD34E /* Submarine.aiff */; };
+		C4D281B12383FD0A009DD34E /* TchaikovskyExample2.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = C4D281AD2383FD0A009DD34E /* TchaikovskyExample2.mp3 */; };
+		C4D281B22383FD0A009DD34E /* TchaikovskyExample2.m4a in Resources */ = {isa = PBXBuildFile; fileRef = C4D281AE2383FD0A009DD34E /* TchaikovskyExample2.m4a */; };
+		C4D281B32383FD0A009DD34E /* TchaikovskyExample2.ogg in Resources */ = {isa = PBXBuildFile; fileRef = C4D281AF2383FD0A009DD34E /* TchaikovskyExample2.ogg */; };
+		C4D281B82383FD3E009DD34E /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C4D281B42383FD3D009DD34E /* Launch Screen.storyboard */; };
+		C4D281B92383FD3E009DD34E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C4D281B62383FD3E009DD34E /* Main.storyboard */; };
+		C4D281BB2383FF24009DD34E /* FDWaveformView in Frameworks */ = {isa = PBXBuildFile; productRef = C4D281BA2383FF24009DD34E /* FDWaveformView */; };
 		D94BE1BF1CCEBF2C0042282A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D94BE1BE1CCEBF2C0042282A /* ViewController.swift */; };
-		D94BE1C21CCEBF2C0042282A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D94BE1C01CCEBF2C0042282A /* Main.storyboard */; };
-		D94BE1C41CCEBF2C0042282A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D94BE1C31CCEBF2C0042282A /* Assets.xcassets */; };
 		D94BE1D31CCEC1730042282A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D94BE1D21CCEC1730042282A /* AppDelegate.swift */; };
-		D9785690225C46D400F068B3 /* FDWaveformView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D978568F225C46D400F068B3 /* FDWaveformView.framework */; };
-		D9785692225C475B00F068B3 /* FDWaveformView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9785691225C475B00F068B3 /* FDWaveformView.framework */; };
-		D9CBAE971CCEC4ED006EC128 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D9CBAE961CCEC4ED006EC128 /* Launch Screen.storyboard */; };
-		D9E0A8311D78CA0000F1C28F /* Submarine.aiff in Resources */ = {isa = PBXBuildFile; fileRef = D9E0A82D1D78CA0000F1C28F /* Submarine.aiff */; };
-		D9E0A8321D78CA0000F1C28F /* TchaikovskyExample2.m4a in Resources */ = {isa = PBXBuildFile; fileRef = D9E0A82E1D78CA0000F1C28F /* TchaikovskyExample2.m4a */; };
-		D9E0A8331D78CA0000F1C28F /* TchaikovskyExample2.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D9E0A82F1D78CA0000F1C28F /* TchaikovskyExample2.mp3 */; };
-		D9E0A8341D78CA0000F1C28F /* TchaikovskyExample2.ogg in Resources */ = {isa = PBXBuildFile; fileRef = D9E0A8301D78CA0000F1C28F /* TchaikovskyExample2.ogg */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		D904BBC51CDD3F170083BD78 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D94BE1B11CCEBF2C0042282A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = D94BE1B81CCEBF2C0042282A;
-			remoteInfo = "iOS Example";
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		D99B39081CD6904E00E56AE2 /* Copy Frameworks */ = {
@@ -45,75 +33,55 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		6C3ED82E325A2A924A3397C6 /* Pods_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		A6AEC542CF856E1CC6C57BE1 /* Pods_iOS_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iOS_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D904BBC01CDD3F170083BD78 /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D904BBC21CDD3F170083BD78 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
-		D904BBC41CDD3F170083BD78 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C4D281962383FB4F009DD34E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C4D281972383FB4F009DD34E /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C4D281AC2383FD0A009DD34E /* Submarine.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = Submarine.aiff; sourceTree = "<group>"; };
+		C4D281AD2383FD0A009DD34E /* TchaikovskyExample2.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = TchaikovskyExample2.mp3; sourceTree = "<group>"; };
+		C4D281AE2383FD0A009DD34E /* TchaikovskyExample2.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = TchaikovskyExample2.m4a; sourceTree = "<group>"; };
+		C4D281AF2383FD0A009DD34E /* TchaikovskyExample2.ogg */ = {isa = PBXFileReference; lastKnownFileType = file; path = TchaikovskyExample2.ogg; sourceTree = "<group>"; };
+		C4D281B52383FD3D009DD34E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = "Base.lproj/Launch Screen.storyboard"; sourceTree = "<group>"; };
+		C4D281B72383FD3E009DD34E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		D94BE1B91CCEBF2C0042282A /* iOS Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iOS Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D94BE1BE1CCEBF2C0042282A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		D94BE1C11CCEBF2C0042282A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		D94BE1C31CCEBF2C0042282A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = Source/Assets.xcassets; sourceTree = "<group>"; };
-		D94BE1C81CCEBF2C0042282A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = Source/Info.plist; sourceTree = "<group>"; };
 		D94BE1D21CCEC1730042282A /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		D978568F225C46D400F068B3 /* FDWaveformView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FDWaveformView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D9785691225C475B00F068B3 /* FDWaveformView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FDWaveformView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D9CBAE961CCEC4ED006EC128 /* Launch Screen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = "Launch Screen.storyboard"; path = "Source/Base.lproj/Launch Screen.storyboard"; sourceTree = "<group>"; };
-		D9E0A82D1D78CA0000F1C28F /* Submarine.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = Submarine.aiff; sourceTree = "<group>"; };
-		D9E0A82E1D78CA0000F1C28F /* TchaikovskyExample2.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = TchaikovskyExample2.m4a; sourceTree = "<group>"; };
-		D9E0A82F1D78CA0000F1C28F /* TchaikovskyExample2.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = TchaikovskyExample2.mp3; sourceTree = "<group>"; };
-		D9E0A8301D78CA0000F1C28F /* TchaikovskyExample2.ogg */ = {isa = PBXFileReference; lastKnownFileType = file; path = TchaikovskyExample2.ogg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		D904BBBD1CDD3F170083BD78 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				D9785690225C46D400F068B3 /* FDWaveformView.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		D94BE1B61CCEBF2C0042282A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D9785692225C475B00F068B3 /* FDWaveformView.framework in Frameworks */,
+				C4D281BB2383FF24009DD34E /* FDWaveformView in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		307FF109381A532CF577FD05 /* Frameworks */ = {
+		C4D281A82383FC0A009DD34E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				D9785691225C475B00F068B3 /* FDWaveformView.framework */,
-				D978568F225C46D400F068B3 /* FDWaveformView.framework */,
-				6C3ED82E325A2A924A3397C6 /* Pods_Tests.framework */,
-				A6AEC542CF856E1CC6C57BE1 /* Pods_iOS_Example.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		D904BBC11CDD3F170083BD78 /* Tests */ = {
+		C4D281AB2383FD0A009DD34E /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				D904BBC21CDD3F170083BD78 /* Tests.swift */,
-				D904BBC41CDD3F170083BD78 /* Info.plist */,
+				C4D281AC2383FD0A009DD34E /* Submarine.aiff */,
+				C4D281AD2383FD0A009DD34E /* TchaikovskyExample2.mp3 */,
+				C4D281AE2383FD0A009DD34E /* TchaikovskyExample2.m4a */,
+				C4D281AF2383FD0A009DD34E /* TchaikovskyExample2.ogg */,
 			);
-			path = Tests;
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		D94BE1B01CCEBF2C0042282A = {
 			isa = PBXGroup;
 			children = (
-				D9E0A82B1D78C9F300F1C28F /* Resources */,
-				D94BE1BB1CCEBF2C0042282A /* Source */,
-				D9A11F981D507CB500348273 /* Supporting Files */,
-				D904BBC11CDD3F170083BD78 /* Tests */,
+				D94BE1BB1CCEBF2C0042282A /* Sources */,
 				D94BE1BA1CCEBF2C0042282A /* Products */,
-				307FF109381A532CF577FD05 /* Frameworks */,
+				C4D281A82383FC0A009DD34E /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -121,63 +89,27 @@
 			isa = PBXGroup;
 			children = (
 				D94BE1B91CCEBF2C0042282A /* iOS Example.app */,
-				D904BBC01CDD3F170083BD78 /* Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		D94BE1BB1CCEBF2C0042282A /* Source */ = {
+		D94BE1BB1CCEBF2C0042282A /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				C4D281B42383FD3D009DD34E /* Launch Screen.storyboard */,
+				C4D281B62383FD3E009DD34E /* Main.storyboard */,
 				D94BE1D21CCEC1730042282A /* AppDelegate.swift */,
 				D94BE1BE1CCEBF2C0042282A /* ViewController.swift */,
+				C4D281962383FB4F009DD34E /* Assets.xcassets */,
+				C4D281972383FB4F009DD34E /* Info.plist */,
+				C4D281AB2383FD0A009DD34E /* Resources */,
 			);
-			path = Source;
-			sourceTree = "<group>";
-		};
-		D9A11F981D507CB500348273 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				D9CBAE961CCEC4ED006EC128 /* Launch Screen.storyboard */,
-				D94BE1C01CCEBF2C0042282A /* Main.storyboard */,
-				D94BE1C31CCEBF2C0042282A /* Assets.xcassets */,
-				D94BE1C81CCEBF2C0042282A /* Info.plist */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		D9E0A82B1D78C9F300F1C28F /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				D9E0A82D1D78CA0000F1C28F /* Submarine.aiff */,
-				D9E0A82E1D78CA0000F1C28F /* TchaikovskyExample2.m4a */,
-				D9E0A82F1D78CA0000F1C28F /* TchaikovskyExample2.mp3 */,
-				D9E0A8301D78CA0000F1C28F /* TchaikovskyExample2.ogg */,
-			);
-			name = Resources;
+			path = Sources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		D904BBBF1CDD3F170083BD78 /* Tests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = D904BBCA1CDD3F170083BD78 /* Build configuration list for PBXNativeTarget "Tests" */;
-			buildPhases = (
-				D904BBBC1CDD3F170083BD78 /* Sources */,
-				D904BBBD1CDD3F170083BD78 /* Frameworks */,
-				D904BBBE1CDD3F170083BD78 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				D904BBC61CDD3F170083BD78 /* PBXTargetDependency */,
-			);
-			name = Tests;
-			productName = Tests;
-			productReference = D904BBC01CDD3F170083BD78 /* Tests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 		D94BE1B81CCEBF2C0042282A /* iOS Example */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = D94BE1CB1CCEBF2C0042282A /* Build configuration list for PBXNativeTarget "iOS Example" */;
@@ -190,8 +122,12 @@
 			buildRules = (
 			);
 			dependencies = (
+				C4D281A72383FBFE009DD34E /* PBXTargetDependency */,
 			);
 			name = "iOS Example";
+			packageProductDependencies = (
+				C4D281BA2383FF24009DD34E /* FDWaveformView */,
+			);
 			productName = "FDWaveformView iOS";
 			productReference = D94BE1B91CCEBF2C0042282A /* iOS Example.app */;
 			productType = "com.apple.product-type.application";
@@ -206,11 +142,6 @@
 				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = "William Entriken";
 				TargetAttributes = {
-					D904BBBF1CDD3F170083BD78 = {
-						CreatedOnToolsVersion = 7.3.1;
-						LastSwiftMigration = 1020;
-						TestTargetID = D94BE1B81CCEBF2C0042282A;
-					};
 					D94BE1B81CCEBF2C0042282A = {
 						CreatedOnToolsVersion = 7.3;
 						DevelopmentTeam = 8Q693ZG5RN;
@@ -232,44 +163,28 @@
 			projectRoot = "";
 			targets = (
 				D94BE1B81CCEBF2C0042282A /* iOS Example */,
-				D904BBBF1CDD3F170083BD78 /* Tests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		D904BBBE1CDD3F170083BD78 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		D94BE1B71CCEBF2C0042282A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D9E0A8341D78CA0000F1C28F /* TchaikovskyExample2.ogg in Resources */,
-				D9E0A8311D78CA0000F1C28F /* Submarine.aiff in Resources */,
-				D9CBAE971CCEC4ED006EC128 /* Launch Screen.storyboard in Resources */,
-				D94BE1C41CCEBF2C0042282A /* Assets.xcassets in Resources */,
-				D94BE1C21CCEBF2C0042282A /* Main.storyboard in Resources */,
-				D9E0A8321D78CA0000F1C28F /* TchaikovskyExample2.m4a in Resources */,
-				D9E0A8331D78CA0000F1C28F /* TchaikovskyExample2.mp3 in Resources */,
+				C4D281B92383FD3E009DD34E /* Main.storyboard in Resources */,
+				C4D281B82383FD3E009DD34E /* Launch Screen.storyboard in Resources */,
+				C4D281B02383FD0A009DD34E /* Submarine.aiff in Resources */,
+				C4D281B22383FD0A009DD34E /* TchaikovskyExample2.m4a in Resources */,
+				C4D2819B2383FB4F009DD34E /* Assets.xcassets in Resources */,
+				C4D281B32383FD0A009DD34E /* TchaikovskyExample2.ogg in Resources */,
+				C4D281B12383FD0A009DD34E /* TchaikovskyExample2.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		D904BBBC1CDD3F170083BD78 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				D904BBC31CDD3F170083BD78 /* Tests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		D94BE1B51CCEBF2C0042282A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -282,52 +197,32 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		D904BBC61CDD3F170083BD78 /* PBXTargetDependency */ = {
+		C4D281A72383FBFE009DD34E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = D94BE1B81CCEBF2C0042282A /* iOS Example */;
-			targetProxy = D904BBC51CDD3F170083BD78 /* PBXContainerItemProxy */;
+			productRef = C4D281A62383FBFE009DD34E /* FDWaveformView */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		D94BE1C01CCEBF2C0042282A /* Main.storyboard */ = {
+		C4D281B42383FD3D009DD34E /* Launch Screen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				D94BE1C11CCEBF2C0042282A /* Base */,
+				C4D281B52383FD3D009DD34E /* Base */,
+			);
+			name = "Launch Screen.storyboard";
+			sourceTree = "<group>";
+		};
+		C4D281B62383FD3E009DD34E /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C4D281B72383FD3E009DD34E /* Base */,
 			);
 			name = Main.storyboard;
-			path = Source;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		D904BBC71CDD3F170083BD78 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				INFOPLIST_FILE = Tests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = net.phor.Tests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/iOS Example.app/iOS Example";
-			};
-			name = Debug;
-		};
-		D904BBC81CDD3F170083BD78 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				INFOPLIST_FILE = Tests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = net.phor.Tests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/iOS Example.app/iOS Example";
-			};
-			name = Release;
-		};
 		D94BE1C91CCEBF2C0042282A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -430,7 +325,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -443,9 +339,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 8Q693ZG5RN;
 				FRAMEWORK_SEARCH_PATHS = "";
-				INFOPLIST_FILE = Source/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Sources/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "net.phor.FDWaveformView.FDWaveformView-iOS";
 				PRODUCT_NAME = "iOS Example";
 				SWIFT_VERSION = 5.0;
@@ -459,9 +358,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 8Q693ZG5RN;
 				FRAMEWORK_SEARCH_PATHS = "";
-				INFOPLIST_FILE = Source/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Sources/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "net.phor.FDWaveformView.FDWaveformView-iOS";
 				PRODUCT_NAME = "iOS Example";
 				SWIFT_VERSION = 5.0;
@@ -471,15 +373,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		D904BBCA1CDD3F170083BD78 /* Build configuration list for PBXNativeTarget "Tests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				D904BBC71CDD3F170083BD78 /* Debug */,
-				D904BBC81CDD3F170083BD78 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		D94BE1B41CCEBF2C0042282A /* Build configuration list for PBXProject "iOS Example" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -499,6 +392,17 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C4D281A62383FBFE009DD34E /* FDWaveformView */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FDWaveformView;
+		};
+		C4D281BA2383FF24009DD34E /* FDWaveformView */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FDWaveformView;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D94BE1B11CCEBF2C0042282A /* Project object */;
 }

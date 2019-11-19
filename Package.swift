@@ -7,16 +7,18 @@ let package = Package(
     products: [
         .library(
             name: "FDWaveformView",
-            targets: ["FDWaveformView"]),
+            targets: ["FDWaveformView"]
+        )
     ],
     dependencies: [],
     targets: [
         .target(
             name: "FDWaveformView",
-            path: "Source"),
+            dependencies: []
+        ),
         .testTarget(
             name: "FDWaveformViewTests",
-            dependencies: ["FDWaveformView"],
-            path: "Tests"),
+            dependencies: ["FDWaveformView"]
+        )
     ]
 )
