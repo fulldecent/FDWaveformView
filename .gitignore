@@ -38,3 +38,6 @@ FDWaveformView.framework.zip
 
 # Swift build artifacts
 .build/
+
+# Swift project manager
+.swiftpm
