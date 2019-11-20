@@ -9,10 +9,6 @@ env:
     - EXAMPLE_WORKSPACE="iOS Example/iOS Example.xcworkspace"
     - IOS_FRAMEWORK_SCHEME="FDWaveformView"
   matrix:
-    - DESTINATION="OS=13.2,name=iPhone 8 Plus"
-    - RUN_TESTS="YES"
-    - BUILD_EXAMPLE="YES"
-    - POD_LINT="NO"
-    - POD_QUALITY_CHECK="NO"
+    - DESTINATION="OS=13.2,name=iPhone 8 Plus" RUN_TESTS="YES" BUILD_EXAMPLE="YES" POD_LINT="NO" POD_QUALITY_CHECK="NO"
 script:
   - Scripts/travis-ci.sh
