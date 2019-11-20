@@ -1,9 +1,10 @@
-// swift-tools-version:4.2
+// swift-tools-version:5.1
 
 import PackageDescription
 
 let package = Package(
     name: "FDWaveformView",
+    platforms: [.iOS(.v8)],
     products: [
         .library(
             name: "FDWaveformView",
