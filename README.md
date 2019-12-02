@@ -85,20 +85,6 @@ Supports **iOS8+** and Swift 3.
 
 Add this to your project using Swift Package Manager. In Xcode that is simply: File > Swift Packages > Add Package Dependency... and you're done. Alternative installations options are shown below for legacy projects.
 
-### CocoaPods
-
-If you are already using [CocoaPods](http://cocoapods.org), just add 'FDWaveformView' to your `Podfile` then run `pod install`.
-
-### Carthage
-
-If you are already using [Carthage](https://github.com/Carthage/Carthage), just add to your `Cartfile`:
-
-```ogdl
-github "fulldecent/FDWaveformView" ~> 0.1
-```
-
-Then run `carthage update` to build the framework and drag the built `FDWaveformView`.framework into your Xcode project.
-
 ## Contributing
 
 This project's layout is based on https://github.com/fulldecent/swift4-module-template If you would like to change the layout, please change that project FIRST. Also you may appreciate that project has "recipes" -- you don't just change code you explain why you are doing things. As a maintainer this makes my job MUCH simpler. In a similar respect, if you are introducing non-minor changes, it will be VERY helpful if you could please reference to another project (like AlamoFire) that has seen and discussed the types of design challenges you are touching.) Thanks again and we all really do appreciate your contributions.
