@@ -41,3 +41,11 @@ class FDWaveformViewTests: XCTestCase {
     }
 
 }
+
+extension FDWaveformViewTests {
+    static var allTests = [
+        ("testZoomSaples", testZoomSaples),
+        ("testGesturesPermissions", testGesturesPermissions),
+        ("testColors", testColors),
+    ]
+}

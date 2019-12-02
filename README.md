@@ -81,12 +81,23 @@ Supports **iOS8+** and Swift 3.
 
 **Includes unit tests** which run successfully using Travis CI.
 
-Installation
-------------
+## Installation
 
-1. Add `pod 'FDWaveformView'` to your <a href="https://github.com/AFNetworking/AFNetworking/wiki/Getting-Started-with-AFNetworking">Podfile</a>
-2. The the API documentation under "Class Reference" at http://cocoadocs.org/docsets/FDWaveformView/
-3. Please add your project to "I USE THIS" at https://www.cocoacontrols.com/controls/fdwaveformview
+Add this to your project using Swift Package Manager. In Xcode that is simply: File > Swift Packages > Add Package Dependency... and you're done. Alternative installations options are shown below for legacy projects.
+
+### CocoaPods
+
+If you are already using [CocoaPods](http://cocoapods.org), just add 'FDWaveformView' to your `Podfile` then run `pod install`.
+
+### Carthage
+
+If you are already using [Carthage](https://github.com/Carthage/Carthage), just add to your `Cartfile`:
+
+```ogdl
+github "fulldecent/FDWaveformView" ~> 0.1
+```
+
+Then run `carthage update` to build the framework and drag the built `FDWaveformView`.framework into your Xcode project.
 
 ## Contributing
 

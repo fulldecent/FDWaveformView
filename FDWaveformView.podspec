@@ -13,5 +13,5 @@ DESC
   s.social_media_url = 'https://twitter.com/fulldecent'
   s.ios.deployment_target = '8.0'
   s.swift_version = '5.0'
-  s.source_files = 'Source/*.swift'
+  s.source_files = 'Sources/FDWaveformView/**/*.swift'
 end

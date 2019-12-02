@@ -244,7 +244,11 @@ final public class FDWaveformRenderOperation: Operation {
     
     // TODO: report progress? (for issue #2)
     func processSamples(fromData sampleBuffer: inout Data, sampleMax: inout CGFloat, outputSamples: inout [CGFloat], samplesToProcess: Int, downSampledLength: Int, samplesPerPixel: Int, filter: [Float]) {
-        sampleBuffer.withUnsafeBytes { (samples: UnsafePointer<Int16>) in
+        sampleBuffer.withUnsafeBytes { bytes in
+            guard let samples = bytes.bindMemory(to: Int16.self).baseAddress else {
+                return
+            }
+            
             var processingBuffer = [Float](repeating: 0.0, count: samplesToProcess)
             
             let sampleCount = vDSP_Length(samplesToProcess)
