@@ -21,5 +21,6 @@ let package = Package(
             name: "FDWaveformViewTests",
             dependencies: ["FDWaveformView"]
         )
-    ]
+    ],
+    swiftLanguageVersions: [.v5]
 )
