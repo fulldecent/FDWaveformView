@@ -4,11 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Master](https://github.com/fulldecent/FDWaveformView/compare/4.0.0...master)
+## [Master](https://github.com/fulldecent/FDWaveformView/compare/5.0.0...master)
+
+---
+
+## [5.0.0](https://github.com/fulldecent/FDWaveformView/releases/tag/5.0.0)
+Released on 2019-12-02.
 
 #### Changed
-- Switch to new standard library clamp functions
-  - Added by [William Entriken](https://github.com/fulldecent)
+- Converted to Swift 4.2 and Xcode 10
+
+#### Added
+- Full support for Swift Package Manager
 
 ---
 
