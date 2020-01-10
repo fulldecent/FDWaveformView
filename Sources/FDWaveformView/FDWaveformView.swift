@@ -123,17 +123,17 @@ open class FDWaveformView: UIView {
     /// If this portion is not available then a re-render will be performed
     private var horizontalBleedAllowed = 0.1 ... 3.0
 
-    /// The number of horizontal pixels to render per visible pixel on the screen (for antialiasing)
+    /// The number of horizontal pixels to render per visible pixel on the screen (for anti-aliasing)
     private var horizontalOverdrawTarget = 3.0
 
-    /// The required number of horizontal pixels to render per visible pixel on the screen (for antialiasing)
+    /// The required number of horizontal pixels to render per visible pixel on the screen (for anti-aliasing)
     /// If this number is not available then a re-render will be performed
     private var horizontalOverdrawAllowed = 1.5 ... 5.0
 
-    /// The number of vertical pixels to render per visible pixel on the screen (for antialiasing)
+    /// The number of vertical pixels to render per visible pixel on the screen (for anti-aliasing)
     private var verticalOverdrawTarget = 2.0
 
-    /// The required number of vertical pixels to render per visible pixel on the screen (for antialiasing)
+    /// The required number of vertical pixels to render per visible pixel on the screen (for anti-aliasing)
     /// If this number is not available then a re-render will be performed
     private var verticalOverdrawAllowed = 1.0 ... 3.0
 
@@ -189,7 +189,7 @@ open class FDWaveformView: UIView {
         return window?.screen.scale ?? UIScreen.main.scale
     }
 
-    /// Waveform type for rending waveforms
+    /// Waveform type for rendering waveforms
     //TODO: make this public after reconciling FDWaveformView.WaveformType and FDWaveformType
     var waveformRenderType: FDWaveformType {
         get {
@@ -240,7 +240,7 @@ open class FDWaveformView: UIView {
     }
 
     /// Indicates the gesture begun lastly.
-    /// This helps to determine which of continuous interaction should be active, pinching or panning.
+    /// This helps to determine which of the continuous interactions should be active, pinching or panning.
     /// pinchRecognizer
     fileprivate var firstGesture = PressType.none
 
@@ -290,7 +290,7 @@ open class FDWaveformView: UIView {
         inProgressWaveformRenderOperation?.cancel()
     }
 
-    /// If the cached waveform or in progress waveform is insufficient for the current frame
+    /// If the cached waveform or in-progress waveform is insufficient for the current frame
     fileprivate func cacheStatus() -> CacheStatus {
         guard !renderForCurrentAssetFailed else { return .notDirty(cancelInProgressRenderOperation: true) }
 
@@ -502,13 +502,13 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
         case .began:
             if firstGesture == .none {
                 // Set firstGesture to .pinch only if panning gesture is not active.
-                // This enables the user to repetitive pan and zoom action.
-                // If we set firstGesture to .pinch in any state then the user became unable
-                // to panning until they release all of fingers from the view.
+                // This enables the user to repetitively pan and zoom action.
+                // If we set firstGesture to .pinch in any state then the user becomes unable
+                // to pan until they release all fingers from the view.
                 firstGesture = .pinch
             }
         case .ended, .cancelled:
-            // This happens only if panning had not started.
+            // This happens only if panning has not started.
             firstGesture = .none
         default:
             break
@@ -527,7 +527,7 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
     @objc func handlePanGesture(_ recognizer: UIPanGestureRecognizer) {
         guard !zoomSamples.isEmpty else { return }
 
-        // This method is called even the user began with pinching.
+        // This method is called even if the user began with pinching.
 
         switch recognizer.state {
         case .began:
@@ -596,13 +596,13 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
     /// An audio file was loaded
     @objc optional func waveformViewDidLoad(_ waveformView: FDWaveformView)
 
-    /// The panning gesture did begin
+    /// The panning gesture began
     @objc optional func waveformDidBeginPanning(_ waveformView: FDWaveformView)
 
-    /// The panning gesture did end
+    /// The panning gesture ended
     @objc optional func waveformDidEndPanning(_ waveformView: FDWaveformView)
 
-    /// The scrubbing gesture did end
+    /// The scrubbing gesture ended
     @objc optional func waveformDidEndScrubbing(_ waveformView: FDWaveformView)
 }
 

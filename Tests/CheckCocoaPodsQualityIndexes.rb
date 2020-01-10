@@ -5,7 +5,7 @@
 # by William Entriken, version 1.0.1
 # Part of https://github.com/fulldecent/swift3-module-template
 #
-# The validates that all controllable quality metrics receive maximum score
+# This validates that all controllable quality metrics receive maximum score
 # from CocoaPods's scoring quality algorithm
 #
 # Usage: ruby CheckCocoaPodsQualityIndexes.rb PODNAME

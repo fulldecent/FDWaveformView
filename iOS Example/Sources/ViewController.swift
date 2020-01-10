@@ -136,7 +136,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         let thisBundle = Bundle(for: type(of: self))
         let url = thisBundle.url(forResource: "Submarine", withExtension: "aiff")
-        // Animate the waveform view in when it is rendered
+        // Animate the waveform view when it is rendered
         waveform.delegate = self
         waveform.alpha = 0.0
         waveform.audioURL = url

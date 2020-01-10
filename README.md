@@ -38,7 +38,7 @@ self.waveform.progressSamples = self.waveform.totalSamples / 2
 <img src="https://i.imgur.com/fRrHiRP.png" width=250>
 </p>
 
-**Zoom in** to show only part of the waveform, of course, zooming in will smoothly rerender to show progressively more detail:
+**Zoom in** to show only part of the waveform, of course, zooming in will smoothly re-render to show progressively more detail:
 
 ```swift
 self.waveform.zoomStartSamples = 0
@@ -87,4 +87,4 @@ Add this to your project using Swift Package Manager. In Xcode that is simply: F
 
 ## Contributing
 
-This project's layout is based on https://github.com/fulldecent/swift4-module-template If you would like to change the layout, please change that project FIRST. Also you may appreciate that project has "recipes" -- you don't just change code you explain why you are doing things. As a maintainer this makes my job MUCH simpler. In a similar respect, if you are introducing non-minor changes, it will be VERY helpful if you could please reference to another project (like AlamoFire) that has seen and discussed the types of design challenges you are touching.) Thanks again and we all really do appreciate your contributions.
+This project's layout is based on https://github.com/fulldecent/swift4-module-template If you would like to change the layout, please change that project FIRST. Also you may appreciate that project has "recipes" -- you don't just change code, you also explain why you are doing things. As a maintainer this makes my job MUCH simpler. In a similar respect, if you are introducing non-minor changes, it will be VERY helpful if you could please reference to another project (like AlamoFire) that has seen and discussed the types of design challenges you are touching.) Thanks again and we all really do appreciate your contributions.

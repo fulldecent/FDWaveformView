@@ -48,7 +48,7 @@ Released on 2017-05-31.
 
 #### Changed
 - Now using ranges in the API where appropriate
-  - Added by [William Entriken](https://github.com/fulldecent) in Regards to Issue
+  - Added by [William Entriken](https://github.com/fulldecent) in regards to issue
   [#76](https://github.com/fulldecent/FDWaveformView/issues/86).
 
 #### Fixed
@@ -65,7 +65,7 @@ Released on 2017-05-03.
 #### Added
 - Improved accuracy of waveform rendering
   - Added by [Kip Nicol](https://github.com/ospr)
-- Added support for rendering waveform images outside of a view (See `FDWaveformRenderOperation`)
+- Added support for rendering waveform images outside of view (See `FDWaveformRenderOperation`)
   - Added by [Kip Nicol](https://github.com/ospr)
 - Added support for rendering linear waveforms
   - Added by [Kip Nicol](https://github.com/ospr)
@@ -94,7 +94,7 @@ Released on 2017-04-15.
 #### Added
 - Improved example app to include more options
   - Added by [William Entriken](https://github.com/fulldecent)
-- Allow animation for changes to zoom
+- Allowed animation for changes to zoom
   - Added by [William Entriken](https://github.com/fulldecent)
 
 #### Fixed
@@ -103,7 +103,7 @@ Released on 2017-04-15.
 - Fixed waveform rendering for large audio files
   - Added by [Kip Nicol](https://github.com/ospr)
 - Fixed crash with quick load time
-  - Added by [William Entriken](https://github.com/fulldecent) in Regards to Issue
+  - Added by [William Entriken](https://github.com/fulldecent) in regards to issue
   [#76](https://github.com/fulldecent/FDWaveformView/issues/76).
 
 ---
@@ -112,9 +112,9 @@ Released on 2017-04-15.
 Released on 2017-02-16.
 
 #### Added
-- Allow scrubbing independantly of scrolling
+- Allowed scrubbing independantly of scrolling
   - Added by [Doug Earnshaw](https://github.com/pixlwave)
-- Tidy up Swift 3.0 conversion, remove some forced unwraps & generally make more Swifty
+- Tidied up Swift 3.0 conversion, removed some forced unwraps & generally made more swifty
   - Added by [Doug Earnshaw](https://github.com/pixlwave)
 
 ---
@@ -125,7 +125,7 @@ Released on 2016-09-27.
 #### Added
 - Automated CocoaPods Quality Indexes testing
   - Added by [Hayden Holligan](https://github.com/haydenholligan)
-- Use GPU to process waveforms
+- Used GPU to process waveforms
   - Added by [Hayden Holligan](https://github.com/haydenholligan)
 
 ---
@@ -135,7 +135,7 @@ Released on 2016-09-02.
 
 #### Fixed
 - Corrected rendering, fixed typo
-  - Added by [William Entriken](https://github.com/fulldecent) in Regards to Issue
+  - Added by [William Entriken](https://github.com/fulldecent) in regards to issue
   [#62](https://github.com/fulldecent/FDWaveformView/issues/62).
 
 ---
@@ -145,7 +145,7 @@ Released on 2016-08-02.
 
 #### Fixed
 - Fixed Podspec for Swift files
-  - Added by [William Entriken](https://github.com/fulldecent) in Regards to Issue
+  - Added by [William Entriken](https://github.com/fulldecent) in regards to issue
   [#61](https://github.com/fulldecent/FDWaveformView/issues/61).
 
 ---
@@ -155,16 +155,16 @@ Released on 2016-06-27.
 
 #### Added
 - Full API documentation
-  - Added by [William Entriken](https://github.com/fulldecent) in Regards to Issue
+  - Added by [William Entriken](https://github.com/fulldecent) in regards to issue
   [#53](https://github.com/fulldecent/FDWaveformView/issues/53).
 - Release process documentation
-  - Added by [William Entriken](https://github.com/fulldecent) in Regards to Issue
+  - Added by [William Entriken](https://github.com/fulldecent) in regards to issue
   [#57](https://github.com/fulldecent/FDWaveformView/issues/57).
-- Change Log
-  - Added by [William Entriken](https://github.com/fulldecent) in Regards to Issue
+- Changed Log
+  - Added by [William Entriken](https://github.com/fulldecent) in regards to issue
   [#54](https://github.com/fulldecent/FDWaveformView/issues/54).
 - Swift Package Manager support
-  - Added by [William Entriken](https://github.com/fulldecent) in Regards to Issue
+  - Added by [William Entriken](https://github.com/fulldecent) in regards to issue
   [#52](https://github.com/fulldecent/FDWaveformView/issues/52).
 
 ---
@@ -182,11 +182,11 @@ Released on 2016-04-10.
 Released on 2016-03-29.
 
 #### Added
-- Separate scrolling and pinching options
+- Separated scrolling and pinching options
   - Added by [Rudy Mutter](https://github.com/rmutter)
 
 #### Updated
-- Uses recommended CocoPods project format
+- Used recommended CocoPods project format
   - Added by [William Entriken](https://github.com/fulldecent)
 
 #### Fixed

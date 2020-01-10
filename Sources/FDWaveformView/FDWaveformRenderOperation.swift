@@ -141,7 +141,7 @@ final public class FDWaveformRenderOperation: Operation {
         finish(with: image)
     }
     
-    /// Read the asset and create create a lower resolution set of samples
+    /// Read the asset and create a lower resolution set of samples
     func sliceAsset(withRange slice: CountableRange<Int>, andDownsampleTo targetSamples: Int) -> (samples: [CGFloat], sampleMax: CGFloat)? {
         guard !isCancelled else { return nil }
         
@@ -181,7 +181,7 @@ final public class FDWaveformRenderOperation: Operation {
         
         // 16-bit samples
         reader.startReading()
-        defer { reader.cancelReading() } // Cancel reading if we exit early if operation is cancelled
+        defer { reader.cancelReading() } // Cancel reading if we exit early or if operation is cancelled
         
         while reader.status == .reading {
             guard !isCancelled else { return nil }
@@ -213,7 +213,7 @@ final public class FDWaveformRenderOperation: Operation {
             //print("Status: \(reader.status)")
         }
         
-        // Process the remaining samples at the end which didn't fit into samplesPerPixel
+        // Process the remaining samples that did not fit into samplesPerPixel at the end
         let samplesToProcess = sampleBuffer.count / MemoryLayout<Int16>.size
         if samplesToProcess > 0 {
             guard !isCancelled else { return nil }
@@ -233,7 +233,7 @@ final public class FDWaveformRenderOperation: Operation {
         }
         
         // if (reader.status == AVAssetReaderStatusFailed || reader.status == AVAssetReaderStatusUnknown)
-        // Something went wrong. Handle it, or not depending on if you can get above to work
+        // Something went wrong. Handle it or do not, depending on if you can get above to work
         if reader.status == .completed || true{
             return (outputSamples, sampleMax)
         } else {
