@@ -4,7 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Master](https://github.com/fulldecent/FDWaveformView/compare/4.0.0...master)
+## [Master](https://github.com/fulldecent/FDWaveformView/compare/4.0.1...master)
+
+#### Changed
+
+---
+
+## [4.0.1](https://github.com/fulldecent/FDWaveformView/releases/tag/4.0.1)
+Released on 2020-02-12.
 
 #### Changed
 - Switch to new standard library clamp functions
