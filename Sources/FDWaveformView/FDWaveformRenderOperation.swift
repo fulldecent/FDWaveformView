@@ -151,8 +151,17 @@ final public class FDWaveformRenderOperation: Operation {
             let reader = try? AVAssetReader(asset: audioContext.asset)
             else { return nil }
         
-        reader.timeRange = CMTimeRange(start: CMTime(value: Int64(slice.lowerBound), timescale: audioContext.asset.duration.timescale),
-                                       duration: CMTime(value: Int64(slice.count), timescale: audioContext.asset.duration.timescale))
+        var channelCount = 1
+        var sampleRate: CMTimeScale = 44100
+        let formatDescriptions = audioContext.assetTrack.formatDescriptions as! [CMAudioFormatDescription]
+        for item in formatDescriptions {
+            guard let fmtDesc = CMAudioFormatDescriptionGetStreamBasicDescription(item) else { return nil }
+            channelCount = Int(fmtDesc.pointee.mChannelsPerFrame)
+            sampleRate = Int32(fmtDesc.pointee.mSampleRate)
+        }
+        
+        reader.timeRange = CMTimeRange(start: CMTime(value: Int64(slice.lowerBound), timescale: sampleRate),
+                                       duration: CMTime(value: Int64(slice.count), timescale: sampleRate))
         let outputSettingsDict: [String : Any] = [
             AVFormatIDKey: Int(kAudioFormatLinearPCM),
             AVLinearPCMBitDepthKey: 16,
@@ -164,13 +173,6 @@ final public class FDWaveformRenderOperation: Operation {
         let readerOutput = AVAssetReaderTrackOutput(track: audioContext.assetTrack, outputSettings: outputSettingsDict)
         readerOutput.alwaysCopiesSampleData = false
         reader.add(readerOutput)
-        
-        var channelCount = 1
-        let formatDescriptions = audioContext.assetTrack.formatDescriptions as! [CMAudioFormatDescription]
-        for item in formatDescriptions {
-            guard let fmtDesc = CMAudioFormatDescriptionGetStreamBasicDescription(item) else { return nil }
-            channelCount = Int(fmtDesc.pointee.mChannelsPerFrame)
-        }
         
         var sampleMax = format.type.floorValue
         let samplesPerPixel = max(1, channelCount * slice.count / targetSamples)

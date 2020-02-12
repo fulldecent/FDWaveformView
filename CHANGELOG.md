@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file.
 #### Changed
 - Switch to new standard library clamp functions
   - Added by [William Entriken](https://github.com/fulldecent)
+- Fixed timescale bug for some mp4 files
+  - Added by [Doug Earnshaw](https://github.com/pixlwave)
 
 ---
 
