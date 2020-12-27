@@ -81,19 +81,19 @@ class ViewController: UIViewController {
     @IBAction func doLoadAAC() {
         let thisBundle = Bundle(for: type(of: self))
         let url = thisBundle.url(forResource: "TchaikovskyExample2", withExtension: "m4a")
-        waveform.audioURL = url
+        waveform.setAudioURL(audioURL: url)
     }
     
     @IBAction func doLoadMP3() {
         let thisBundle = Bundle(for: type(of: self))
         let url = thisBundle.url(forResource: "TchaikovskyExample2", withExtension: "mp3")
-        waveform.audioURL = url
+        waveform.setAudioURL(audioURL: url)
     }
     
     @IBAction func doLoadOGG() {
         let thisBundle = Bundle(for: type(of: self))
         let url = thisBundle.url(forResource: "TchaikovskyExample2", withExtension: "ogg")
-        waveform.audioURL = url
+        waveform.setAudioURL(audioURL: url)
     }
     
     @IBAction func toggleScrub(_ sender: UISwitch) {
@@ -139,7 +139,7 @@ class ViewController: UIViewController {
         // Animate the waveform view when it is rendered
         waveform.delegate = self
         waveform.alpha = 0.0
-        waveform.audioURL = url
+        waveform.setAudioURL(audioURL: url)
         waveform.zoomSamples = 0 ..< waveform.totalSamples / 3
         waveform.doesAllowScrubbing = true
         waveform.doesAllowStretch = true

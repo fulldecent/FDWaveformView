@@ -16,38 +16,47 @@ open class FDWaveformView: UIView {
     /// A delegate to accept progress reporting
     /*@IBInspectable*/ open weak var delegate: FDWaveformViewDelegate?
 
-    /// The audio file to render
-    /*@IBInspectable*/ open var audioURL: URL? {
+    /// The source for sample data
+    private var dataSource: FDAudioSource? {
         didSet {
-            guard let audioURL = audioURL else {
-                NSLog("FDWaveformView received nil audioURL")
-                audioContext = nil
-                return
+            waveformImage = nil
+            zoomSamples = 0 ..< self.totalSamples
+            highlightedSamples = nil
+            inProgressWaveformRenderOperation = nil
+            cachedWaveformRenderOperation = nil
+            renderForCurrentAssetFailed = false
+
+            setNeedsDisplay()
+            setNeedsLayout()
+        }
+    }
+    
+    public func setAudioURL(audioURL: URL?) {
+        guard let audioURL = audioURL else {
+            NSLog("FDWaveformView received nil audioURL")
+            dataSource = nil
+            return
+        }
+
+        loadingInProgress = true
+        delegate?.waveformViewWillLoad?(self)
+        
+        FDAudioSource.load(fromAudioURL: audioURL) { dataSource in
+            if dataSource == nil {
+                NSLog("FDWaveformView failed to load URL: \(audioURL)")
             }
-
-            loadingInProgress = true
-            delegate?.waveformViewWillLoad?(self)
-
-            FDAudioContext.load(fromAudioURL: audioURL) { audioContext in
-                DispatchQueue.main.async {
-                    guard self.audioURL == audioContext?.audioURL else { return }
-
-                    if audioContext == nil {
-                        NSLog("FDWaveformView failed to load URL: \(audioURL)")
-                    }
-
-                    self.audioContext = audioContext // This will reset the view and kick off a layout
-
-                    self.loadingInProgress = false
-                    self.delegate?.waveformViewDidLoad?(self)
-                }
+            DispatchQueue.main.async {
+                self.dataSource = dataSource // This will reset the view and kick off a layout
+                self.loadingInProgress = false
+                self.delegate?.waveformViewDidLoad?(self)
             }
         }
+
     }
 
     /// The total number of audio samples in the file
     open var totalSamples: Int {
-        return audioContext?.totalSamples ?? 0
+        return dataSource?.count ?? 0
     }
 
     /// The samples to be highlighted in a different color
@@ -138,7 +147,7 @@ open class FDWaveformView: UIView {
     private var verticalOverdrawAllowed = 1.0 ... 3.0
 
     /// The "zero" level (in dB)
-    fileprivate let noiseFloor: CGFloat = -50.0
+    fileprivate let noiseFloor: Float = -50.0
 
 
 
@@ -146,22 +155,7 @@ open class FDWaveformView: UIView {
 
     /// Whether rendering for the current asset failed
     private var renderForCurrentAssetFailed = false
-
-    /// Current audio context to be used for rendering
-    private var audioContext: FDAudioContext? {
-        didSet {
-            waveformImage = nil
-            zoomSamples = 0 ..< self.totalSamples
-            highlightedSamples = nil
-            inProgressWaveformRenderOperation = nil
-            cachedWaveformRenderOperation = nil
-            renderForCurrentAssetFailed = false
-
-            setNeedsDisplay()
-            setNeedsLayout()
-        }
-    }
-
+    
     /// Currently running renderer
     private var inProgressWaveformRenderOperation: FDWaveformRenderOperation? {
         willSet {
@@ -356,7 +350,8 @@ open class FDWaveformView: UIView {
 
     override open func layoutSubviews() {
         super.layoutSubviews()
-        guard audioContext != nil && !zoomSamples.isEmpty else {
+        guard dataSource != nil,
+              !zoomSamples.isEmpty else {
             return
         }
 
@@ -410,8 +405,10 @@ open class FDWaveformView: UIView {
     }
 
     func renderWaveform() {
-        guard let audioContext = audioContext else { return }
-        guard !zoomSamples.isEmpty else { return }
+        guard let dataSource = dataSource,
+              !zoomSamples.isEmpty else {
+            return
+        }
 
         let renderSamples = zoomSamples.extended(byFactor: horizontalBleedTarget).clamped(to: 0 ..< totalSamples)
         let widthInPixels = floor(frame.width * CGFloat(horizontalOverdrawTarget))
@@ -419,7 +416,7 @@ open class FDWaveformView: UIView {
         let imageSize = CGSize(width: widthInPixels, height: heightInPixels)
         let renderFormat = FDWaveformRenderFormat(type: waveformRenderType, wavesColor: .black, scale: desiredImageScale)
 
-        let waveformRenderOperation = FDWaveformRenderOperation(audioContext: audioContext, imageSize: imageSize, sampleRange: renderSamples, format: renderFormat) { [weak self] image in
+        let waveformRenderOperation = FDWaveformRenderOperation(dataSource: dataSource, imageSize: imageSize, sampleRange: renderSamples, format: renderFormat) { [weak self] image in
             DispatchQueue.main.async {
                 guard let strongSelf = self else { return }
 
@@ -448,7 +445,7 @@ enum FDWaveformType: Equatable {
 
     /// Waveform is rendered using a logarithmic scale
     ///   noiseFloor: The "zero" level (in dB)
-    case logarithmic(noiseFloor: CGFloat)
+    case logarithmic(noiseFloor: Float)
 
     // See http://stackoverflow.com/questions/24339807/how-to-test-equality-of-swift-enums-with-associated-values
     public static func ==(lhs: FDWaveformType, rhs: FDWaveformType) -> Bool {
@@ -465,7 +462,7 @@ enum FDWaveformType: Equatable {
         return false
     }
 
-    public var floorValue: CGFloat {
+    public var floorValue: Float {
         switch self {
         case .linear: return 0
         case .logarithmic(let noiseFloor): return noiseFloor
@@ -482,7 +479,7 @@ enum FDWaveformType: Equatable {
             var zero: Float = 32768.0
             vDSP_vdbcon(normalizedSamples, 1, &zero, &normalizedSamples, 1, vDSP_Length(normalizedSamples.count), 1)
 
-            //Clip to [noiseFloor, 0]
+            // Clip to [noiseFloor, 0]
             var ceil: Float = 0.0
             var noiseFloorFloat = Float(noiseFloor)
             vDSP_vclip(normalizedSamples, 1, &noiseFloorFloat, &ceil, &normalizedSamples, 1, vDSP_Length(normalizedSamples.count))
@@ -604,6 +601,23 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
 
     /// The scrubbing gesture ended
     @objc optional func waveformDidEndScrubbing(_ waveformView: FDWaveformView)
+}
+
+/// Te connect to the data we want to plot
+public protocol FDWaveformViewDataSource {
+    //TODO: Consider using RandomAccessCollection<Float> instead of FDWaveformViewDataSource
+
+    /// The first data offset available (usually 0)
+    var startIndex: Int { get }
+
+    /// One past the last data offset available
+    var endIndex: Int { get }
+
+    /// Number of data samples available
+    var count: Int { get }
+
+    /// Get samples
+    func readSampleData(bounds: Range<Int>) throws -> Data //TODO: make this [Float] return
 }
 
 //MARK -
