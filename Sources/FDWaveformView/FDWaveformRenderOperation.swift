@@ -44,8 +44,8 @@ struct FDWaveformRenderFormat {
 /// Operation used for rendering waveform images
 final public class FDWaveformRenderOperation: Operation {
     
-    /// The audio context used to build the waveform
-    let audioContext: FDAudioContext
+    /// Where we get data from
+    let dataSource: FDAudioSource
     
     /// Size of waveform image to render
     public let imageSize: CGSize
@@ -74,10 +74,10 @@ final public class FDWaveformRenderOperation: Operation {
     /// Final rendered image. Used to hold image for completionHandler.
     private var renderedImage: UIImage?
     
-    init(audioContext: FDAudioContext, imageSize: CGSize, sampleRange: CountableRange<Int>? = nil, format: FDWaveformRenderFormat = FDWaveformRenderFormat(), completionHandler: @escaping (_ image: UIImage?) -> ()) {
-        self.audioContext = audioContext
+    init(dataSource: FDAudioSource, imageSize: CGSize, sampleRange: CountableRange<Int>? = nil, format: FDWaveformRenderFormat = FDWaveformRenderFormat(), completionHandler: @escaping (_ image: UIImage?) -> ()) {
+        self.dataSource = dataSource
         self.imageSize = imageSize
-        self.sampleRange = sampleRange ?? 0..<audioContext.totalSamples
+        self.sampleRange = sampleRange ?? dataSource.startIndex..<dataSource.endIndex
         self.format = format
         self.completionHandler = completionHandler
         
@@ -142,151 +142,58 @@ final public class FDWaveformRenderOperation: Operation {
     }
     
     /// Read the asset and create a lower resolution set of samples
-    func sliceAsset(withRange slice: CountableRange<Int>, andDownsampleTo targetSamples: Int) -> (samples: [CGFloat], sampleMax: CGFloat)? {
-        guard !isCancelled else { return nil }
-        
-        guard
-            !slice.isEmpty,
-            targetSamples > 0,
-            let reader = try? AVAssetReader(asset: audioContext.asset)
-            else { return nil }
-        
-        var channelCount = 1
-        var sampleRate: CMTimeScale = 44100
-        let formatDescriptions = audioContext.assetTrack.formatDescriptions as! [CMAudioFormatDescription]
-        for item in formatDescriptions {
-            guard let fmtDesc = CMAudioFormatDescriptionGetStreamBasicDescription(item) else { return nil }
-            channelCount = Int(fmtDesc.pointee.mChannelsPerFrame)
-            sampleRate = Int32(fmtDesc.pointee.mSampleRate)
-        }
-        
-        reader.timeRange = CMTimeRange(start: CMTime(value: Int64(slice.lowerBound), timescale: sampleRate),
-                                       duration: CMTime(value: Int64(slice.count), timescale: sampleRate))
-        let outputSettingsDict: [String : Any] = [
-            AVFormatIDKey: Int(kAudioFormatLinearPCM),
-            AVLinearPCMBitDepthKey: 16,
-            AVLinearPCMIsBigEndianKey: false,
-            AVLinearPCMIsFloatKey: false,
-            AVLinearPCMIsNonInterleaved: false
-        ]
-        
-        let readerOutput = AVAssetReaderTrackOutput(track: audioContext.assetTrack, outputSettings: outputSettingsDict)
-        readerOutput.alwaysCopiesSampleData = false
-        reader.add(readerOutput)
-        
-        var sampleMax = format.type.floorValue
-        let samplesPerPixel = max(1, channelCount * slice.count / targetSamples)
-        let filter = [Float](repeating: 1.0 / Float(samplesPerPixel), count: samplesPerPixel)
-        
-        var outputSamples = [CGFloat]()
-        var sampleBuffer = Data()
-        
-        // 16-bit samples
-        reader.startReading()
-        defer { reader.cancelReading() } // Cancel reading if we exit early or if operation is cancelled
-        
-        while reader.status == .reading {
-            guard !isCancelled else { return nil }
-            
-            guard let readSampleBuffer = readerOutput.copyNextSampleBuffer(),
-                let readBuffer = CMSampleBufferGetDataBuffer(readSampleBuffer) else {
-                    break
-            }
-            // Append audio sample buffer into our current sample buffer
-            var readBufferLength = 0
-            var readBufferPointer: UnsafeMutablePointer<Int8>?
-            CMBlockBufferGetDataPointer(readBuffer, atOffset: 0, lengthAtOffsetOut: &readBufferLength, totalLengthOut: nil, dataPointerOut: &readBufferPointer)
-            sampleBuffer.append(UnsafeBufferPointer(start: readBufferPointer, count: readBufferLength))
-            CMSampleBufferInvalidate(readSampleBuffer)
-            
-            let totalSamples = sampleBuffer.count / MemoryLayout<Int16>.size
-            let downSampledLength = totalSamples / samplesPerPixel
-            let samplesToProcess = downSampledLength * samplesPerPixel
-            
-            guard samplesToProcess > 0 else { continue }
-            
-            processSamples(fromData: &sampleBuffer,
-                           sampleMax: &sampleMax,
-                           outputSamples: &outputSamples,
-                           samplesToProcess: samplesToProcess,
-                           downSampledLength: downSampledLength,
-                           samplesPerPixel: samplesPerPixel,
-                           filter: filter)
-            //print("Status: \(reader.status)")
-        }
-        
-        // Process the remaining samples that did not fit into samplesPerPixel at the end
-        let samplesToProcess = sampleBuffer.count / MemoryLayout<Int16>.size
-        if samplesToProcess > 0 {
-            guard !isCancelled else { return nil }
-            
-            let downSampledLength = 1
-            let samplesPerPixel = samplesToProcess
-            let filter = [Float](repeating: 1.0 / Float(samplesPerPixel), count: samplesPerPixel)
-            
-            processSamples(fromData: &sampleBuffer,
-                           sampleMax: &sampleMax,
-                           outputSamples: &outputSamples,
-                           samplesToProcess: samplesToProcess,
-                           downSampledLength: downSampledLength,
-                           samplesPerPixel: samplesPerPixel,
-                           filter: filter)
-            //print("Status: \(reader.status)")
-        }
-        
-        // if (reader.status == AVAssetReaderStatusFailed || reader.status == AVAssetReaderStatusUnknown)
-        // Something went wrong. Handle it or do not, depending on if you can get above to work
-        if reader.status == .completed || true{
-            return (outputSamples, sampleMax)
-        } else {
-            print("FDWaveformRenderOperation failed to read audio: \(String(describing: reader.error))")
-            return nil
-        }
-    }
     
-    // TODO: report progress? (for issue #2)
-    func processSamples(fromData sampleBuffer: inout Data, sampleMax: inout CGFloat, outputSamples: inout [CGFloat], samplesToProcess: Int, downSampledLength: Int, samplesPerPixel: Int, filter: [Float]) {
-        sampleBuffer.withUnsafeBytes { bytes in
-            guard let samples = bytes.bindMemory(to: Int16.self).baseAddress else {
+    /// Get data and downsample to an approximate size
+    /// - Parameters:
+    ///   - slice: Samples to get
+    ///   - targetSamples: Requested minimum outputsize
+    /// - Returns: An array of samples at least as large as targetSamples
+    func sliceAsset(withRange slice: CountableRange<Int>, andDownsampleTo targetSamples: Int) -> (samples: [Float], sampleMax: Float)? {
+        guard !isCancelled,
+              !slice.isEmpty,
+              targetSamples != 0,
+              var inputSampleData = try? dataSource.readSampleData(bounds: slice) else { return nil }
+        
+        let inputSampleCount = inputSampleData.count / MemoryLayout<Int16>.size
+        let downsampleFactor = max(1, inputSampleCount / targetSamples)
+        let averagingFilter = [Float](repeating: 1.0 / Float(downsampleFactor), count: downsampleFactor)
+        let outputSampleCount = inputSampleCount / downsampleFactor
+
+        var outputSamples = [Float](repeating: 0.0, count: outputSampleCount)
+        var outputSampleMax: Float = .nan
+
+        inputSampleData.withUnsafeBytes { bytes in
+            guard let inputSampleInt16Data = bytes.bindMemory(to: Int16.self).baseAddress else {
                 return
             }
             
-            var processingBuffer = [Float](repeating: 0.0, count: samplesToProcess)
+            var inputSamples = [Float](repeating: 0.0, count: inputSampleCount)
             
-            let sampleCount = vDSP_Length(samplesToProcess)
+            // Convert 16-bit Int samples to Floats
+            vDSP_vflt16(inputSampleInt16Data, 1, &inputSamples, 1, vDSP_Length(inputSampleCount))
             
-            //Convert 16bit int samples to floats
-            vDSP_vflt16(samples, 1, &processingBuffer, 1, sampleCount)
+            // Take the absolute values to get amplitude
+            vDSP_vabs(inputSamples, 1, &inputSamples, 1, vDSP_Length(inputSampleCount))
             
-            //Take the absolute values to get amplitude
-            vDSP_vabs(processingBuffer, 1, &processingBuffer, 1, sampleCount)
+            // Let current type further process the samples
+            format.type.process(normalizedSamples: &inputSamples)
             
-            //Let current type further process the samples
-            format.type.process(normalizedSamples: &processingBuffer)
+            // Downsample and average
+            vDSP_desamp(inputSamples,
+                        vDSP_Stride(downsampleFactor),
+                        averagingFilter,
+                        &outputSamples,
+                        vDSP_Length(outputSampleCount),
+                        vDSP_Length(downsampleFactor))
             
-            //Downsample and average
-            var downSampledData = [Float](repeating: 0.0, count: downSampledLength)
-            vDSP_desamp(processingBuffer,
-                        vDSP_Stride(samplesPerPixel),
-                        filter, &downSampledData,
-                        vDSP_Length(downSampledLength),
-                        vDSP_Length(samplesPerPixel))
-            
-            let downSampledDataCG = downSampledData.map { (value: Float) -> CGFloat in
-                let element = CGFloat(value)
-                if element > sampleMax { sampleMax = element }
-                return element
-            }
-            
-            // Remove processed samples
-            sampleBuffer.removeFirst(samplesToProcess * MemoryLayout<Int16>.size)
-            
-            outputSamples += downSampledDataCG
+            // Find maximum value
+            vDSP_maxv(outputSamples, 1, &outputSampleMax, vDSP_Length(outputSampleCount))
         }
+        
+        return (outputSamples, outputSampleMax)
     }
     
-    // TODO: report progress? (for issue #2)
-    func plotWaveformGraph(_ samples: [CGFloat], maximumValue max: CGFloat, zeroValue min: CGFloat) -> UIImage? {
+    func plotWaveformGraph(_ samples: [Float], maximumValue max: Float, zeroValue min: Float) -> UIImage? {
         guard !isCancelled else { return nil }
         
         let imageSize = CGSize(width: CGFloat(samples.count) / format.scale,
@@ -308,11 +215,11 @@ final public class FDWaveformRenderOperation: Operation {
         if max == min {
             sampleDrawingScale = 0
         } else {
-            sampleDrawingScale = (imageSize.height * format.scale) / 2 / (max - min)
+            sampleDrawingScale = (imageSize.height * format.scale) / 2 / CGFloat(max - min)
         }
         let verticalMiddle = (imageSize.height * format.scale) / 2
         for (x, sample) in samples.enumerated() {
-            let height = (sample - min) * sampleDrawingScale
+            let height = CGFloat(sample - min) * sampleDrawingScale
             context.move(to: CGPoint(x: CGFloat(x), y: verticalMiddle - height))
             context.addLine(to: CGPoint(x: CGFloat(x), y: verticalMiddle + height))
             context.strokePath();
