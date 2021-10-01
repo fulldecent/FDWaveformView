@@ -41,3 +41,6 @@ FDWaveformView.framework.zip
 
 # Swift project manager
 .swiftpm
+
+# User-specific xcconfig files
+iOS Example/Xcode-config/DEVELOPMENT_TEAM.xcconfig
