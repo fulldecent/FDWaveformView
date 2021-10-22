@@ -4,13 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Master](https://github.com/fulldecent/FDWaveformView/compare/4.0.1...master)
+## [Master](https://github.com/fulldecent/FDWaveformView/compare/5.0.1...master)
 
 #### Changed
 
 ---
 
-## [4.0.1](https://github.com/fulldecent/FDWaveformView/releases/tag/4.0.1)
+## [5.0.1](https://github.com/fulldecent/FDWaveformView/releases/tag/5.0.1)
 Released on 2020-02-12.
 
 #### Changed
@@ -21,7 +21,7 @@ Released on 2020-02-12.
 
 ---
 
-## [4.0.0](https://github.com/fulldecent/FDWaveformView/releases/tag/4.0.0)
+## [5.0.0](https://github.com/fulldecent/FDWaveformView/releases/tag/5.0.0)
 Released on 2019-04-08.
 
 #### Changed
