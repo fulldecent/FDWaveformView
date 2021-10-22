@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3D4FAE662706FFD8000EFCC8 /* DEVELOPMENT_TEAM.template.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3D4FAE632706FFD8000EFCC8 /* DEVELOPMENT_TEAM.template.xcconfig */; };
+		3D4FAE672706FFD8000EFCC8 /* DEVELOPMENT_TEAM.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3D4FAE642706FFD8000EFCC8 /* DEVELOPMENT_TEAM.xcconfig */; };
+		3D4FAE682706FFD8000EFCC8 /* Shared.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3D4FAE652706FFD8000EFCC8 /* Shared.xcconfig */; };
 		C4D2819B2383FB4F009DD34E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C4D281962383FB4F009DD34E /* Assets.xcassets */; };
 		C4D281B02383FD0A009DD34E /* Submarine.aiff in Resources */ = {isa = PBXBuildFile; fileRef = C4D281AC2383FD0A009DD34E /* Submarine.aiff */; };
 		C4D281B12383FD0A009DD34E /* TchaikovskyExample2.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = C4D281AD2383FD0A009DD34E /* TchaikovskyExample2.mp3 */; };
@@ -33,6 +36,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3D4FAE632706FFD8000EFCC8 /* DEVELOPMENT_TEAM.template.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = DEVELOPMENT_TEAM.template.xcconfig; sourceTree = "<group>"; };
+		3D4FAE642706FFD8000EFCC8 /* DEVELOPMENT_TEAM.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = DEVELOPMENT_TEAM.xcconfig; sourceTree = "<group>"; };
+		3D4FAE652706FFD8000EFCC8 /* Shared.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
 		C4D281962383FB4F009DD34E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C4D281972383FB4F009DD34E /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C4D281AC2383FD0A009DD34E /* Submarine.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = Submarine.aiff; sourceTree = "<group>"; };
@@ -58,6 +64,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3D4FAE622706FFD8000EFCC8 /* Xcode-config */ = {
+			isa = PBXGroup;
+			children = (
+				3D4FAE632706FFD8000EFCC8 /* DEVELOPMENT_TEAM.template.xcconfig */,
+				3D4FAE642706FFD8000EFCC8 /* DEVELOPMENT_TEAM.xcconfig */,
+				3D4FAE652706FFD8000EFCC8 /* Shared.xcconfig */,
+			);
+			path = "Xcode-config";
+			sourceTree = "<group>";
+		};
 		C4D281A82383FC0A009DD34E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -82,6 +98,7 @@
 				D94BE1BB1CCEBF2C0042282A /* Sources */,
 				D94BE1BA1CCEBF2C0042282A /* Products */,
 				C4D281A82383FC0A009DD34E /* Frameworks */,
+				3D4FAE622706FFD8000EFCC8 /* Xcode-config */,
 			);
 			sourceTree = "<group>";
 		};
@@ -144,7 +161,6 @@
 				TargetAttributes = {
 					D94BE1B81CCEBF2C0042282A = {
 						CreatedOnToolsVersion = 7.3;
-						DevelopmentTeam = 8Q693ZG5RN;
 						LastSwiftMigration = 1020;
 					};
 				};
@@ -172,10 +188,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3D4FAE672706FFD8000EFCC8 /* DEVELOPMENT_TEAM.xcconfig in Resources */,
+				3D4FAE682706FFD8000EFCC8 /* Shared.xcconfig in Resources */,
 				C4D281B92383FD3E009DD34E /* Main.storyboard in Resources */,
 				C4D281B82383FD3E009DD34E /* Launch Screen.storyboard in Resources */,
 				C4D281B02383FD0A009DD34E /* Submarine.aiff in Resources */,
 				C4D281B22383FD0A009DD34E /* TchaikovskyExample2.m4a in Resources */,
+				3D4FAE662706FFD8000EFCC8 /* DEVELOPMENT_TEAM.template.xcconfig in Resources */,
 				C4D2819B2383FB4F009DD34E /* Assets.xcassets in Resources */,
 				C4D281B32383FD0A009DD34E /* TchaikovskyExample2.ogg in Resources */,
 				C4D281B12383FD0A009DD34E /* TchaikovskyExample2.mp3 in Resources */,
@@ -225,6 +244,7 @@
 /* Begin XCBuildConfiguration section */
 		D94BE1C91CCEBF2C0042282A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3D4FAE652706FFD8000EFCC8 /* Shared.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
@@ -283,6 +303,7 @@
 		};
 		D94BE1CA1CCEBF2C0042282A /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3D4FAE652706FFD8000EFCC8 /* Shared.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
@@ -339,7 +360,6 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 8Q693ZG5RN;
 				FRAMEWORK_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "$(SRCROOT)/Sources/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -358,7 +378,6 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 8Q693ZG5RN;
 				FRAMEWORK_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "$(SRCROOT)/Sources/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
