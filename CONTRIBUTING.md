@@ -4,7 +4,7 @@ All contributors are welcome. Please use issues and pull requests to contribute 
 
 # Release Process
 
-1. Confirm the build is passing in travis
+1. Confirm the build vorks (todo: set up GitHub Actions testing)
    1. This automatically checks the pod file is building
 2. Create a release commit, see [prior releases](https://github.com/fulldecent/FDWaveformView/releases) for an example
    1. Update the change log to label the latest improvements under the new version name

@@ -1,10 +1,4 @@
 # FDWaveformView
-[![Build Status](https://travis-ci.org/fulldecent/FDWaveformView.svg?branch=master)](https://travis-ci.org/fulldecent/FDWaveformView)
-[![Version](https://img.shields.io/cocoapods/v/FDWaveformView.svg?style=flat)](http://cocoadocs.org/docsets/FDWaveformView)
-[![License](https://img.shields.io/cocoapods/l/FDWaveformView.svg?style=flat)](http://cocoadocs.org/docsets/FDWaveformView)
-[![Platform](https://img.shields.io/cocoapods/p/FDWaveformView.svg?style=flat)](http://cocoadocs.org/docsets/FDWaveformView)
-[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
-
 
 FDWaveformView is an easy way to display an audio waveform in your app. It is a nice visualization to show a playing audio file or to select a position in a file.
 
@@ -79,7 +73,7 @@ Creates **antialiased waveforms** by drawing more pixels than are seen on screen
 
 Supports **iOS8+** and Swift 3.
 
-**Includes unit tests** which run successfully using Travis CI.
+**Includes unit tests**, todo: run these on GitHub Actions
 
 ## Installation
 
