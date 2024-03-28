@@ -4,9 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Master](https://github.com/fulldecent/FDWaveformView/compare/4.0.1...master)
+## [Master](https://github.com/fulldecent/FDWaveformView/compare/5.0.2...master)
 
 #### Changed
+
+---
+
+## [5.0.2](https://github.com/fulldecent/FDWaveformView/releases/tag/5.0.2)
+Released on 2024-03-27.
+
+#### Changed
+- Removed Travis CI, CocoaPods, Carthage
 
 ---
 
