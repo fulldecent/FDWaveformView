@@ -25,7 +25,7 @@ Features
 **Set play progress** to highlight part of the waveform:
 
 ```swift
-self.waveform.progressSamples = self.waveform.totalSamples / 2
+self.waveform.highlightedSamples = 0..<(self.waveform.totalSamples / 2)
 ```
 
 <p align="center">
@@ -35,8 +35,7 @@ self.waveform.progressSamples = self.waveform.totalSamples / 2
 **Zoom in** to show only part of the waveform, of course, zooming in will smoothly re-render to show progressively more detail:
 
 ```swift
-self.waveform.zoomStartSamples = 0
-self.waveform.zoomEndSamples = self.waveform.totalSamples / 4
+self.waveform.zoomSamples = 0..<(self.waveform.totalSamples / 4)
 ```
 
 <p align="center">
@@ -60,7 +59,7 @@ self.waveform.doesAllowScroll = true
 ```swift
 UIView.animate(withDuration: 0.3) {
     let randomNumber = arc4random() % self.waveform.totalSamples
-    self.waveform.progressSamples = randomNumber
+    self.waveform.highlightedSamples = 0..<randomNumber
 }
 ```
 
