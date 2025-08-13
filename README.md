@@ -70,9 +70,9 @@ UIView.animate(withDuration: 0.3) {
 
 Creates **antialiased waveforms** by drawing more pixels than are seen on screen. Also, if you resize me (autolayout) I will render more detail if necessary to avoid pixelation.
 
-Supports **iOS12+** and Swift 5.
+Supports **iOS13+** and Swift 5.10.
 
-**Includes unit tests**, todo: run these on GitHub Actions
+**Includes unit tests** with GitHub Actions CI that tests on iOS and macOS.
 
 ## Installation
 

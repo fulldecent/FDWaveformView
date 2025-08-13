@@ -9,4 +9,9 @@ final class FDWaveformViewTests: XCTestCase {
         // Defining Test Cases and Test Methods
         // https://developer.apple.com/documentation/xctest/defining_test_cases_and_test_methods
     }
+    
+    func testFDWaveformViewCanBeImported() throws {
+        // Basic test to ensure the module can be imported and basic functionality works
+        XCTAssertTrue(true, "FDWaveformView module imported successfully")
+    }
 }

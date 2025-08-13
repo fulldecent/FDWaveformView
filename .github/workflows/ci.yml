@@ -1,0 +1,92 @@
+name: "FDWaveformView CI"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  spm:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.runsOn }}
+    env:
+      DEVELOPER_DIR: "/Applications/${{ matrix.xcode }}.app/Contents/Developer"
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - xcode: "Xcode_16.1"
+            runsOn: macos-15
+            name: "macOS 15, Swift 6.0, SPM"
+          - xcode: "Xcode_15.4"
+            runsOn: macos-14
+            name: "macOS 14, Swift 5.10, SPM"
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Test Swift Package Manager
+        run: |
+          set -o pipefail
+          swift --version
+          swift build
+          swift test
+
+  ios:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.runsOn }}
+    env:
+      DEVELOPER_DIR: "/Applications/${{ matrix.xcode }}.app/Contents/Developer"
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - destination: "OS=18.1,name=iPhone 15"
+            name: "iOS 18.1"
+            xcode: "Xcode_16.1"
+            runsOn: macos-15
+          - destination: "OS=17.5,name=iPhone 15"
+            name: "iOS 17.5"
+            xcode: "Xcode_15.4"
+            runsOn: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Test iOS
+        run: |
+          set -o pipefail
+          xcodebuild -version
+          xcodebuild -scheme FDWaveformView -destination "${{ matrix.destination }}" clean build test
+
+  macos:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.runsOn }}
+    env:
+      DEVELOPER_DIR: "/Applications/${{ matrix.xcode }}.app/Contents/Developer"
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - xcode: "Xcode_16.1"
+            runsOn: macos-15
+            name: "macOS 15, Xcode 16.1"
+          - xcode: "Xcode_15.4"
+            runsOn: macos-14
+            name: "macOS 14, Xcode 15.4"
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Test macOS
+        run: |
+          set -o pipefail
+          xcodebuild -version
+          xcodebuild -scheme FDWaveformView -destination "platform=macOS" clean build test
