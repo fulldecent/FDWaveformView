@@ -25,8 +25,7 @@ Features
 **Set play progress** to highlight part of the waveform:
 
 ```swift
-let samplesToHighlight = self.waveform.totalSamples / 2
-self.waveform.highlightedSamples = 0 ..< samplesToHighlight
+self.waveform.highlightedSamples = 0..<(self.waveform.totalSamples / 2)
 ```
 
 <p align="center">
@@ -36,7 +35,7 @@ self.waveform.highlightedSamples = 0 ..< samplesToHighlight
 **Zoom in** to show only part of the waveform, of course, zooming in will smoothly re-render to show progressively more detail:
 
 ```swift
-self.waveform.zoomSamples = 0 ..< (self.waveform.totalSamples / 4)
+self.waveform.zoomSamples = 0..<(self.waveform.totalSamples / 4)
 ```
 
 <p align="center">

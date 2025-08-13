@@ -106,7 +106,7 @@ open class FDWaveformView: UIView {
         }
     }
 
-    /// The color of the highlighted waveform (see `progressSamples`
+    /// The color of the highlighted waveform (see `highlightedSamples`
     @IBInspectable open var progressColor = UIColor.blue {
         didSet {
             highlightedImage.tintColor = progressColor
