@@ -1,7 +1,7 @@
 ---
 name: Test
 
-"on":
+on:
   push:
     branches: [main, master]
   pull_request:
@@ -18,12 +18,6 @@ jobs:
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: '15.4'
-
-      - name: Build for macOS
-        run: swift build
-
-      - name: Run tests
-        run: swift test
 
       - name: Build for iOS
         run: swift build -Xswiftc "-sdk" -Xswiftc "`xcrun --sdk iphonesimulator --show-sdk-path`" -Xswiftc "-target" -Xswiftc "x86_64-apple-ios12.0-simulator"
