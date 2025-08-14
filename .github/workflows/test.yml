@@ -1,0 +1,32 @@
+---
+name: Test
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    runs-on: macos-14
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Xcode version
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.4'
+
+      - name: Build and Test for iOS
+        run: |
+          # Build for iPhone Simulator using xcodebuild with Swift package
+          xcodebuild -scheme FDWaveformView \
+            -destination "platform=iOS Simulator,name=iPhone 15,OS=17.5" \
+            clean build
+          
+          # Run tests on iPhone Simulator  
+          xcodebuild -scheme FDWaveformView \
+            -destination "platform=iOS Simulator,name=iPhone 15,OS=17.5" \
+            test

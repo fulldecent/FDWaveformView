@@ -59,7 +59,7 @@ self.waveform.doesAllowScroll = true
 ```swift
 UIView.animate(withDuration: 0.3) {
     let randomNumber = arc4random() % self.waveform.totalSamples
-    self.waveform.highlightedSamples = 0..<randomNumber
+    self.waveform.highlightedSamples = 0 ..< randomNumber
 }
 ```
 
@@ -72,7 +72,7 @@ Creates **antialiased waveforms** by drawing more pixels than are seen on screen
 
 Supports **iOS12+** and Swift 5.
 
-**Includes unit tests**, todo: run these on GitHub Actions
+**Includes unit tests**, now running on GitHub Actions
 
 ## Installation
 
