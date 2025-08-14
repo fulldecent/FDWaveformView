@@ -19,5 +19,14 @@ jobs:
         with:
           xcode-version: '15.4'
 
-      - name: Build for iOS
-        run: swift build -Xswiftc "-sdk" -Xswiftc "`xcrun --sdk iphonesimulator --show-sdk-path`" -Xswiftc "-target" -Xswiftc "x86_64-apple-ios12.0-simulator"
+      - name: Build and Test for iOS
+        run: |
+          # Build for iPhone Simulator using xcodebuild with Swift package
+          xcodebuild -scheme FDWaveformView \
+            -destination "platform=iOS Simulator,name=iPhone 15,OS=17.5" \
+            clean build
+          
+          # Run tests on iPhone Simulator  
+          xcodebuild -scheme FDWaveformView \
+            -destination "platform=iOS Simulator,name=iPhone 15,OS=17.5" \
+            test
