@@ -1,27 +1,35 @@
-# Change Log
+# Change log
+
 All notable changes to this project will be documented in this file.
 `FDWaveformView` adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## [Master](https://github.com/fulldecent/FDWaveformView/compare/5.0.2...master)
+## [Main](https://github.com/fulldecent/FDWaveformView/compare/5.0.2...main)
 
-#### Changed
+### Changed
+
+- Updated README to mention Swift Package Manager only installation
+- Set up CI with GitHub Actions and document testing from command line
 
 ---
 
 ## [5.0.2](https://github.com/fulldecent/FDWaveformView/releases/tag/5.0.2)
+
 Released on 2024-03-27.
 
-#### Changed
+### Changed
+
 - Removed Travis CI, CocoaPods, Carthage
 
 ---
 
 ## [4.0.1](https://github.com/fulldecent/FDWaveformView/releases/tag/4.0.1)
+
 Released on 2020-02-12.
 
-#### Changed
+### Changed
+
 - Switch to new standard library clamp functions
   - Added by [William Entriken](https://github.com/fulldecent)
 - Fixed timescale bug for some mp4 files
@@ -30,9 +38,11 @@ Released on 2020-02-12.
 ---
 
 ## [4.0.0](https://github.com/fulldecent/FDWaveformView/releases/tag/4.0.0)
+
 Released on 2019-04-08.
 
-#### Changed
+### Changed
+
 - Converted to Swift 4.2 and Xcode 10
   - Added by [Doug Earnshaw](https://github.com/pixlwave)
 - Prevent to handle panning gesture while pinching
@@ -44,31 +54,38 @@ Released on 2019-04-08.
 ---
 
 ## [3.0.1](https://github.com/fulldecent/FDWaveformView/releases/tag/3.0.1)
+
 Released on 2017-10-27.
 
-#### Fixed
+### Fixed
+
 - Fixed Highlight Samples not aligned to base waveform [#101](https://github.com/fulldecent/FDWaveformView/issues/101).
   - Added by [Jon Andersen](https://github.com/jonandersen)
 
 ---
 
 ## [3.0.0](https://github.com/fulldecent/FDWaveformView/releases/tag/3.0.0)
+
 Released on 2017-10-27.
 
-#### Changed
+### Changed
+
 - Now supporting Swift 4.0
 
 ---
 
 ## [2.2.1](https://github.com/fulldecent/FDWaveformView/releases/tag/2.2.1)
+
 Released on 2017-05-31.
 
-#### Changed
+### Changed
+
 - Now using ranges in the API where appropriate
   - Added by [William Entriken](https://github.com/fulldecent) in regards to issue
   [#76](https://github.com/fulldecent/FDWaveformView/issues/86).
 
-#### Fixed
+### Fixed
+
 - Fixed a retain cycle in completion handler of waveform render operation
   - Added by [Philippe Jayet](https://github.com/pjay)
 - Cancel waveform render operation when view is released
@@ -77,9 +94,11 @@ Released on 2017-05-31.
 ---
 
 ## [2.2.0](https://github.com/fulldecent/FDWaveformView/releases/tag/2.2.0)
+
 Released on 2017-05-03.
 
-#### Added
+### Added
+
 - Improved accuracy of waveform rendering
   - Added by [Kip Nicol](https://github.com/ospr)
 - Added support for rendering waveform images outside of view (See `FDWaveformRenderOperation`)
@@ -91,7 +110,8 @@ Released on 2017-05-03.
 - Added support for updating waveform type and color to iOS Example app.
   - Added by [Kip Nicol](https://github.com/ospr)
 
-#### Fixed
+### Fixed
+
 - Fixed waveform rendering for large audio files
   - Added by [Kip Nicol](https://github.com/ospr)
 - Fixed bug which could prevent waveform from fitting new view size if rendering was in progress during a view resize
@@ -106,15 +126,18 @@ Released on 2017-05-03.
 ---
 
 ## [2.1.0](https://github.com/fulldecent/FDWaveformView/releases/tag/2.1.0)
+
 Released on 2017-04-15.
 
-#### Added
+### Added
+
 - Improved example app to include more options
   - Added by [William Entriken](https://github.com/fulldecent)
 - Allowed animation for changes to zoom
   - Added by [William Entriken](https://github.com/fulldecent)
 
-#### Fixed
+### Fixed
+
 - Improved accuracy of waveform rendering
   - Added by [Kip Nicol](https://github.com/ospr)
 - Fixed waveform rendering for large audio files
@@ -126,9 +149,11 @@ Released on 2017-04-15.
 ---
 
 ## [2.0.1](https://github.com/fulldecent/FDWaveformView/releases/tag/2.0.1)
+
 Released on 2017-02-16.
 
-#### Added
+### Added
+
 - Allowed scrubbing independantly of scrolling
   - Added by [Doug Earnshaw](https://github.com/pixlwave)
 - Tidied up Swift 3.0 conversion, removed some forced unwraps & generally made more swifty
@@ -137,9 +162,11 @@ Released on 2017-02-16.
 ---
 
 ## [2.0.0](https://github.com/fulldecent/FDWaveformView/releases/tag/2.0.0)
+
 Released on 2016-09-27.
 
-#### Added
+### Added
+
 - Automated CocoaPods Quality Indexes testing
   - Added by [Hayden Holligan](https://github.com/haydenholligan)
 - Used GPU to process waveforms
@@ -148,9 +175,11 @@ Released on 2016-09-27.
 ---
 
 ## [1.0.2](https://github.com/fulldecent/FDWaveformView/releases/tag/1.0.2)
+
 Released on 2016-09-02.
 
-#### Fixed
+### Fixed
+
 - Corrected rendering, fixed typo
   - Added by [William Entriken](https://github.com/fulldecent) in regards to issue
   [#62](https://github.com/fulldecent/FDWaveformView/issues/62).
@@ -158,9 +187,11 @@ Released on 2016-09-02.
 ---
 
 ## [1.0.1](https://github.com/fulldecent/FDWaveformView/releases/tag/1.0.1)
+
 Released on 2016-08-02.
 
-#### Fixed
+### Fixed
+
 - Fixed Podspec for Swift files
   - Added by [William Entriken](https://github.com/fulldecent) in regards to issue
   [#61](https://github.com/fulldecent/FDWaveformView/issues/61).
@@ -168,9 +199,11 @@ Released on 2016-08-02.
 ---
 
 ## [1.0.0](https://github.com/fulldecent/FDWaveformView/releases/tag/1.0.0)
+
 Released on 2016-06-27.
 
-#### Added
+### Added
+
 - Full API documentation
   - Added by [William Entriken](https://github.com/fulldecent) in regards to issue
   [#53](https://github.com/fulldecent/FDWaveformView/issues/53).
@@ -187,50 +220,61 @@ Released on 2016-06-27.
 ---
 
 ## [0.3.2](https://github.com/fulldecent/FDWaveformView/releases/tag/0.3.2)
+
 Released on 2016-04-10.
 
-#### Added
+### Added
+
 - Carthage support
   - Added by [William Entriken](https://github.com/fulldecent)
 
 ---
 
 ## [0.3.0](https://github.com/fulldecent/FDWaveformView/releases/tag/0.3.0)
+
 Released on 2016-03-29.
 
-#### Added
+### Added
+
 - Separated scrolling and pinching options
   - Added by [Rudy Mutter](https://github.com/rmutter)
 
-#### Updated
+### Updated
+
 - Used recommended CocoPods project format
   - Added by [William Entriken](https://github.com/fulldecent)
 
-#### Fixed
+### Fixed
+
 - That warning everyone was seeing
   - Added by [Yin Cheng](https://github.com/msching)
 
 ---
 
 ## [0.2.2](https://github.com/fulldecent/FDWaveformView/releases/tag/0.2.2)
+
 Released on 2015-09-14.
 
-#### Added
+### Added
+
 - Profiling tests
   - Added by [William Entriken](https://github.com/fulldecent)
 
 ---
 
 ## [0.1.2](https://github.com/fulldecent/FDWaveformView/releases/tag/0.1.2)
+
 Released on 2014-01-06.
 
-#### Added
+### Added
+
 - First cocoapods release
   - Added by [William Entriken](https://github.com/fulldecent)
 
 ---
 
 ## [0.1.0](https://github.com/fulldecent/FDWaveformView/releases/tag/0.1.0)
+
 Released on 2013-11-04.
 
 Initial public release.

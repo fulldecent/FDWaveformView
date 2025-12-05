@@ -2,8 +2,6 @@
 
 FDWaveformView is an easy way to display an audio waveform in your app. It is a nice visualization to show a playing audio file or to select a position in a file.
 
-**:hatching_chick: Virtual tip jar: https://amazon.com/hz/wishlist/ls/EE78A23EEGQB**
-
 Usage
 -----
 
@@ -67,12 +65,33 @@ UIView.animate(withDuration: 0.3) {
 <img src="https://i.imgur.com/EgxXaCY.gif" width=250 loop=infinite>
 </p>
 
-
 Creates **antialiased waveforms** by drawing more pixels than are seen on screen. Also, if you resize me (autolayout) I will render more detail if necessary to avoid pixelation.
 
 Supports **iOS12+** and Swift 5.
 
 **Includes unit tests**, now running on GitHub Actions
+
+## Testing
+
+To build and run tests from the command line, first find an available simulator:
+
+```sh
+xcrun simctl list devices available | grep iPhone
+```
+
+Then build and test using a simulator ID:
+
+```sh
+# Build the library
+xcodebuild build -scheme FDWaveformView -destination 'id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
+
+# Run unit tests
+xcodebuild test -scheme FDWaveformView -destination 'id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
+
+# Build the Example app (requires a newer iOS simulator)
+cd Example
+xcodebuild build -scheme Example -destination 'id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
+```
 
 ## Installation
 
@@ -80,4 +99,4 @@ Add this to your project using Swift Package Manager. In Xcode that is simply: F
 
 ## Contributing
 
-* This project's layout is based on https://github.com/fulldecent/swift5-module-template
+* This project's layout is based on <https://github.com/fulldecent/swift6-module-template>
