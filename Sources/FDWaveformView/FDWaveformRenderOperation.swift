@@ -1,5 +1,5 @@
 //
-// Copyright 2013 - 2017, William Entriken and the FDWaveformView contributors.
+// Copyright William Entriken and the FDWaveformView contributors.
 //
 import UIKit
 import AVFoundation
@@ -44,8 +44,12 @@ struct FDWaveformRenderFormat {
 /// Operation used for rendering waveform images
 final public class FDWaveformRenderOperation: Operation {
     
-    /// The audio context used to build the waveform
-    let audioContext: FDAudioContext
+    /// The data source used to build the waveform
+    let dataSource: FDWaveformDataSource
+    
+    /// The audio context used to build the waveform (for optimized AVAssetReader path)
+    /// If nil, uses the generic dataSource.readSamples() method
+    let audioContext: FDAudioContext?
     
     /// Size of waveform image to render
     public let imageSize: CGSize
@@ -74,7 +78,27 @@ final public class FDWaveformRenderOperation: Operation {
     /// Final rendered image. Used to hold image for completionHandler.
     private var renderedImage: UIImage?
     
+    /// Initialize with a generic data source
+    init(dataSource: FDWaveformDataSource, imageSize: CGSize, sampleRange: CountableRange<Int>? = nil, format: FDWaveformRenderFormat = FDWaveformRenderFormat(), completionHandler: @escaping (_ image: UIImage?) -> ()) {
+        self.dataSource = dataSource
+        self.audioContext = dataSource as? FDAudioContext
+        self.imageSize = imageSize
+        self.sampleRange = sampleRange ?? 0..<dataSource.sampleCount
+        self.format = format
+        self.completionHandler = completionHandler
+        
+        super.init()
+        
+        self.completionBlock = { [weak self] in
+            guard let `self` = self else { return }
+            self.completionHandler(self.renderedImage)
+            self.renderedImage = nil
+        }
+    }
+    
+    /// Legacy initializer for backward compatibility
     init(audioContext: FDAudioContext, imageSize: CGSize, sampleRange: CountableRange<Int>? = nil, format: FDWaveformRenderFormat = FDWaveformRenderFormat(), completionHandler: @escaping (_ image: UIImage?) -> ()) {
+        self.dataSource = audioContext
         self.audioContext = audioContext
         self.imageSize = imageSize
         self.sampleRange = sampleRange ?? 0..<audioContext.totalSamples
@@ -130,8 +154,17 @@ final public class FDWaveformRenderOperation: Operation {
         let targetSamples = Int(imageSize.width * format.scale)
         
         let image: UIImage? = {
+            // Use optimized AVAssetReader path if we have an audioContext,
+            // otherwise use the generic dataSource.readSamples() method
+            let result: (samples: [CGFloat], sampleMax: CGFloat)?
+            if audioContext != nil {
+                result = sliceAsset(withRange: sampleRange, andDownsampleTo: targetSamples)
+            } else {
+                result = sliceDataSource(withRange: sampleRange, andDownsampleTo: targetSamples)
+            }
+            
             guard
-                let (samples, sampleMax) = sliceAsset(withRange: sampleRange, andDownsampleTo: targetSamples),
+                let (samples, sampleMax) = result,
                 let image = plotWaveformGraph(samples, maximumValue: sampleMax, zeroValue: format.type.floorValue)
                 else { return nil }
             
@@ -141,9 +174,58 @@ final public class FDWaveformRenderOperation: Operation {
         finish(with: image)
     }
     
+    /// Read samples from the generic data source and downsample
+    func sliceDataSource(withRange slice: CountableRange<Int>, andDownsampleTo targetSamples: Int) -> (samples: [CGFloat], sampleMax: CGFloat)? {
+        guard !isCancelled else { return nil }
+        guard !slice.isEmpty, targetSamples > 0 else { return nil }
+        
+        // Read samples from data source
+        guard let rawSamples = try? dataSource.readSamples(in: slice.lowerBound..<slice.upperBound) else {
+            return nil
+        }
+        
+        guard !isCancelled else { return nil }
+        
+        var sampleMax = format.type.floorValue
+        let samplesPerPixel = max(1, slice.count / targetSamples)
+        let filter = [Float](repeating: 1.0 / Float(samplesPerPixel), count: samplesPerPixel)
+        
+        // Take absolute values
+        var processingBuffer = rawSamples
+        vDSP_vabs(processingBuffer, 1, &processingBuffer, 1, vDSP_Length(processingBuffer.count))
+        
+        // Apply waveform type processing (linear/logarithmic)
+        format.type.process(normalizedSamples: &processingBuffer)
+        
+        // Downsample
+        let downSampledLength = processingBuffer.count / samplesPerPixel
+        guard downSampledLength > 0 else {
+            // If we have fewer samples than pixels, just use what we have
+            let outputSamples = processingBuffer.map { CGFloat($0) }
+            let maxVal = outputSamples.max() ?? format.type.floorValue
+            return (outputSamples, maxVal)
+        }
+        
+        var downSampledData = [Float](repeating: 0.0, count: downSampledLength)
+        vDSP_desamp(processingBuffer,
+                    vDSP_Stride(samplesPerPixel),
+                    filter, &downSampledData,
+                    vDSP_Length(downSampledLength),
+                    vDSP_Length(samplesPerPixel))
+        
+        let outputSamples = downSampledData.map { (value: Float) -> CGFloat in
+            let element = CGFloat(value)
+            if element > sampleMax { sampleMax = element }
+            return element
+        }
+        
+        return (outputSamples, sampleMax)
+    }
+    
     /// Read the asset and create a lower resolution set of samples
     func sliceAsset(withRange slice: CountableRange<Int>, andDownsampleTo targetSamples: Int) -> (samples: [CGFloat], sampleMax: CGFloat)? {
         guard !isCancelled else { return nil }
+        guard let audioContext = audioContext else { return nil }
         
         guard
             !slice.isEmpty,
