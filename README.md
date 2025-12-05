@@ -79,7 +79,7 @@ To build and run tests from the command line, first find an available simulator:
 xcrun simctl list devices available | grep iPhone
 ```
 
-Then build and test using a simulator ID:
+Then build and test using a simulator ID (replace the placeholder with an ID from the output above):
 
 ```sh
 # Build the library
