@@ -11,13 +11,12 @@ import UIKit
 // see http://stackoverflow.com/questions/3514066/how-to-tint-a-transparent-png-image-in-iphone
 
 /// A view for rendering audio waveforms
-/*@IBDesignable*/ // IBDesignable support in XCode is so broken it's sad
 open class FDWaveformView: UIView {
   /// A delegate to accept progress reporting
-  /*@IBInspectable*/ open weak var delegate: FDWaveformViewDelegate?
+  open weak var delegate: FDWaveformViewDelegate?
 
   /// The audio file to render
-  /*@IBInspectable*/ open var audioURL: URL? {
+  open var audioURL: URL? {
     didSet {
       guard let audioURL = audioURL else {
         NSLog("FDWaveformView received nil audioURL")
@@ -51,7 +50,7 @@ open class FDWaveformView: UIView {
   }
 
   /// The samples to be highlighted in a different color
-  /*@IBInspectable*/ open var highlightedSamples: CountableRange<Int>? = nil {
+  open var highlightedSamples: CountableRange<Int>? = nil {
     didSet {
       guard totalSamples > 0 else {
         return
@@ -69,7 +68,7 @@ open class FDWaveformView: UIView {
   }
 
   /// The samples to be displayed
-  /*@IBInspectable*/ open var zoomSamples: CountableRange<Int> = 0..<0 {
+  open var zoomSamples: CountableRange<Int> = 0..<0 {
     didSet {
       setNeedsDisplay()
       setNeedsLayout()
@@ -78,13 +77,13 @@ open class FDWaveformView: UIView {
 
   /// Whether to allow tap and pan gestures to change highlighted range
   /// Pan gives priority to `doesAllowScroll` if this and that are both `true`
-  /*@IBInspectable*/ open var doesAllowScrubbing = true
+  open var doesAllowScrubbing = true
 
   /// Whether to allow pinch gesture to change zoom
-  /*@IBInspectable*/ open var doesAllowStretch = true
+  open var doesAllowStretch = true
 
   /// Whether to allow pan gesture to change zoom
-  /*@IBInspectable*/ open var doesAllowScroll = true
+  open var doesAllowScroll = true
 
   /// Supported waveform types
   //TODO: make this public after reconciling FDWaveformView.WaveformType and FDWaveformType
@@ -101,14 +100,14 @@ open class FDWaveformView: UIView {
   }
 
   /// The color of the waveform
-  @IBInspectable open var wavesColor = UIColor.black {
+  open var wavesColor = UIColor.black {
     didSet {
       imageView.tintColor = wavesColor
     }
   }
 
   /// The color of the highlighted waveform (see `highlightedSamples`
-  @IBInspectable open var progressColor = UIColor.blue {
+  open var progressColor = UIColor.blue {
     didSet {
       highlightedImage.tintColor = progressColor
     }

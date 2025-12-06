@@ -4,7 +4,7 @@ FDWaveformView displays audio waveforms in Swift apps so users can preview audio
 
 ## Usage
 
-Add an `FDWaveformView` in Interface Builder or programmatically, then load audio. If your file is missing an extension, see the [Stack Overflow answer on AVURLAsset without extensions](https://stackoverflow.com/questions/9290972/is-it-possible-to-make-avurlasset-work-without-a-file-extension).
+Add an `FDWaveformView` programmatically, then load audio. If your file is missing an extension, see the [Stack Overflow answer on AVURLAsset without extensions](https://stackoverflow.com/questions/9290972/is-it-possible-to-make-avurlasset-work-without-a-file-extension).
 
 ```swift
 let thisBundle = Bundle(for: type(of: self))
