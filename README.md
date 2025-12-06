@@ -1,11 +1,10 @@
 # FDWaveformView
 
-FDWaveformView is an easy way to display an audio waveform in your app. It is a nice visualization to show a playing audio file or to select a position in a file.
+FDWaveformView displays audio waveforms in Swift apps so users can preview audio, scrub, and pick positions with ease.
 
-Usage
------
+## Usage
 
-To use it, add an `FDWaveformView` using Interface Builder or programmatically and then just load your audio as per this example. Note: if your audio file does not have file extension, see <a href="https://stackoverflow.com/questions/9290972/is-it-possible-to-make-avurlasset-work-without-a-file-extension">this SO question</a>.
+Add an `FDWaveformView` in Interface Builder or programmatically, then load audio. If your file is missing an extension, see the [Stack Overflow answer on AVURLAsset without extensions](https://stackoverflow.com/questions/9290972/is-it-possible-to-make-avurlasset-work-without-a-file-extension).
 
 ```swift
 let thisBundle = Bundle(for: type(of: self))
@@ -13,34 +12,33 @@ let url = thisBundle.url(forResource: "Submarine", withExtension: "aiff")
 self.waveform.audioURL = url
 ```
 
-<p align="center">
-<img src="https://i.imgur.com/5N7ozog.png" width=250>
-</p>
+![Waveform overview showing loaded audio](https://i.imgur.com/5N7ozog.png)
 
-Features
---------
+## Features
 
-**Set play progress** to highlight part of the waveform:
+### Highlight playback
+
+Highlight a portion of the waveform to show progress.
 
 ```swift
 self.waveform.highlightedSamples = 0..<(self.waveform.totalSamples / 2)
 ```
 
-<p align="center">
-<img src="https://i.imgur.com/fRrHiRP.png" width=250>
-</p>
+![Waveform with highlighted progress](https://i.imgur.com/fRrHiRP.png)
 
-**Zoom in** to show only part of the waveform, of course, zooming in will smoothly re-render to show progressively more detail:
+### Zoom for detail
+
+Render only the visible portion while progressively adding detail as you zoom.
 
 ```swift
 self.waveform.zoomSamples = 0..<(self.waveform.totalSamples / 4)
 ```
 
-<p align="center">
-<img src="https://i.imgur.com/JQOKQ3o.png" width=250>
-</p>
+![Zoomed waveform segment](https://i.imgur.com/JQOKQ3o.png)
 
-**Enable gestures** for zooming in, panning around or scrubbing:
+### Gesture control
+
+Allow scrubbing, stretching, and scrolling with built-in gestures.
 
 ```swift
 self.waveform.doesAllowScrubbing = true
@@ -48,11 +46,11 @@ self.waveform.doesAllowStretch = true
 self.waveform.doesAllowScroll = true
 ```
 
-<p align="center">
-<img src="https://i.imgur.com/8oR7cpq.gif" width=250 loop=infinite>
-</p>
+![Gesture-driven waveform interaction](https://i.imgur.com/8oR7cpq.gif)
 
-**Supports animation** for changing properties:
+### Animated updates
+
+Animate property changes for smoother UI feedback.
 
 ```swift
 UIView.animate(withDuration: 0.3) {
@@ -61,25 +59,60 @@ UIView.animate(withDuration: 0.3) {
 }
 ```
 
-<p align="center">
-<img src="https://i.imgur.com/EgxXaCY.gif" width=250 loop=infinite>
-</p>
+![Animated waveform highlight change](https://i.imgur.com/EgxXaCY.gif)
 
-Creates **antialiased waveforms** by drawing more pixels than are seen on screen. Also, if you resize me (autolayout) I will render more detail if necessary to avoid pixelation.
+### Rendering quality
 
-Supports **iOS12+** and Swift 5.
+- Antialiased waveforms draw extra pixels to avoid jagged edges.
+- Autolayout-driven size changes trigger re-rendering to prevent pixelation.
+- Supports iOS 12+ and Swift 5.
+- Includes unit tests running on GitHub Actions.
 
-**Includes unit tests**, now running on GitHub Actions
+## Installation
+
+Use Swift Package Manager: in Xcode choose File > Swift Packages > Add Package Dependency and point to this repository. Legacy installation options are available if needed.
+
+## API
+
+Following is the complete API for this module:
+
+- `FDWaveformView` (open class, subclass of `UIView`)
+  - `init()` (public init) default initializer
+  - `delegate: FDWaveformViewDelegate?` (open var, get/set) delegate for loading and rendering callbacks
+  - `audioURL: URL?` (open var, get/set) audio file to render asynchronously
+  - `totalSamples: Int` (open var, get) sample count of the loaded asset
+  - `highlightedSamples: CountableRange<Int>?` (open var, get/set) range tinted with `progressColor`
+  - `zoomSamples: CountableRange<Int>` (open var, get/set) range currently displayed
+  - `doesAllowScrubbing: Bool` (open var, get/set) enable tap and pan scrubbing
+  - `doesAllowStretch: Bool` (open var, get/set) enable pinch-to-zoom
+  - `doesAllowScroll: Bool` (open var, get/set) enable panning across the waveform
+  - `wavesColor: UIColor` (open var, get/set) tint for the base waveform image
+  - `progressColor: UIColor` (open var, get/set) tint for the highlighted waveform
+  - `loadingInProgress: Bool` (open var, get) indicates async load in progress
+
+- `FDWaveformViewDelegate` (@objc public protocol)
+  - `waveformViewWillRender(_ waveformView: FDWaveformView)` (optional)
+  - `waveformViewDidRender(_ waveformView: FDWaveformView)` (optional)
+  - `waveformViewWillLoad(_ waveformView: FDWaveformView)` (optional)
+  - `waveformViewDidLoad(_ waveformView: FDWaveformView)` (optional)
+  - `waveformDidBeginPanning(_ waveformView: FDWaveformView)` (optional)
+  - `waveformDidEndPanning(_ waveformView: FDWaveformView)` (optional)
+  - `waveformDidEndScrubbing(_ waveformView: FDWaveformView)` (optional)
+
+A couple other things are exposed that we do not consider public API:
+
+- `FDWaveformView` (implements `UIGestureRecognizerDelegate`)
+  - `gestureRecognizer(_:shouldRecognizeSimultaneouslyWith:) -> Bool`
 
 ## Testing
 
-To build and run tests from the command line, first find an available simulator:
+Find an available simulator:
 
 ```sh
 xcrun simctl list devices available | grep iPhone
 ```
 
-Then build and test using a simulator ID (replace the placeholder with an ID from the output above):
+Build and test using a simulator ID from the output:
 
 ```sh
 # Build the library
@@ -93,10 +126,6 @@ cd Example
 xcodebuild build -scheme Example -destination 'id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
 ```
 
-## Installation
-
-Add this to your project using Swift Package Manager. In Xcode that is simply: File > Swift Packages > Add Package Dependency... and you're done. Alternative installations options are shown below for legacy projects.
-
 ## Contributing
 
-* This project's layout is based on <https://github.com/fulldecent/swift6-module-template>
+- This project's layout is based on <https://github.com/fulldecent/swift6-module-template>
