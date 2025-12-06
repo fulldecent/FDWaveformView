@@ -1,9 +1,8 @@
+//
+// Copyright (c) William Entriken and the FDWaveformView contributors
+//
 import AVFoundation
 import Accelerate
-import MediaPlayer
-//
-// Copyright 2013 - 2017, William Entriken and the FDWaveformView contributors.
-//
 import UIKit
 
 // FROM http://stackoverflow.com/questions/5032775/drawing-waveform-with-avassetreader

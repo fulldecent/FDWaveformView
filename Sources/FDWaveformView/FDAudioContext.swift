@@ -1,8 +1,7 @@
+//
+// Copyright (c) William Entriken and the FDWaveformView contributors
+//
 import AVFoundation
-//
-// Copyright 2013 - 2017, William Entriken and the FDWaveformView contributors.
-//
-import UIKit
 
 /// Holds audio information used for building waveforms
 final class FDAudioContext {

@@ -1,8 +1,8 @@
+//
+// Copyright (c) William Entriken and the FDWaveformView contributors
+//
 import AVFoundation
 import Accelerate
-//
-// Copyright 2013 - 2017, William Entriken and the FDWaveformView contributors.
-//
 import UIKit
 
 /// Format options for FDWaveformRenderOperation

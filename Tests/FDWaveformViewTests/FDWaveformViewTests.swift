@@ -1,3 +1,6 @@
+//
+// Copyright (c) William Entriken and the FDWaveformView contributors
+//
 import XCTest
 
 @testable import FDWaveformView

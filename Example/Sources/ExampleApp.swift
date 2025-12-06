@@ -1,8 +1,5 @@
 //
-//  ExampleApp.swift
-//  Example
-//
-//  Created by William Entriken on Mar 27, 2024.
+// Copyright (c) William Entriken and the FDWaveformView contributors
 //
 
 import SwiftUI
