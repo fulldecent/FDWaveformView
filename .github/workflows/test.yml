@@ -30,6 +30,11 @@ jobs:
             -scheme FDWaveformView \
             -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5'
 
+      - name: Check formatting
+        run: |
+          swift format format --in-place --recursive Sources/ Tests/
+          git diff --exit-code || (echo "Code is not formatted. Run: swift format format --in-place --recursive Sources/ Tests/" && exit 1)
+
       - name: Test
         run: |
           xcodebuild test \

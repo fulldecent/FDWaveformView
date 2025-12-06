@@ -4,24 +4,24 @@
 import PackageDescription
 
 let package = Package(
-    name: "FDWaveformView",
-    platforms: [
-        .iOS(.v12),
-        .macOS(.v10_14)
-    ],
-    products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
-        .library(
-            name: "FDWaveformView",
-            targets: ["FDWaveformView"]),
-    ],
-    targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
-        .target(
-            name: "FDWaveformView"),
-        .testTarget(
-            name: "FDWaveformViewTests",
-            dependencies: ["FDWaveformView"]),
-    ]
+  name: "FDWaveformView",
+  platforms: [
+    .iOS(.v12),
+    .macOS(.v10_14),
+  ],
+  products: [
+    // Products define the executables and libraries a package produces, making them visible to other packages.
+    .library(
+      name: "FDWaveformView",
+      targets: ["FDWaveformView"])
+  ],
+  targets: [
+    // Targets are the basic building blocks of a package, defining a module or a test suite.
+    // Targets can depend on other targets in this package and products from dependencies.
+    .target(
+      name: "FDWaveformView"),
+    .testTarget(
+      name: "FDWaveformViewTests",
+      dependencies: ["FDWaveformView"]),
+  ]
 )
