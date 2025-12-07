@@ -49,7 +49,7 @@ final class FDWaveformRenderOperation: Operation {
   /// Format of waveform image
   let format: FDWaveformRenderFormat
 
-  // MARK: - NSOperation Overrides
+  // MARK: - NSOperation overrides
 
   override var isAsynchronous: Bool { return true }
 
@@ -59,7 +59,7 @@ final class FDWaveformRenderOperation: Operation {
   private var _isFinished = false
   override var isFinished: Bool { return _isFinished }
 
-  // MARK: - Private
+  // MARK: - private
 
   ///  Handler called when the rendering has completed. nil UIImage indicates that there was an error during processing.
   private let completionHandler: (UIImage?) -> Void

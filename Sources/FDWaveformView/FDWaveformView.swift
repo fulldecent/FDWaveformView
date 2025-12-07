@@ -1,12 +1,7 @@
 //
 // Copyright (c) William Entriken and the FDWaveformView contributors
 //
-import Accelerate
 import UIKit
-
-// FROM http://stackoverflow.com/questions/5032775/drawing-waveform-with-avassetreader
-// DO SEE http://stackoverflow.com/questions/1191868/uiimageview-scaling-interpolation
-// see http://stackoverflow.com/questions/3514066/how-to-tint-a-transparent-png-image-in-iphone
 
 /// A view for rendering audio waveforms
 open class FDWaveformView: UIView {
@@ -123,7 +118,7 @@ open class FDWaveformView: UIView {
     }
   }
 
-  //TODO: MAKE PUBLIC
+  // TODO: make public
 
   /// The portion of extra pixels to render left and right of the viewable region
   private var horizontalBleedTarget = 0.5
@@ -149,7 +144,7 @@ open class FDWaveformView: UIView {
   /// Minimum number of samples that can be displayed (limits maximum zoom)
   private let minimumZoomSamples = 10
 
-  // Mark - Private vars
+  // mark - private vars
 
   /// Whether rendering for the current asset failed
   private var renderForCurrentAssetFailed = false
@@ -658,7 +653,7 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
   @objc optional func waveformDidEndScrubbing(_ waveformView: FDWaveformView)
 }
 
-//MARK -
+//mark:
 
 extension CountableRange where Bound: Strideable {
 
