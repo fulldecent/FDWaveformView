@@ -2,6 +2,7 @@
 // Copyright (c) William Entriken and the FDWaveformView contributors
 //
 
+import AVFoundation
 import FDWaveformView
 import SwiftUI
 
@@ -120,6 +121,10 @@ struct ContentView: View {
   @State private var isShowingProfilingAlert = false
   @State private var profilingStartTime: Date?
   @State private var aacRenderTime: TimeInterval?
+  @State private var audioPlayer: AVAudioPlayer?
+  @State private var isPlaying = false
+  @State private var playbackTimer: Timer?
+  @State private var playbackStartTime: Date?
 
   var body: some View {
     NavigationView {
@@ -227,6 +232,21 @@ struct ContentView: View {
           }
         }
         .frame(height: 200)
+
+        HStack {
+          Button(action: playAudio) {
+            Label("Play", systemImage: "play.fill")
+          }
+          .buttonStyle(.borderedProminent)
+          .disabled(audioURL == nil)
+
+          Button(action: stopAudio) {
+            Label("Stop", systemImage: "stop.fill")
+          }
+          .buttonStyle(.bordered)
+          .disabled(!isPlaying)
+        }
+        .padding()
       }
       .padding()
     }
@@ -270,6 +290,50 @@ struct ContentView: View {
       )
       isShowingProfilingAlert = true
       profilingStartTime = nil
+    }
+  }
+
+  private func playAudio() {
+    guard let audioURL = audioURL else { return }
+
+    do {
+      audioPlayer = try AVAudioPlayer(contentsOf: audioURL)
+      audioPlayer?.play()
+      isPlaying = true
+      progress = 0
+
+      // Start playback timer to update progress
+      playbackStartTime = Date()
+      playbackTimer = Timer.scheduledTimer(withTimeInterval: 0.016, repeats: true) { _ in
+        updateProgress()
+      }
+    } catch {
+      NSLog("Failed to play audio: \(error)")
+    }
+  }
+
+  private func stopAudio() {
+    audioPlayer?.stop()
+    isPlaying = false
+    playbackTimer?.invalidate()
+    playbackTimer = nil
+    playbackStartTime = nil
+  }
+
+  private func updateProgress() {
+    guard isPlaying, let startTime = playbackStartTime, totalSamples > 0 else { return }
+
+    let elapsedTime = Date().timeIntervalSince(startTime)
+    let sampleRate = 44100  // Submarine.aiff sample rate
+    let currentSample = Int(elapsedTime * Double(sampleRate))
+
+    if currentSample < totalSamples {
+      withAnimation(.linear(duration: 0.016)) {
+        progress = currentSample
+      }
+    } else {
+      // Playback finished
+      stopAudio()
     }
   }
 }
