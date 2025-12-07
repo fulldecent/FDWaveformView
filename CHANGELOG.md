@@ -5,12 +5,29 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Main](https://github.com/fulldecent/FDWaveformView/compare/5.0.2...main)
+## [5.1.0](https://github.com/fulldecent/FDWaveformView/releases/tag/5.1.0)
+
+Released on 2025-12-06.
+
+### Added
+
+- Set up testing and support iOS 18
+- Set up GitHub Actions testing and improve test coverage
+  - In regards to issue [#162](https://github.com/fulldecent/FDWaveformView/pull/162)
+- Clarify instructions for building and testing with simulator ID in README
 
 ### Changed
 
-- Updated README to mention Swift Package Manager only installation
-- Set up CI with GitHub Actions and document testing from command line
+- Separated data source into its own protocol for better architecture (resolves [#139](https://github.com/fulldecent/FDWaveformView/issues/139) and [#146](https://github.com/fulldecent/FDWaveformView/issues/146))
+  - Allows custom data providers for waveform rendering
+  - Enables future support for incremental rendering ([#2](https://github.com/fulldecent/FDWaveformView/issues/2))
+- Standardized copyright statement across all source files
+- Cleaned up scale types and improved type consistency
+- Improved capitalization in code comments and documentation to follow style guidelines
+- Clarified public API by removing interface builder notes
+- Applied swift formatting standards
+- Fixed GitHub Actions workflow to target iPhone platform instead of macOS
+- Fixed GitHub Actions workflow for macOS/iOS builds and added platform specs to Package.swift
 
 ---
 
