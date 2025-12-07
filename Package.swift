@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
   name: "FDWaveformView",
   platforms: [
-    .iOS(.v12),
+    .iOS(.v13),
     .macOS(.v10_14),
   ],
   products: [

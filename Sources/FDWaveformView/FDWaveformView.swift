@@ -1,7 +1,6 @@
 //
 // Copyright (c) William Entriken and the FDWaveformView contributors
 //
-import AVFoundation
 import Accelerate
 import UIKit
 
@@ -19,33 +18,46 @@ open class FDWaveformView: UIView {
     didSet {
       guard let audioURL = audioURL else {
         NSLog("FDWaveformView received nil audioURL")
-        audioContext = nil
+        dataSource = nil
         return
       }
 
       loadingInProgress = true
       delegate?.waveformViewWillLoad?(self)
 
-      FDAudioContext.load(fromAudioURL: audioURL) { audioContext in
-        DispatchQueue.main.async {
-          guard self.audioURL == audioContext?.audioURL else { return }
-
-          if audioContext == nil {
-            NSLog("FDWaveformView failed to load URL: \(audioURL)")
-          }
-
-          self.audioContext = audioContext  // This will reset the view and kick off a layout
-
-          self.loadingInProgress = false
-          self.delegate?.waveformViewDidLoad?(self)
-        }
-      }
+      let dataSource = FDWaveformAudioDataSource(audioURL: audioURL)
+      self.dataSource = dataSource
+      // Note: waveformViewDidLoad is called after loadTotalSamples completes
     }
   }
 
   /// The total number of audio samples in the file
+  /// This value is calculated from the asset's duration and sample rate.
+  /// Note: This is a cached value that is loaded asynchronously.
+  private var cachedTotalSamples: Int = 0
+
   open var totalSamples: Int {
-    return audioContext?.totalSamples ?? 0
+    return cachedTotalSamples
+  }
+
+  /// Loads the total sample count asynchronously and triggers a layout update when ready.
+  private func loadTotalSamples() {
+    guard let dataSource = dataSource else {
+      cachedTotalSamples = 0
+      return
+    }
+
+    Task {
+      let count = await dataSource.numberOfSamples()
+      await MainActor.run {
+        self.cachedTotalSamples = count
+        self.zoomSamples = (0..<count).clamped(to: 0..<max(1, count))
+        self.loadingInProgress = false
+        self.delegate?.waveformViewDidLoad?(self)
+        self.setNeedsDisplay()
+        self.setNeedsLayout()
+      }
+    }
   }
 
   /// The samples to be highlighted in a different color
@@ -85,13 +97,12 @@ open class FDWaveformView: UIView {
   open var doesAllowScroll = true
 
   /// Supported waveform types
-  //TODO: make this public after reconciling FDWaveformView.WaveformType and FDWaveformType
-  enum WaveformType {
+  public enum WaveformType {
     case linear, logarithmic
   }
 
-  // Type of waveform to display
-  var waveformType: WaveformType = .logarithmic {
+  /// Type of waveform to display
+  open var waveformType: WaveformType = .logarithmic {
     didSet {
       setNeedsDisplay()
       setNeedsLayout()
@@ -138,16 +149,20 @@ open class FDWaveformView: UIView {
   /// The "zero" level (in dB)
   fileprivate let noiseFloor: CGFloat = -50.0
 
+  /// Minimum number of samples that can be displayed (limits maximum zoom)
+  private let minimumZoomSamples = 10
+
   // Mark - Private vars
 
   /// Whether rendering for the current asset failed
   private var renderForCurrentAssetFailed = false
 
-  /// Current audio context to be used for rendering
-  private var audioContext: FDAudioContext? {
+  /// Current data source to be used for rendering
+  private var dataSource: FDWaveformDataSource? {
     didSet {
+      cachedTotalSamples = 0  // Reset cache when new data source is set
       waveformImage = nil
-      zoomSamples = (0..<self.totalSamples).clamped(to: 0..<max(1, self.totalSamples))
+      zoomSamples = 0..<0
       highlightedSamples = nil
       inProgressWaveformRenderOperation = nil
       cachedWaveformRenderOperation = nil
@@ -155,6 +170,9 @@ open class FDWaveformView: UIView {
 
       setNeedsDisplay()
       setNeedsLayout()
+
+      // Load sample count asynchronously
+      loadTotalSamples()
     }
   }
 
@@ -200,10 +218,6 @@ open class FDWaveformView: UIView {
     case notDirty(cancelInProgressRenderOperation: Bool)
   }
 
-  fileprivate func decibel(_ amplitude: CGFloat) -> CGFloat {
-    return 20.0 * log10(abs(amplitude))
-  }
-
   /// View for rendered waveform
   lazy fileprivate var imageView: UIImageView = {
     let retval = UIImageView(frame: CGRect.zero)
@@ -237,6 +251,9 @@ open class FDWaveformView: UIView {
   /// This helps to determine which of the continuous interactions should be active, pinching or panning.
   /// pinchRecognizer
   fileprivate var firstGesture = PressType.none
+
+  /// Accumulated fractional pan delta (in samples) for smooth slow panning
+  fileprivate var accumulatedPanDelta: CGFloat = 0
 
   /// Gesture recognizer
   fileprivate var pinchRecognizer = UIPinchGestureRecognizer()
@@ -359,7 +376,7 @@ open class FDWaveformView: UIView {
 
   override open func layoutSubviews() {
     super.layoutSubviews()
-    guard audioContext != nil && !zoomSamples.isEmpty else {
+    guard dataSource != nil && !zoomSamples.isEmpty else {
       return
     }
 
@@ -433,7 +450,7 @@ open class FDWaveformView: UIView {
   }
 
   func renderWaveform() {
-    guard let audioContext = audioContext else { return }
+    guard let dataSource = dataSource else { return }
     let clampedZoomSamples = zoomSamples.clamped(to: 0..<max(1, totalSamples))
     guard !clampedZoomSamples.isEmpty else { return }
 
@@ -446,7 +463,8 @@ open class FDWaveformView: UIView {
       type: waveformRenderType, wavesColor: .black, scale: desiredImageScale)
 
     let waveformRenderOperation = FDWaveformRenderOperation(
-      audioContext: audioContext, imageSize: imageSize, sampleRange: renderSamples,
+      dataSource: dataSource, totalSamples: totalSamples, imageSize: imageSize,
+      sampleRange: renderSamples,
       format: renderFormat
     ) { [weak self] image in
       DispatchQueue.main.async {
@@ -507,18 +525,20 @@ enum FDWaveformType: Equatable {
       return
 
     case .logarithmic(let noiseFloor):
-      // Convert samples to a log scale
-      var zero: Float = 32768.0
-      vDSP_vdbcon(
-        normalizedSamples, 1, &zero, &normalizedSamples, 1,
-        vDSP_Length(normalizedSamples.count), 1)
-
-      //Clip to [noiseFloor, 0]
-      var ceil: Float = 0.0
-      var noiseFloorFloat = Float(noiseFloor)
-      vDSP_vclip(
-        normalizedSamples, 1, &noiseFloorFloat, &ceil, &normalizedSamples, 1,
-        vDSP_Length(normalizedSamples.count))
+      // Convert normalized [0, 1] samples to dB scale
+      // Formula: dB = 20 * log10(amplitude)
+      // For amplitude in [0, 1]: dB ranges from -infinity to 0
+      // We use a small epsilon to avoid log(0) = -infinity
+      let epsilon: Float = 1e-10
+      for i in 0..<normalizedSamples.count {
+        let amplitude = max(normalizedSamples[i], epsilon)
+        var dB = 20.0 * log10(amplitude)
+        // Clip to [noiseFloor, 0]
+        dB = max(dB, Float(noiseFloor))
+        dB = min(dB, 0)
+        // Normalize to [0, 1] where 0 = noiseFloor and 1 = 0 dB
+        normalizedSamples[i] = (dB - Float(noiseFloor)) / (0 - Float(noiseFloor))
+      }
     }
   }
 }
@@ -532,37 +552,66 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
   }
 
   @objc func handlePinchGesture(_ recognizer: UIPinchGestureRecognizer) {
-    guard doesAllowStretch, recognizer.scale != 1 else { return }
+    guard doesAllowStretch else { return }
 
+    // Always handle state changes first, before any early returns
     switch recognizer.state {
     case .began:
       if firstGesture == .none {
-        // Set firstGesture to .pinch only if panning gesture is not active.
-        // This enables the user to repetitively pan and zoom action.
-        // If we set firstGesture to .pinch in any state then the user becomes unable
-        // to pan until they release all fingers from the view.
         firstGesture = .pinch
       }
     case .ended, .cancelled:
-      // This happens only if panning has not started.
       firstGesture = .none
+      return  // Nothing more to do on end
     default:
       break
     }
 
+    // Skip if no actual scale change
+    guard recognizer.scale != 1 else { return }
+
     let clampedZoomSamples = zoomSamples.clamped(to: 0..<max(1, totalSamples))
     let zoomRangeSamples = CGFloat(clampedZoomSamples.count)
+
+    // Calculate desired new zoom range using the full accumulated scale (not resetting each frame)
+    let desiredZoomRangeSamples = zoomRangeSamples / recognizer.scale
+    var newZoomRangeSamples = Int(round(desiredZoomRangeSamples))
+
+    // Enforce minimum and maximum zoom range
+    let maxZoomRange = totalSamples
+    newZoomRangeSamples = max(minimumZoomSamples, min(maxZoomRange, newZoomRangeSamples))
+
+    // Check if we're at zoom limits
+    let isAtMinZoom = clampedZoomSamples.count <= minimumZoomSamples
+    let isAtMaxZoom = clampedZoomSamples.count >= totalSamples
+    let isZoomingIn = recognizer.scale > 1
+    let isZoomingOut = recognizer.scale < 1
+
+    if (isAtMinZoom && isZoomingIn) || (isAtMaxZoom && isZoomingOut) {
+      // Reset scale so reversing direction works immediately
+      recognizer.scale = 1
+      return
+    }
+
+    // Only apply if there's an actual change
+    if newZoomRangeSamples == clampedZoomSamples.count {
+      // Don't reset scale - let it accumulate until we have enough for a change
+      return
+    }
+
+    // Calculate pinch center for zoom positioning
+    let pinchCenterFraction = recognizer.location(in: self).x / bounds.width
     let pinchCenterSample =
-      clampedZoomSamples.lowerBound
-      + Int(zoomRangeSamples * recognizer.location(in: self).x / bounds.width)
-    let newZoomRangeSamples = Int(zoomRangeSamples * 1.0 / recognizer.scale)
-    let newZoomStart =
-      pinchCenterSample
-      - Int(
-        CGFloat(pinchCenterSample - clampedZoomSamples.lowerBound) * 1.0 / recognizer.scale)
+      clampedZoomSamples.lowerBound + Int(zoomRangeSamples * pinchCenterFraction)
+
+    // Calculate new start position to keep pinch center stable
+    let samplesBeforeCenter = Int(CGFloat(newZoomRangeSamples) * pinchCenterFraction)
+    let newZoomStart = pinchCenterSample - samplesBeforeCenter
     let newZoomEnd = newZoomStart + newZoomRangeSamples
 
     zoomSamples = (newZoomStart..<newZoomEnd).clamped(to: 0..<max(1, totalSamples))
+
+    // Only reset scale after we've applied a change
     recognizer.scale = 1
   }
 
@@ -570,23 +619,31 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
     let clampedZoomSamples = zoomSamples.clamped(to: 0..<max(1, totalSamples))
     guard !clampedZoomSamples.isEmpty else { return }
 
-    // This method is called even if the user began with pinching.
+    // Don't allow panning while pinching is active
+    if firstGesture == .pinch {
+      return
+    }
+
+    // Don't process multi-touch as pan
+    if recognizer.numberOfTouches > 1 {
+      return
+    }
 
     switch recognizer.state {
     case .began:
-      guard firstGesture != .pinch else { return }
       firstGesture = .pan
+      accumulatedPanDelta = 0
     case .ended, .cancelled:
-      let isPan = firstGesture == .pan
       firstGesture = .none
-      guard isPan else { return }
+      accumulatedPanDelta = 0
+    case .changed:
+      break
     default:
-      guard firstGesture == .pan, recognizer.numberOfTouches == 1 else { return }
+      return
     }
 
     if doesAllowScroll {
       if clampedZoomSamples.count == totalSamples {
-        // No need to handle panning
         return
       }
 
@@ -598,22 +655,31 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
       recognizer.setTranslation(CGPoint.zero, in: self)
 
       let samplesPerPixel = CGFloat(clampedZoomSamples.count) / bounds.width
-      let deltaPixels =
-        point.x < 0
-        ? min(
-          -point.x * samplesPerPixel, CGFloat(totalSamples - clampedZoomSamples.endIndex))
-        : min(point.x * samplesPerPixel, CGFloat(clampedZoomSamples.startIndex)) * -1
-      if deltaPixels != 0 {
-        zoomSamples =
-          (clampedZoomSamples.startIndex + Int(deltaPixels)..<clampedZoomSamples.endIndex
-          + Int(deltaPixels)).clamped(to: 0..<max(1, totalSamples))
+      let deltaSamples = -point.x * samplesPerPixel
+
+      accumulatedPanDelta += deltaSamples
+
+      let wholeSampleDelta = Int(accumulatedPanDelta)
+      if wholeSampleDelta != 0 {
+        let maxForwardDelta = totalSamples - clampedZoomSamples.endIndex
+        let maxBackwardDelta = -clampedZoomSamples.startIndex
+        let clampedDelta = max(maxBackwardDelta, min(maxForwardDelta, wholeSampleDelta))
+
+        if clampedDelta != 0 {
+          zoomSamples =
+            (clampedZoomSamples.startIndex + clampedDelta)
+            ..<(clampedZoomSamples.endIndex + clampedDelta)
+        }
+
+        accumulatedPanDelta -= CGFloat(wholeSampleDelta)
       }
+
       if recognizer.state == .ended {
         delegate?.waveformDidEndPanning?(self)
       }
     } else if doesAllowScrubbing {
       let rangeSamples = CGFloat(clampedZoomSamples.count)
-      let scrubLocation = min(max(recognizer.location(in: self).x, 0), frame.width)  // clamp location within the frame
+      let scrubLocation = min(max(recognizer.location(in: self).x, 0), frame.width)
       highlightedSamples =
         0..<Int(
           (CGFloat(clampedZoomSamples.startIndex) + rangeSamples * scrubLocation
