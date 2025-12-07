@@ -146,9 +146,6 @@ open class FDWaveformView: UIView {
   /// If this number is not available then a re-render will be performed
   private var verticalOverdrawAllowed = 1.0...3.0
 
-  /// The "zero" level (in dB)
-  fileprivate let noiseFloor: CGFloat = -50.0
-
   /// Minimum number of samples that can be displayed (limits maximum zoom)
   private let minimumZoomSamples = 10
 
@@ -201,15 +198,6 @@ open class FDWaveformView: UIView {
   /// Desired scale of image based on window's screen scale
   private var desiredImageScale: CGFloat {
     return window?.screen.scale ?? UIScreen.main.scale
-  }
-
-  /// Waveform type for rendering waveforms
-  //TODO: make this public after reconciling FDWaveformView.WaveformType and FDWaveformType
-  var waveformRenderType: FDWaveformType {
-    switch waveformType {
-    case .linear: return .linear
-    case .logarithmic: return .logarithmic(noiseFloor: noiseFloor)
-    }
   }
 
   /// Represents the status of the waveform renderings
@@ -341,7 +329,7 @@ open class FDWaveformView: UIView {
   func isWaveformRenderOperationDirty(_ renderOperation: FDWaveformRenderOperation?) -> Bool? {
     guard let renderOperation = renderOperation else { return nil }
 
-    if renderOperation.format.type != waveformRenderType {
+    if renderOperation.format.type != waveformType {
       return true
     }
     if renderOperation.format.scale != desiredImageScale {
@@ -460,7 +448,7 @@ open class FDWaveformView: UIView {
     let heightInPixels = frame.height * CGFloat(horizontalOverdrawTarget)
     let imageSize = CGSize(width: widthInPixels, height: heightInPixels)
     let renderFormat = FDWaveformRenderFormat(
-      type: waveformRenderType, wavesColor: .black, scale: desiredImageScale)
+      type: waveformType, wavesColor: .black, scale: desiredImageScale)
 
     let waveformRenderOperation = FDWaveformRenderOperation(
       dataSource: dataSource, totalSamples: totalSamples, imageSize: imageSize,
@@ -485,61 +473,6 @@ open class FDWaveformView: UIView {
     delegate?.waveformViewWillRender?(self)
 
     waveformRenderOperation.start()
-  }
-}
-
-//TODO: make this public after reconciling FDWaveformView.WaveformType and FDWaveformType
-enum FDWaveformType: Equatable {
-  /// Waveform is rendered using a linear scale
-  case linear
-
-  /// Waveform is rendered using a logarithmic scale
-  ///   noiseFloor: The "zero" level (in dB)
-  case logarithmic(noiseFloor: CGFloat)
-
-  // See http://stackoverflow.com/questions/24339807/how-to-test-equality-of-swift-enums-with-associated-values
-  public static func == (lhs: FDWaveformType, rhs: FDWaveformType) -> Bool {
-    switch lhs {
-    case .linear:
-      if case .linear = rhs {
-        return true
-      }
-    case .logarithmic(let lhsNoiseFloor):
-      if case .logarithmic(let rhsNoiseFloor) = rhs {
-        return lhsNoiseFloor == rhsNoiseFloor
-      }
-    }
-    return false
-  }
-
-  public var floorValue: CGFloat {
-    switch self {
-    case .linear: return 0
-    case .logarithmic(let noiseFloor): return noiseFloor
-    }
-  }
-
-  func process(normalizedSamples: inout [Float]) {
-    switch self {
-    case .linear:
-      return
-
-    case .logarithmic(let noiseFloor):
-      // Convert normalized [0, 1] samples to dB scale
-      // Formula: dB = 20 * log10(amplitude)
-      // For amplitude in [0, 1]: dB ranges from -infinity to 0
-      // We use a small epsilon to avoid log(0) = -infinity
-      let epsilon: Float = 1e-10
-      for i in 0..<normalizedSamples.count {
-        let amplitude = max(normalizedSamples[i], epsilon)
-        var dB = 20.0 * log10(amplitude)
-        // Clip to [noiseFloor, 0]
-        dB = max(dB, Float(noiseFloor))
-        dB = min(dB, 0)
-        // Normalize to [0, 1] where 0 = noiseFloor and 1 = 0 dB
-        normalizedSamples[i] = (dB - Float(noiseFloor)) / (0 - Float(noiseFloor))
-      }
-    }
   }
 }
 
@@ -666,9 +599,9 @@ extension FDWaveformView: UIGestureRecognizerDelegate {
         let clampedDelta = max(maxBackwardDelta, min(maxForwardDelta, wholeSampleDelta))
 
         if clampedDelta != 0 {
-          zoomSamples =
-            (clampedZoomSamples.startIndex + clampedDelta)
-            ..<(clampedZoomSamples.endIndex + clampedDelta)
+          let newStart = clampedZoomSamples.startIndex + clampedDelta
+          let newEnd = clampedZoomSamples.endIndex + clampedDelta
+          zoomSamples = newStart..<newEnd
         }
 
         accumulatedPanDelta -= CGFloat(wholeSampleDelta)

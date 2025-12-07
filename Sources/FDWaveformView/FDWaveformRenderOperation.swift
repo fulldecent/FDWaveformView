@@ -6,27 +6,22 @@ import Accelerate
 import UIKit
 
 /// Format options for FDWaveformRenderOperation
-//MAYBE: Make this public
 struct FDWaveformRenderFormat {
 
   /// The type of waveform to render
-  //TODO: make this public after reconciling FDWaveformView.WaveformType and FDWaveformType
-  var type: FDWaveformType
+  var type: FDWaveformView.WaveformType
 
   /// The color of the waveform
-  internal var wavesColor: UIColor
+  var wavesColor: UIColor
 
   /// The scale factor to apply to the rendered image (usually the current screen's scale)
-  public var scale: CGFloat
+  var scale: CGFloat
 
-  public init() {
-    self.init(
-      type: .linear,
-      wavesColor: .black,
-      scale: UIScreen.main.scale)
-  }
-
-  init(type: FDWaveformType, wavesColor: UIColor, scale: CGFloat) {
+  init(
+    type: FDWaveformView.WaveformType = .linear,
+    wavesColor: UIColor = .black,
+    scale: CGFloat = UIScreen.main.scale
+  ) {
     self.type = type
     self.wavesColor = wavesColor
     self.scale = scale
@@ -38,6 +33,9 @@ final class FDWaveformRenderOperation: Operation {
 
   /// When samples per pixel falls below this threshold, switch from binned maximums to individual samples
   private let samplesPerPixelThreshold = 2
+
+  /// The noise floor for logarithmic display (in dB)
+  private let noiseFloorDecibels: Float = -50.0
 
   /// The data source used to build the waveform
   let dataSource: FDWaveformDataSource
@@ -147,7 +145,7 @@ final class FDWaveformRenderOperation: Operation {
 
       // Apply logarithmic transformation only to amplitude data (not signed samples)
       if !isSignedSamples {
-        format.type.process(normalizedSamples: &amplitudes)
+        applyWaveformType(&amplitudes)
       }
 
       let samples = amplitudes.map { CGFloat($0) }
@@ -162,11 +160,25 @@ final class FDWaveformRenderOperation: Operation {
     }
   }
 
-  /// Read the asset and create a lower resolution set of samples
-  // TODO: Implement sliceAsset if needed for backwards compatibility
-  // This method is no longer used as we now use the dataSource protocol
+  /// Applies the waveform type transformation to the amplitude samples
+  private func applyWaveformType(_ samples: inout [Float]) {
+    switch format.type {
+    case .linear:
+      return
+    case .logarithmic:
+      // Convert normalized [0, 1] samples to dB scale
+      let epsilon: Float = 1e-10
+      for i in 0..<samples.count {
+        let amplitude = max(samples[i], epsilon)
+        var dB = 20.0 * log10(amplitude)
+        dB = max(dB, noiseFloorDecibels)
+        dB = min(dB, 0)
+        // Normalize to [0, 1] where 0 = noiseFloor and 1 = 0 dB
+        samples[i] = (dB - noiseFloorDecibels) / (0 - noiseFloorDecibels)
+      }
+    }
+  }
 
-  // TODO: report progress? (for issue #2)
   func plotWaveformGraph(
     _ samples: [CGFloat], maximumValue max: CGFloat, zeroValue min: CGFloat,
     isSignedSamples: Bool = false

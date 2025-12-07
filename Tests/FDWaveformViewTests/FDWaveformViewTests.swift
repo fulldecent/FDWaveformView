@@ -39,26 +39,15 @@ final class FDWaveformViewTests: XCTestCase {
     XCTAssertEqual(waveformView.progressColor, .green)
   }
 
-  func testFDWaveformTypeEquality() throws {
-    // Test FDWaveformType enum equality
-    let linear1 = FDWaveformType.linear
-    let linear2 = FDWaveformType.linear
-    let logarithmic1 = FDWaveformType.logarithmic(noiseFloor: -50.0)
-    let logarithmic2 = FDWaveformType.logarithmic(noiseFloor: -50.0)
-    let logarithmic3 = FDWaveformType.logarithmic(noiseFloor: -60.0)
+  func testWaveformTypeEquality() throws {
+    // Test WaveformType enum equality
+    let linear1 = FDWaveformView.WaveformType.linear
+    let linear2 = FDWaveformView.WaveformType.linear
+    let logarithmic1 = FDWaveformView.WaveformType.logarithmic
+    let logarithmic2 = FDWaveformView.WaveformType.logarithmic
 
     XCTAssertEqual(linear1, linear2)
     XCTAssertEqual(logarithmic1, logarithmic2)
     XCTAssertNotEqual(linear1, logarithmic1)
-    XCTAssertNotEqual(logarithmic1, logarithmic3)
-  }
-
-  func testFDWaveformTypeFloorValue() throws {
-    // Test floor value property
-    let linear = FDWaveformType.linear
-    let logarithmic = FDWaveformType.logarithmic(noiseFloor: -45.0)
-
-    XCTAssertEqual(linear.floorValue, 0)
-    XCTAssertEqual(logarithmic.floorValue, -45.0)
   }
 }
