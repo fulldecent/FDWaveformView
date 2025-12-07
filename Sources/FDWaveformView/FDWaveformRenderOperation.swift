@@ -17,14 +17,23 @@ struct FDWaveformRenderFormat {
   /// The scale factor to apply to the rendered image (usually the current screen's scale)
   var scale: CGFloat
 
+  /// Default scale factor for rendering
+  private static var defaultScale: CGFloat {
+    #if os(visionOS)
+      return 2.0
+    #else
+      return UIScreen.main.scale
+    #endif
+  }
+
   init(
     type: FDWaveformView.WaveformType = .linear,
     wavesColor: UIColor = .black,
-    scale: CGFloat = UIScreen.main.scale
+    scale: CGFloat? = nil
   ) {
     self.type = type
     self.wavesColor = wavesColor
-    self.scale = scale
+    self.scale = scale ?? Self.defaultScale
   }
 }
 

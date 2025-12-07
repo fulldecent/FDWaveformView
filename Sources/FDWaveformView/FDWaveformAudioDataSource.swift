@@ -9,43 +9,52 @@ import Foundation
 final class FDWaveformAudioDataSource: FDWaveformDataSource {
     private let audioURL: URL
     private let asset: AVAsset
-    private let assetTrack: AVAssetTrack?
-    private let sampleRate: Int
-    private let channelCount: Int
-    private let cachedTotalSamples: Int
+    private var assetTrack: AVAssetTrack?
+    private var sampleRate: Int = 44100
+    private var channelCount: Int = 1
+    private var cachedTotalSamples: Int = 0
+    private var isLoaded: Bool = false
 
     init(audioURL: URL) {
         self.audioURL = audioURL
         self.asset = AVAsset(url: audioURL)
+    }
 
-        // Get the audio track and its properties
-        let tracks = asset.tracks(withMediaType: .audio)
-        self.assetTrack = tracks.first
+    /// Loads audio track properties asynchronously. Called automatically on first access.
+    private func loadTrackIfNeeded() async {
+        guard !isLoaded else { return }
+        isLoaded = true
 
-        if let track = assetTrack,
-            let formatDescriptions = track.formatDescriptions as? [CMAudioFormatDescription],
-            let formatDesc = formatDescriptions.first,
-            let streamDesc = CMAudioFormatDescriptionGetStreamBasicDescription(formatDesc)
-        {
-            self.sampleRate = Int(streamDesc.pointee.mSampleRate)
-            self.channelCount = Int(streamDesc.pointee.mChannelsPerFrame)
+        do {
+            let tracks = try await asset.loadTracks(withMediaType: .audio)
+            self.assetTrack = tracks.first
 
-            // Calculate total samples from duration
-            let duration = asset.duration
-            let durationInSeconds = CMTimeGetSeconds(duration)
-            self.cachedTotalSamples = Int(durationInSeconds * Double(sampleRate))
-        } else {
-            self.sampleRate = 44100
-            self.channelCount = 1
-            self.cachedTotalSamples = 0
+            if let track = assetTrack,
+                let formatDescriptions = try? await track.load(.formatDescriptions)
+                    as? [CMAudioFormatDescription],
+                let formatDesc = formatDescriptions.first,
+                let streamDesc = CMAudioFormatDescriptionGetStreamBasicDescription(formatDesc)
+            {
+                self.sampleRate = Int(streamDesc.pointee.mSampleRate)
+                self.channelCount = Int(streamDesc.pointee.mChannelsPerFrame)
+
+                // Calculate total samples from duration
+                let duration = try await asset.load(.duration)
+                let durationInSeconds = CMTimeGetSeconds(duration)
+                self.cachedTotalSamples = Int(durationInSeconds * Double(sampleRate))
+            }
+        } catch {
+            // Keep default values on error
         }
     }
 
     func numberOfSamples() async -> Int {
+        await loadTrackIfNeeded()
         return cachedTotalSamples
     }
 
     func samples(in range: Range<Int>) async -> [Float] {
+        await loadTrackIfNeeded()
         guard !range.isEmpty, let track = assetTrack else { return [] }
 
         guard let reader = try? AVAssetReader(asset: asset) else { return [] }
@@ -124,6 +133,7 @@ final class FDWaveformAudioDataSource: FDWaveformDataSource {
     }
 
     func maximums(from range: Range<Int>, numberOfBins: Int) async -> [Float] {
+        await loadTrackIfNeeded()
         guard !range.isEmpty, numberOfBins > 0, let track = assetTrack else { return [] }
 
         guard let reader = try? AVAssetReader(asset: asset) else { return [] }

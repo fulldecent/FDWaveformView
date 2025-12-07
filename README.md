@@ -65,7 +65,7 @@ UIView.animate(withDuration: 0.3) {
 
 - Antialiased waveforms draw extra pixels to avoid jagged edges.
 - Autolayout-driven size changes trigger re-rendering to prevent pixelation.
-- Supports iOS 12+ and Swift 5.
+- Supports iOS 15+ and visionOS 1.0+.
 - Includes unit tests running on GitHub Actions.
 
 ## Installation

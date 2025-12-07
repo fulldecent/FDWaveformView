@@ -192,7 +192,11 @@ open class FDWaveformView: UIView {
 
   /// Desired scale of image based on window's screen scale
   private var desiredImageScale: CGFloat {
-    return window?.screen.scale ?? UIScreen.main.scale
+    #if os(visionOS)
+      return 2.0
+    #else
+      return window?.screen.scale ?? UIScreen.main.scale
+    #endif
   }
 
   /// Represents the status of the waveform renderings

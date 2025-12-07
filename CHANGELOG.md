@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [5.1.1](https://github.com/fulldecent/FDWaveformView/releases/tag/5.1.1)
+
+Released on 2025-12-06.
+
+### Added
+
+- visionOS 1.0+ support with proper screen scale handling
+
+---
+
 ## [5.1.0](https://github.com/fulldecent/FDWaveformView/releases/tag/5.1.0)
 
 Released on 2025-12-06.
