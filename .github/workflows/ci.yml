@@ -27,9 +27,9 @@ jobs:
           destination_id="$({
             xcodebuild -showdestinations -scheme FDWaveformView 2>/dev/null |
             grep 'platform:iOS Simulator' |
-            grep 'name:iPhone' |
+            grep -v 'placeholder' |
             head -n 1 |
-            sed -E 's/.*id:([^,}]+).*/\1/'
+            sed -E 's/.*id:([^,}]+).*/\1/' || true
           })"
 
           if [[ -z "$destination_id" ]]; then
