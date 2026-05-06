@@ -1,6 +1,10 @@
 # FDWaveformView
 
+[![ci](https://github.com/fulldecent/FDWaveformView/actions/workflows/ci.yml/badge.svg)](https://github.com/fulldecent/FDWaveformView/actions/workflows/ci.yml)
+
 FDWaveformView displays audio waveforms in Swift apps so users can preview audio, scrub, and pick positions with ease.
+
+**:hatching_chick: Virtual tip jar: <https://amazon.com/hz/wishlist/ls/EE78A23EEGQB>**
 
 ## Usage
 
@@ -65,8 +69,8 @@ UIView.animate(withDuration: 0.3) {
 
 - Antialiased waveforms draw extra pixels to avoid jagged edges.
 - Autolayout-driven size changes trigger re-rendering to prevent pixelation.
-- Supports iOS 15+ and visionOS 1.0+.
-- Includes unit tests running on GitHub Actions.
+- Supports iOS 12+ and Swift 5.
+- Includes unit tests that run on GitHub Actions.
 
 ## Installation
 

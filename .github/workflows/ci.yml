@@ -1,0 +1,44 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: macos-latest
+
+    steps:
+      - name: check out repository
+        uses: actions/checkout@v4
+
+      - name: select iOS simulator
+        id: simulator
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          destination_id="$({
+            xcodebuild -showdestinations -scheme FDWaveformView 2>/dev/null |
+            grep 'platform:iOS Simulator' |
+            grep 'name:iPhone' |
+            head -n 1 |
+            sed -E 's/.*id:([^,}]+).*/\1/'
+          })"
+
+          if [[ -z "$destination_id" ]]; then
+            echo "No iOS simulator destination found for scheme FDWaveformView" >&2
+            exit 1
+          fi
+
+          echo "destination=id=$destination_id" >> "$GITHUB_OUTPUT"
+
+      - name: build and test
+        run: xcodebuild test -scheme FDWaveformView -destination "${{
+          steps.simulator.outputs.destination }}"
