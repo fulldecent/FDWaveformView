@@ -69,12 +69,12 @@ UIView.animate(withDuration: 0.3) {
 
 - Antialiased waveforms draw extra pixels to avoid jagged edges.
 - Autolayout-driven size changes trigger re-rendering to prevent pixelation.
-- Supports iOS 12+ and Swift 5.
+- Supports iOS 15+, visionOS 1+, and Swift tools version 5.10, as declared in `Package.swift`.
 - Includes unit tests that run on GitHub Actions.
 
 ## Installation
 
-Use Swift Package Manager: in Xcode choose File > Swift Packages > Add Package Dependency and point to this repository. Legacy installation options are available if needed.
+Add this package with Swift Package Manager. In Xcode that is File > Add Package Dependencies...
 
 ## API
 
@@ -110,26 +110,26 @@ A couple other things are exposed that we do not consider public API:
 
 ## Testing
 
-Find an available simulator:
+GitHub Actions runs the suite on the macOS 15 image with Xcode 16.4. That image provides an iPhone 16 simulator on iOS 18.5. The command is:
+
+```sh
+xcodebuild test -scheme FDWaveformView -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5'
+```
+
+On another Xcode, list the simulators that copy of Xcode can see and pass one of those ids. `xcodebuild` only accepts destinations from the selected Xcode, so an id printed by a different install will fail.
 
 ```sh
 xcrun simctl list devices available | grep iPhone
+xcodebuild test -scheme FDWaveformView -destination 'id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
 ```
 
-Build and test using a simulator ID from the output:
+The Example app target deploys to iOS 18.6, so its simulator has to be iOS 18.6 or newer:
 
 ```sh
-# Build the library
-xcodebuild build -scheme FDWaveformView -destination 'id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
-
-# Run unit tests
-xcodebuild test -scheme FDWaveformView -destination 'id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
-
-# Build the Example app (requires a newer iOS simulator)
-cd Example
-xcodebuild build -scheme Example -destination 'id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
+xcodebuild build -project Example/Example.xcodeproj -scheme Example -destination 'id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
 ```
 
 ## Contributing
 
 - This project's layout is based on <https://github.com/fulldecent/swift6-module-template>
+- Ignore rules are inlined from [Swift.gitignore](https://github.com/github/gitignore/blob/main/Swift.gitignore) and [Global/Xcode.gitignore](https://github.com/github/gitignore/blob/main/Global/Xcode.gitignore). The macOS and secret rules above them come from [project-template](https://github.com/fulldecent/project-template).
