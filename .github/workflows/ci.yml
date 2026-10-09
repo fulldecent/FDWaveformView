@@ -1,5 +1,12 @@
 name: ci
 
+# macos-latest is the macOS 26 image. It does not install Xcode 16.4, and the
+# simulator-discovery script previously used here failed on that image
+# (https://github.com/fulldecent/FDWaveformView/actions/runs/25414955912).
+# This job pins the macOS 15 image, whose default Xcode is 16.4 and which
+# lists an iPhone 16 simulator on iOS 18.5:
+# https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md
+
 on:
   push:
     branches:
@@ -12,33 +19,34 @@ concurrency:
 
 jobs:
   test:
-    runs-on: macos-latest
+    name: Build and Test
+    runs-on: macos-15
 
     steps:
-      - name: check out repository
+      - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: select iOS simulator
-        id: simulator
-        shell: bash
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app
+
+      - name: Show build environment
         run: |
-          set -euo pipefail
+          xcodebuild -version
+          xcrun swift --version
 
-          destination_id="$({
-            xcodebuild -showdestinations -scheme FDWaveformView 2>/dev/null |
-            grep 'platform:iOS Simulator' |
-            grep -v 'placeholder' |
-            head -n 1 |
-            sed -E 's/.*id:([^,}]+).*/\1/' || true
-          })"
+      - name: Build
+        run: |
+          xcodebuild build \
+            -scheme FDWaveformView \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5'
 
-          if [[ -z "$destination_id" ]]; then
-            echo "No iOS simulator destination found for scheme FDWaveformView" >&2
-            exit 1
-          fi
+      - name: Check formatting
+        run: |
+          swift format format --in-place --recursive Sources/ Tests/
+          git diff --exit-code || (echo "Code is not formatted. Run: swift format format --in-place --recursive Sources/ Tests/" && exit 1)
 
-          echo "destination=id=$destination_id" >> "$GITHUB_OUTPUT"
-
-      - name: build and test
-        run: xcodebuild test -scheme FDWaveformView -destination "${{
-          steps.simulator.outputs.destination }}"
+      - name: Test
+        run: |
+          xcodebuild test \
+            -scheme FDWaveformView \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5'

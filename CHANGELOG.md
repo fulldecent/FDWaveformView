@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## Main
+
+### Changed
+
+- Pin GitHub Actions to the macOS 15 image, Xcode 16.4, and an iPhone 16 simulator on iOS 18.5. The workflow on `macos-latest` failed before the package compiled.
+- Inline `.gitignore` from the current Swift and Xcode ignore files, plus the macOS and secret rules from project-template.
+- Describe the release steps in terms of `CHANGELOG.md` and a GitHub tag.
+
+---
+
 ## [5.1.1](https://github.com/fulldecent/FDWaveformView/releases/tag/5.1.1)
 
 Released on 2025-12-06.
