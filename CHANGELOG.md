@@ -9,9 +9,10 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Pin GitHub Actions to the macOS 15 image, Xcode 16.4, and an iPhone 16 simulator on iOS 18.5. The workflow on `macos-latest` failed before the package compiled.
+- Require Swift tools 6.4 and enable Approachable Concurrency. Xcode 26 cannot load that tools version.
+- Test on the GitHub-hosted Xcode 27 runner, using an iPhone 17 simulator on iOS 27.0.
+- Hand releases to Release Please. Commit messages use `fix:`, `feat:` or `BREAKING CHANGE:`. Tags stay unprefixed, matching `5.1.1`.
 - Inline `.gitignore` from the current Swift and Xcode ignore files, plus the macOS and secret rules from project-template.
-- Describe the release steps in terms of `CHANGELOG.md` and a GitHub tag.
 
 ---
 

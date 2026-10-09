@@ -1,16 +1,20 @@
 name: ci
 
-# macos-latest is the macOS 26 image. It does not install Xcode 16.4, and the
-# simulator-discovery script previously used here failed on that image
-# (https://github.com/fulldecent/FDWaveformView/actions/runs/25414955912).
-# This job pins the macOS 15 image, whose default Xcode is 16.4 and which
-# lists an iPhone 16 simulator on iOS 18.5:
-# https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md
+# GitHub-hosted Xcode 27. macos-26 stops at Xcode 26, which cannot load
+# swift-tools-version 6.4.
+# https://github.blog/changelog/2026-07-16-xcode-27-runner-image-now-in-public-preview/
+# https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md
+#
+# swift6-module-template runs `xcrun swift test` on this runner. This package
+# imports UIKit and its platforms are iOS and visionOS, so that command builds
+# for macOS and cannot compile. The destination below is the iPhone 17
+# simulator on iOS 27.0, which the Xcode 27.0 image lists.
+#
+# release.yml calls this workflow. It reads $.jobs.build-test.
 
 on:
+  workflow_call:
   push:
-    branches:
-      - main
   pull_request:
 
 concurrency:
@@ -18,27 +22,17 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    name: Build and Test
-    runs-on: macos-15
-
+  build-test:
+    name: Build and test
+    runs-on: xcode-27
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_16.4.app
+      - name: Check out this commit
+        uses: actions/checkout@v7
 
       - name: Show build environment
         run: |
           xcodebuild -version
           xcrun swift --version
-
-      - name: Build
-        run: |
-          xcodebuild build \
-            -scheme FDWaveformView \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5'
 
       - name: Check formatting
         run: |
@@ -49,4 +43,4 @@ jobs:
         run: |
           xcodebuild test \
             -scheme FDWaveformView \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5'
+            -destination 'platform=iOS Simulator,name=iPhone 17,OS=27.0'

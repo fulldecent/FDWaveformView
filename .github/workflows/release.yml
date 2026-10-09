@@ -1,0 +1,122 @@
+# Release
+#
+# Open or update the release pull request, test the package, and publish the
+# GitHub Release.
+#
+# Adapted from swift6-module-template release 16.5.0:
+# https://github.com/fulldecent/swift6-module-template/blob/v16.5.0/.github/workflows/release.yml
+# That workflow attests a Linux static library from `swift build -c release`.
+# This package imports UIKit, so there is no Linux library to publish. Swift
+# Package Manager installs from the git tag. The published release is the tag
+# and the generated notes.
+#
+# Tags stay `5.1.1`, without a `v` prefix, because that is the shape of the
+# existing tags. release-please-config.json sets include-v-in-tag to false.
+#
+# One-time setup
+#   1. GitHub repo > Settings > General > Releases > Enable release immutability.
+#   2. GitHub repo > Settings > Actions > General > Workflow permissions: Read and write permissions.
+#   3. Under Workflow permissions, check "Allow GitHub Actions to create and approve pull requests".
+
+name: Release
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag to publish, for example 5.1.2. Leave empty to open or update the release pull request only.
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  propose:
+    name: Open or update the release pull request
+    if: github.event_name == 'push' || inputs.tag == ''
+    runs-on: ubuntu-latest
+    outputs:
+      pr: ${{ steps.merged.outputs.pr }}
+      tag_name: ${{ steps.merged.outputs.tag_name }}
+    steps:
+      - name: Open the release pull request
+        uses: googleapis/release-please-action@v5
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+          skip-github-release: true
+
+      - name: Find a merged release pull request
+        id: merged
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          found=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" --jq '
+            .[] | select(.merged_at != null and any(.labels[]; .name == "autorelease: pending"))
+            | "\(.number) \(.title | capture("release (?<v>[0-9]+[.][0-9]+[.][0-9]+)").v)"' | head -n 1)
+          if [ -n "$found" ]; then
+            read -r pr tag <<< "$found"
+            echo "pr=$pr" >> "$GITHUB_OUTPUT"
+            echo "tag_name=$tag" >> "$GITHUB_OUTPUT"
+          fi
+
+  build-test:
+    name: Build and test
+    needs: propose
+    if: |
+      always() &&
+      (needs.propose.result == 'success' || needs.propose.result == 'skipped') &&
+      (needs.propose.outputs.tag_name != '' ||
+       (github.event_name == 'workflow_dispatch' && inputs.tag != ''))
+    uses: ./.github/workflows/ci.yml
+
+  publish:
+    name: Publish release
+    needs: [propose, build-test]
+    if: |
+      always() &&
+      needs.build-test.result == 'success' &&
+      (needs.propose.outputs.tag_name != '' ||
+       (github.event_name == 'workflow_dispatch' && inputs.tag != ''))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Resolve the tag
+        id: tag
+        env:
+          TAG: ${{ inputs.tag || needs.propose.outputs.tag_name }}
+        run: |
+          case "$TAG" in
+            [0-9]*.[0-9]*.[0-9]*) ;;
+            *) echo "tag must look like 5.1.2" >&2; exit 1 ;;
+          esac
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          gh release create "$TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "$TAG" \
+            --generate-notes \
+            --latest
+
+      - name: Mark the release pull request tagged
+        if: needs.propose.outputs.pr != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ needs.propose.outputs.pr }}
+        run: |
+          gh api -X DELETE "repos/$GITHUB_REPOSITORY/issues/$PR/labels/autorelease:%20pending"
+          gh api "repos/$GITHUB_REPOSITORY/issues/$PR/labels" -f "labels[]=autorelease: tagged"

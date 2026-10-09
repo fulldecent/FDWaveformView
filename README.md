@@ -69,7 +69,7 @@ UIView.animate(withDuration: 0.3) {
 
 - Antialiased waveforms draw extra pixels to avoid jagged edges.
 - Autolayout-driven size changes trigger re-rendering to prevent pixelation.
-- Supports iOS 15+, visionOS 1+, and Swift tools version 5.10, as declared in `Package.swift`.
+- Supports iOS 15+, visionOS 1+, and Swift tools version 6.4, as declared in `Package.swift`. Xcode 26 cannot load that tools version.
 - Includes unit tests that run on GitHub Actions.
 
 ## Installation
@@ -110,11 +110,13 @@ A couple other things are exposed that we do not consider public API:
 
 ## Testing
 
-GitHub Actions runs the suite on the macOS 15 image with Xcode 16.4. That image provides an iPhone 16 simulator on iOS 18.5. The command is:
+GitHub Actions runs the suite on the [Xcode 27 runner image](https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md). The default Xcode there is 27.0, and that copy provides an iPhone 17 simulator on iOS 27.0. The command is:
 
 ```sh
-xcodebuild test -scheme FDWaveformView -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5'
+xcodebuild test -scheme FDWaveformView -destination 'platform=iOS Simulator,name=iPhone 17,OS=27.0'
 ```
+
+`xcrun swift test` builds the package for macOS. These sources import UIKit, so that command does not compile this package.
 
 On another Xcode, list the simulators that copy of Xcode can see and pass one of those ids. `xcodebuild` only accepts destinations from the selected Xcode, so an id printed by a different install will fail.
 
@@ -129,7 +131,16 @@ The Example app target deploys to iOS 18.6, so its simulator has to be iOS 18.6 
 xcodebuild build -project Example/Example.xcodeproj -scheme Example -destination 'id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
 ```
 
+## Releases
+
+Commit messages use `fix:`, `feat:` or `BREAKING CHANGE:`. [Release Please](https://github.com/googleapis/release-please) opens a release pull request from those messages. Merging that pull request runs [.github/workflows/release.yml](.github/workflows/release.yml), which tests the package and publishes the GitHub Release.
+
+[`.release-please-manifest.json`](.release-please-manifest.json) is the last released version, `5.1.1`. Tags do not use a `v` prefix, because the existing tags do not. Swift Package Manager installs from the git tag. This module imports UIKit, so the release does not attach a Linux static library.
+
+In the repository settings, under Actions, General, Workflow permissions, select read and write permissions and check "Allow GitHub Actions to create and approve pull requests". Under General, Releases, enable release immutability.
+
 ## Contributing
 
 - This project's layout is based on <https://github.com/fulldecent/swift6-module-template>
 - Ignore rules are inlined from [Swift.gitignore](https://github.com/github/gitignore/blob/main/Swift.gitignore) and [Global/Xcode.gitignore](https://github.com/github/gitignore/blob/main/Global/Xcode.gitignore). The macOS and secret rules above them come from [project-template](https://github.com/fulldecent/project-template).
+- Releases follow [swift6-module-template](https://github.com/fulldecent/swift6-module-template/blob/v16.5.0/.github/workflows/release.yml), release 16.5.0. The published result here is the git tag. That template publishes a Linux static library, and this module imports UIKit.
