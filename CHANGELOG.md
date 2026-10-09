@@ -16,6 +16,14 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [5.1.2](https://github.com/fulldecent/FDWaveformView/compare/5.1.1...5.1.2) (2026-10-09)
+
+
+### Bug Fixes
+
+* match CI to Swift 6.4 and the Xcode 27 runner ([f74c8b8](https://github.com/fulldecent/FDWaveformView/commit/f74c8b8852ccaed6ca5cadc820df601737f10a35))
+* match CI to Swift 6.4 and the Xcode 27 runner ([990af43](https://github.com/fulldecent/FDWaveformView/commit/990af436df58408824c75caa085d14a3f374acde))
+
 ## [5.1.1](https://github.com/fulldecent/FDWaveformView/releases/tag/5.1.1)
 
 Released on 2025-12-06.
