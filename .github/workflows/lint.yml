@@ -1,0 +1,33 @@
+name: Lint
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    # Runs on all pull requests targeting any branch
+    branches: ["**"]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Prettier & Markdownlint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js (tool runtime)
+        uses: actions/setup-node@v7
+        with:
+          node-version: "lts/*" # Floating version is appropriate specifically for Prettier and markdownlint
+
+      - name: Check formatting (Prettier)
+        # Command fails if any files do not meet the formatting rules.
+        run: npx prettier@latest --check .
+
+      - name: Check Markdown (markdownlint)
+        # Command fails if any markdown files do not meet the linting rules.
+        run: npx markdownlint-cli@latest "**/*.md"

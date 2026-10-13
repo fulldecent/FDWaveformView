@@ -1,6 +1,6 @@
 # FDWaveformView
 
-[![ci](https://github.com/fulldecent/FDWaveformView/actions/workflows/ci.yml/badge.svg)](https://github.com/fulldecent/FDWaveformView/actions/workflows/ci.yml)
+[![ci](https://github.com/fulldecent/FDWaveformView/actions/workflows/ci.yml/badge.svg)](https://github.com/fulldecent/FDWaveformView/actions/workflows/ci.yml) [![Lint](https://github.com/fulldecent/FDWaveformView/actions/workflows/lint.yml/badge.svg)](https://github.com/fulldecent/FDWaveformView/actions/workflows/lint.yml)
 
 FDWaveformView displays audio waveforms in Swift apps so users can preview audio, scrub, and pick positions with ease.
 
@@ -144,3 +144,4 @@ In the repository settings, under Actions, General, Workflow permissions, select
 - This project's layout is based on <https://github.com/fulldecent/swift6-module-template>
 - Ignore rules are inlined from [Swift.gitignore](https://github.com/github/gitignore/blob/main/Swift.gitignore) and [Global/Xcode.gitignore](https://github.com/github/gitignore/blob/main/Global/Xcode.gitignore). The macOS and secret rules above them come from [project-template](https://github.com/fulldecent/project-template).
 - Releases follow [swift6-module-template](https://github.com/fulldecent/swift6-module-template/blob/v16.5.0/.github/workflows/release.yml), release 16.5.0. The published result here is the git tag. That template publishes a Linux static library, and this module imports UIKit.
+- [lint.yml](.github/workflows/lint.yml), [.editorconfig](.editorconfig), [.markdownlint.json](.markdownlint.json), [.markdownlintignore](.markdownlintignore), and [.prettierignore](.prettierignore) follow [swift6-module-template](https://github.com/fulldecent/swift6-module-template) release [16.6.0](https://github.com/fulldecent/swift6-module-template/releases/tag/v16.6.0). Prettier checks files that are not Markdown. markdownlint checks Markdown. The commands are in that template's Development section.
